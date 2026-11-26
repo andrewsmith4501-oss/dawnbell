@@ -209,6 +209,12 @@ const PAL={
   nell:{tun:'#e88ab0',tunD:'#b8628a',tunL:'#ffb4d0',hair:'#2a1f1a',hairD:'#1a120e',skin:'#e0a878',skinD:'#bf8659',belt:'#7a3a5a',robe:true},
   soldier:{tun:'#5a3a7a',tunD:'#3a2454',tunL:'#7a5a9c',hair:'#3a2a1a',hairD:'#2a1d12',skin:'#e8b88a',skinD:'#c99068',belt:'#2a2030',buck:'#c8a8ff',hood:true,hoodC:'#4a4a58',legs:'#3a3448'},
   morrow:{tun:'#2a2234',tunD:'#16111d',tunL:'#4a3e5a',hair:'#d8d8e0',hairD:'#a8a8b4',skin:'#e6d2c0',skinD:'#c4ad9a',belt:'#8a6ac8',buck:'#f0c65a',robe:true},
+  pell:{tun:'#5a9ad8',tunD:'#3a72b0',tunL:'#8ac0f0',hair:'#e8b060',hairD:'#c08a3a',skin:'#f3c69b',skinD:'#d99e72',belt:'#3a5a8a',robe:true},
+  hobb:{tun:'#2e4466',tunD:'#1c2c46',tunL:'#4a6690',hair:'#d8d8d0',hairD:'#a8a8a0',skin:'#d9a77c',skinD:'#b8865c',belt:'#5a3a20',buck:'#f0c65a',beard:'#e0e0d8',hat:'#2a3448',legs:'#2a3040'},
+  brine:{tun:'#3a5a7a',tunD:'#263e58',tunL:'#5a7ea0',hair:'#8a6a4a',hairD:'#6a4a30',skin:'#e8b88a',skinD:'#c99068',belt:'#2a2030',buck:'#f0c65a',hat:'#f0f0f0',legs:'#2a3448'},
+  maddox:{tun:'#4a8a8a',tunD:'#2e6464',tunL:'#6aaeae',hair:'#b8b8b0',hairD:'#8a8a84',skin:'#c98f62',skinD:'#a8704a',belt:'#3a2a1a',beard:'#c8c8c0',legs:'#3a4048'},
+  coralie:{tun:'#6aa898',tunD:'#4a8070',tunL:'#8ccab8',hair:'#f2f2f2',hairD:'#cfcfcf',skin:'#efc19a',skinD:'#d09a72',belt:'#c9a24a',robe:true},
+  wenna:{tun:'#b8603a',tunD:'#8a4428',tunL:'#d8845a',hair:'#3a2a1a',hairD:'#2a1d12',skin:'#e0a878',skinD:'#bf8659',belt:'#f3ead6',robe:true},
 };
 /* chunky chibi people: 16x24 with a big head, lit from the upper left */
 function personBase(dir,f,p){return mk(16,24,g=>{
@@ -362,6 +368,10 @@ function beetleBase(W,H,o){return mk(W,H,g=>{const p=o.pal,s=o.s,cx=Math.round(W
 function beetleSet(W,H,s,pal){const o={};for(const k of['shell','open','belly'])o[k]=[0,1].map(f=>{const b=outlined(beetleBase(W,H,{s,pal,f,open:k==='open',belly:k==='belly'}));return[0,1,2,3].map(d=>rot(b,d));});return o;}
 SPR.beetle=beetleSet(18,14,1,{d:'#1f3d44',m:'#2f6a6e',l:'#6fc2b8',spot:'#f0c65a',head:'#1a2a30',jaw:'#d8b070',leg:'#14202a',belly:'#c8a878',bellyL:'#e8d0a0'});
 SPR.grim=beetleSet(40,32,2,{d:'#2a1e30',m:'#4a3350',l:'#8a6a9a',spot:'#ff8a3a',head:'#1e1424',jaw:'#f0d090',leg:'#140c18',belly:'#c89a70',bellyL:'#ecd0a0'});
+SPR.crab=beetleSet(18,14,1,{d:'#7a2418',m:'#c8482a',l:'#f08a5a',spot:'#ffd0a0',head:'#5a1a10',jaw:'#ffb070',leg:'#5a1a10',belly:'#f0d0b0',bellyL:'#fff0dc'});
+SPR.brine=beetleSet(40,32,2,{d:'#2e3c3a',m:'#5a7a6a',l:'#9ab8a0',spot:'#e8e0c8',head:'#24302e',jaw:'#e8a060',leg:'#1e2828',belly:'#d8b890',bellyL:'#f0dcc0'});
+SPR.gull=[0,1].map(f=>outlined(mk(16,9,g=>{const w='#c8d0dc',wl='#ffffff';if(f){R(g,w,0,0,5,2);R(g,w,11,0,5,2);R(g,wl,3,2,4,2);R(g,wl,9,2,4,2);}else{R(g,w,0,6,5,2);R(g,w,11,6,5,2);R(g,wl,3,4,4,2);R(g,wl,9,4,4,2);}
+  R(g,'#ffffff',5,3,6,4);R(g,'#ffffff',10,2,3,3);R(g,'#f0c65a',13,3,2,1);R(g,'#1b1420',11,3,1,1);R(g,'#8a94a8',3,4,2,2);R(g,'#c8d0dc',6,6,4,1);})));
 const COIN=[outlined(mk(6,6,g=>{blob(g,'#b8862f',3,3,3,3);blob(g,'#f0c65a',3,3,2,2);R(g,'#fff1a8',2,1,1,2);})),outlined(mk(6,6,g=>{R(g,'#b8862f',2,0,2,6);R(g,'#f0c65a',2,1,1,4);}))];
 const ORE_PICK=outlined(mk(7,6,g=>{blob(g,'#6a6470',4,3,4,3);R(g,'#e0803a',2,2,2,1);R(g,'#ffc070',4,3,2,1);R(g,'#ffc070',2,2,1,1);}));
 const SHARD=outlined(mk(7,10,g=>{g.fillStyle='#7fe8ff';g.beginPath();g.moveTo(3.5,0);g.lineTo(7,5);g.lineTo(3.5,10);g.lineTo(0,5);g.fill();R(g,'#ffffff',3,2,1,4);}));
@@ -407,6 +417,7 @@ function wraithImg(rev){return outlined(mk(36,42,g=>{const c=rev?'#5e4e86':'#3a2
   R(g,'#b09a50',17,20,2,2);R(g,'#b09a50',16,22,4,3);R(g,'#b09a50',15,25,6,2);R(g,'#e0c870',16,22,1,3);R(g,'#b09a50',17,27,2,1);}));}
 SPR.wraith=[wraithImg(false),wraithImg(true)];
 const CAP_IMG=outlined(mk(8,8,g=>{blob(g,'#2a9a8a',4,3,4,3);blob(g,'#6af0d0',4,2,3,2);R(g,'#e8fff8',2,1,1,1);R(g,'#e8fff8',5,2,1,1);R(g,'#e8e0c0',3,5,2,3);R(g,'#b8b090',4,5,1,3);}));
+const GLASS_IMG=outlined(mk(9,7,g=>{blob(g,'#3aa890',4,4,4,3);blob(g,'#7ae0c8',4,3,3,2);R(g,'#ffffff',2,2,2,1);}));IC2.glass=GLASS_IMG.toDataURL();
 const LILY_IMG=outlined(mk(10,9,g=>{for(const[dx,dy]of[[0,-3],[3,0],[0,3],[-3,0],[2,-2],[-2,2],[2,2],[-2,-2]])blob(g,'#ffffff',5+dx,4+dy,2,2);blob(g,'#c8e0ff',5,4,2,2);R(g,'#ffe060',4,4,2,1);R(g,'#4a9a4a',4,8,2,1);}));
 const HP_IMG=outlined(mk(7,6,g=>{HEART_BM.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='X')return;g.fillStyle=(x<=3&&y<=2)?'#e8434f':'#5a2a34';g.fillRect(x,y,1,1);}));R(g,'#ffb3b8',1,1,1,1);}));
 IC2.cap=CAP_IMG.toDataURL();
@@ -448,25 +459,27 @@ function towerSprite(b){const W=b.w*TS,H=b.h*TS+30;return outlined(mk(W,H,g=>{co
 
 /* ================= tiles ================= */
 const T={GRASS:0,PATH:1,WATER:2,TREE:3,BUSH:4,ROCK:5,SIGN:6,BRAMBLE:7,FLOWER:8,STUMP:9,COBBLE:10,WALL:11,FENCE:12,WELL:13,STALL:14,BOARD:15,ORE:16,QG:17,CLIFF:18,BLD:19,DOOR:20,IWALL:21,FLOOR:22,STONE:23,COUNTER:24,CRATE:25,BARREL:26,TABLE:27,ANVIL:28,FORGE:29,PEW:30,ALTAR:31,STAIRS:32,PILLAR:33,PIT:34,POST:35,CHEST:36,CRYSTAL:37,BARS:38,LOCK:39,BIGLOCK:40,TORCH:41,CAVE:42,
-  GATE:43,BRIDGE:44,REED:45,BLOCK:46,PLATE:47,BRAZ:48,BRAZL:49,VINE:50,LILY:51};
+  GATE:43,BRIDGE:44,REED:45,BLOCK:46,PLATE:47,BRAZ:48,BRAZL:49,VINE:50,LILY:51,SAND:52};
 const SOLID=new Array(64).fill(false);[2,3,4,5,6,7,9,11,12,13,14,15,16,18,19,21,24,25,26,27,28,29,30,31,33,34,35,36,37,38,39,40,41,43,45,46,48,49,50,51].forEach(i=>SOLID[i]=true);
 const OBJT=new Set([3,4,5,6,7,9,11,12,13,14,15,16,24,25,26,27,28,29,30,31,33,35,36,37,38,39,40,41,43,45,46,48,49,50]);
 const WALLISH=new Set([21,20,41,38,39,40]);
 const CUTTABLE=new Set([4,45]);
 let S=null,map=null,ground=null;
-function tileAt(x,y){if(x<0||y<0||x>=MW||y>=MH)return S&&S.indoor?T.IWALL:T.TREE;return map[y*MW+x];}
+function tileAt(x,y){if(x<0||y<0||x>=MW||y>=MH)return S&&S.indoor?T.IWALL:(S&&S.edgeAt?S.edgeAt(x,y):T.TREE);return map[y*MW+x];}
 function setT(x,y,t){if(x>=0&&y>=0&&x<MW&&y<MH)map[y*MW+x]=t;}
 function grid(w,h,t){const m=new Uint8Array(w*h).fill(t);return{w,h,m,set(x,y,v){if(x>=0&&y>=0&&x<w&&y<h)m[y*w+x]=v;},get(x,y){return(x<0||y<0||x>=w||y>=h)?-1:m[y*w+x];},fill(x0,y0,x1,y1,v){for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)this.set(x,y,v);}};}
 
 const GC={p0:'#e6bf7e',p1:'#c99c5c',p2:'#f4d69c',w0:'#3d9ee6',w1:'#2b7fd0',w2:'#9fe0fb',wd:'#2466b8'};
 const GP={town:{a:'#5fbd4c',b:'#76cc58',d:'#3c9638',l:'#a2e47a'},marsh:{a:'#56a85a',b:'#6ab866',d:'#367c44',l:'#94d488'}};
+GP.coast={a:'#6ec05a',b:'#84cc64',d:'#4a9a40',l:'#b0e48a'};
 const isPathT=t=>t===T.PATH||t===T.BRAMBLE;
 const isCob=t=>t===T.COBBLE||t===T.DOOR||t===T.STALL||t===T.WELL||t===T.BOARD||t===T.GATE;
 const isWet=t=>t===T.WATER||t===T.LILY||t===T.BRIDGE;
 function baseOf(x,y,t){
-  if(S.indoor){if(t===T.IWALL||t===T.DOOR||t===T.STAIRS||t===T.PIT||t===T.PLATE)return t;if(t===T.TORCH)return T.IWALL;if(t===T.BARS||t===T.LOCK||t===T.BIGLOCK)return T.DOOR;if(t===T.VINE&&(x===0||y===0||x===MW-1||y===MH-1))return T.DOOR;if(t===T.BLOCK&&S.plates&&S.plates.has(x+','+y))return T.PLATE;return S.floor;}
+  if(S.indoor){if(t===T.WATER)return t;if(t===T.IWALL||t===T.DOOR||t===T.STAIRS||t===T.PIT||t===T.PLATE)return t;if(t===T.TORCH)return T.IWALL;if(t===T.BARS||t===T.LOCK||t===T.BIGLOCK)return T.DOOR;if(t===T.VINE&&(x===0||y===0||x===MW-1||y===MH-1))return T.DOOR;if(t===T.BLOCK&&S.plates&&S.plates.has(x+','+y))return T.PLATE;return S.floor;}
   if(S.id==='quarry')return t===T.CLIFF||t===T.CAVE?t:T.QG;
   if(t===T.WATER||t===T.LILY||t===T.BRIDGE)return t;
+  if(S.coast&&(OBJT.has(t)||t===T.BLD||t===T.GATE||t===T.SAND))return x>=COAST_SAND(y)-1||y>=30?T.SAND:T.GRASS;
   if(t===T.DOOR||t===T.STALL||t===T.WELL||t===T.BOARD||t===T.CRATE||t===T.GATE)return T.COBBLE;
   if(t===T.BRAMBLE)return T.PATH;
   if(OBJT.has(t)||t===T.BLD)return T.GRASS;
@@ -489,6 +502,10 @@ function paintTile(g,x,y){
     if(b===T.BRIDGE){const vert=isWet(tileAt(x-1,y))&&isWet(tileAt(x+1,y))||tileAt(x,y-1)===T.BRIDGE||tileAt(x,y+1)===T.BRIDGE;R(g,'#3a2414',px,py+TS-2,TS,2);
       if(vert){R(g,'#9a6a3a',px+1,py,14,TS);for(let i=0;i<TS;i+=4){R(g,'#c4894a',px+1,py+i,14,3);R(g,'#e0aa66',px+1,py+i,14,1);R(g,'#6a4424',px+1,py+i+3,14,1);}R(g,'#5a3418',px,py,2,TS);R(g,'#5a3418',px+14,py,2,TS);R(g,'#8a5a30',px,py,1,TS);}
       else{R(g,'#9a6a3a',px,py+1,TS,13);for(let i=0;i<TS;i+=4){R(g,'#c4894a',px+i,py+2,3,11);R(g,'#e0aa66',px+i,py+2,1,11);R(g,'#6a4424',px+i+3,py+2,1,11);}R(g,'#5a3418',px,py+1,TS,2);R(g,'#5a3418',px,py+12,TS,2);R(g,'#8a5a30',px,py+1,TS,1);}}
+    return;}
+  if(b===T.SAND){R(g,mix('#e8d49a','#f4e4b4',vnoise(x*.4,y*.4)),px,py,TS,TS);for(let i=0;i<6;i++){const hx=px+((hash(x*13+i,y*7)*14)|0),hy=py+((hash(x*5,y*11+i)*14)|0);R(g,i%2?'#d2ba7e':'#fff6d8',hx,hy,i%3?1:2,1);}
+    const wn=(dx,dy)=>isWet(tileAt(x+dx,y+dy));if(wn(1,0))R(g,'#d6c08a',px+TS-4,py,4,TS);if(wn(-1,0))R(g,'#d6c08a',px,py,4,TS);if(wn(0,1))R(g,'#d6c08a',px,py+TS-4,TS,4);if(wn(0,-1))R(g,'#d6c08a',px,py,TS,4);
+    const gp=GP.coast,gr=(dx,dy)=>{const u=tileAt(x+dx,y+dy);return u===T.GRASS||u===T.FLOWER||u===T.TREE;};if(gr(-1,0))for(let i=0;i<TS;i+=2)R(g,gp.a,px,py+i,1+((hash(px,py+i)*3)|0),2);if(gr(0,-1))for(let i=0;i<TS;i+=2)R(g,gp.a,px+i,py,2,1+((hash(px+i,py)*3)|0));
     return;}
   if(b===T.PATH){R(g,mix(GC.p0,GC.p2,vnoise(x*.5,y*.5)*.6),px,py,TS,TS);for(let i=0;i<6;i++){const hx=px+((hash(x*31+i,y*17+i)*14)|0),hy=py+((hash(x*5+i,y*11)*14)|0);R(g,GC.p1,hx,hy+1,2,1);R(g,GC.p2,hx,hy,2,1);}
     const n=(dx,dy)=>{const u=tileAt(x+dx,y+dy);return isPathT(u)||isCob(u)||u===T.BRIDGE;};const gp=S.gpal||GP.town;
@@ -623,6 +640,11 @@ const SONGS={
     {w:'square',v:.045,p:"D5*3 F5*3 A5*2 G#5*2 A5*2 F5*2 D5*2 | E5*3 F5*3 G5*2 A5*4 -*4 | D5*3 F5*3 A5*2 C6*2 A5*2 F5*2 D5*2 | C#5*4 E5*4 A4*4 -*4"},
     {w:'triangle',v:.14,d:.7,p:[xN('D2*2 D3*2',2),'Bb1*2 Bb2*2 C2*2 C3*2',xN('D2*2 D3*2',2),'Bb1*2 Bb2*2 C2*2 C3*2',xN('D2*2 D3*2',2),'Bb1*2 Bb2*2 C2*2 C3*2',xN('A1*2 A2*2',3),'C#2*2 E2*2'].join(' ')},
     {drum:true,v:.55,p:"k . h . s . h . k . k . s . h h"}]},
+  coast:{bpm:108,ch:[
+    {w:'square',v:.045,p:"A4*2 C5*2 E5*4 D5*2 C5*2 A4*4 | G4*2 B4*2 D5*4 C5*2 B4*2 G4*4 | A4*2 C5*2 E5*4 A5*4 G5*2 E5*2 | D5*4 E5*2 C5*2 A4*8 | E5*2 E5*2 A5*4 G5*2 E5*2 C5*4 | D5*2 D5*2 G5*4 F5*2 D5*2 B4*4 | C5*2 E5*2 A5*4 G5*2 E5*2 D5*2 B4*2 | A4*4 E4*4 A4*8"},
+    {w:'square',v:.015,d:.55,p:[xN('A3 C4 E4 C4',4),xN('G3 B3 D4 B3',4),xN('A3 C4 E4 C4',4),xN('A3 C4 E4 C4',4),xN('C4 E4 G4 E4',4),xN('G3 B3 D4 B3',4),xN('F3 A3 C4 A3',4),xN('A3 C4 E4 C4',4)].join(' ')},
+    {w:'triangle',v:.12,d:.9,p:"A2*8 E2*8 | G2*8 D2*8 | A2*8 E2*8 | A2*8 E2*8 | C3*8 G2*8 | G2*8 D2*8 | F2*8 C3*8 | A2*8 E2*8"},
+    {drum:true,v:.4,p:"k . . . h . h . s . . . h . h ."}]},
   marsh:{bpm:84,ch:[
     {w:'triangle',v:.09,p:"D5*6 E5*2 F5*4 A5*4 | G5*6 F5*2 E5*8 | C5*6 D5*2 E5*4 G5*4 | F5*4 E5*4 D5*8 | A5*6 G5*2 F5*4 D5*4 | E5*6 F5*2 G5*8 | F5*4 E5*4 C5*4 E5*4 | D5*12 -*4"},
     {w:'square',v:.014,d:.5,p:[xN('D4 F4 A4 F4',4),xN('C4 E4 G4 E4',4),xN('Bb3 D4 F4 D4',4),xN('A3 C#4 E4 C#4',4)].join(' ')},
@@ -664,9 +686,9 @@ function musicTick(){if(!AC)return;
   if(tv===0||MUS.next<AC.currentTime-.5){MUS.next=Math.max(MUS.next,AC.currentTime);if(tv===0)return;}
   while(MUS.next<AC.currentTime+.25){for(const c of s.ch){const e=c.ev[MUS.step%c.ev.length];if(e)musicNote(c,e,MUS.next,sd);}MUS.step++;MUS.next+=sd;}}
 function desiredTrack(){if(mode==='title')return'title';if(!S||!P)return null;
-  if(mode==='paused'&&(menuKind==='chapter'||menuKind==='chapter2'||menuKind==='chapter3'))return'title';
+  if(mode==='paused'&&(menuKind==='chapter'||menuKind==='chapter2'||menuKind==='chapter3'||menuKind==='chapter4'))return'title';
   if(S.fight)return S.id==='mw7'?'wraith':'boss';if(battleT>0)return'battle';
-  const id=S.id;if(id==='forest')return'forest';if(id==='marsh')return'marsh';if(S.dg==='mw')return'tower';if(id==='town')return'town';if(id==='quarry')return'quarry';if(id==='chapel')return'chapel';if(id==='cellar'||S.dungeon)return'deep';return'indoor';}
+  const id=S.id;if(id==='coast')return'coast';if(S.dg==='gl')return'tower';if(id==='forest')return'forest';if(id==='marsh')return'marsh';if(S.dg==='mw')return'tower';if(id==='town')return'town';if(id==='quarry')return'quarry';if(id==='chapel')return'chapel';if(id==='cellar'||S.dungeon)return'deep';return'indoor';}
 
 /* ================= input ================= */
 const held={},edge={};let lastInput='touch';
@@ -736,10 +758,10 @@ const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function newPlayer(){return{x:0,y:0,hw:5,hh:3,fx:0,fy:1,state:'normal',atkT:0,rollT:0,rdx:0,rdy:0,rollCd:0,inv:0,kbT:0,kbx:0,kby:0,hp:6,maxHp:6,walkT:0,moving:false,shield:false,hitSet:null,cutSet:null,inExit:false,hk:null,hookCd:0,charge:0,spinT:0,lampCd:0,push:0,pushDir:-1};}
 const EDEF={slime:{hw:5,hh:3,hp:2,rad:6,dmg:1},big:{hw:10,hh:5,hp:6,rad:12,dmg:2},rat:{hw:4,hh:3,hp:1,rad:5,dmg:1},ratking:{hw:9,hh:5,hp:8,rad:11,dmg:2},bat:{hw:4,hh:3,hp:1,rad:5,dmg:1,fly:true},sentinel:{hw:11,hh:6,hp:12,rad:14,dmg:1},beetle:{hw:6,hh:4,hp:3,rad:7,dmg:1},grim:{hw:14,hh:9,hp:24,rad:17,dmg:1},
-  frog:{hw:5,hh:3,hp:2,rad:6,dmg:1},plant:{hw:6,hh:4,hp:2,rad:7,dmg:1,fixed:true},guard:{hw:5,hh:3,hp:6,rad:7,dmg:1},captain:{hw:8,hh:5,hp:18,rad:11,dmg:2},wisp:{hw:4,hh:3,hp:1,rad:6,dmg:1,fly:true},wraith:{hw:10,hh:6,hp:24,rad:14,dmg:1,fly:true}};
+  frog:{hw:5,hh:3,hp:2,rad:6,dmg:1},plant:{hw:6,hh:4,hp:2,rad:7,dmg:1,fixed:true},guard:{hw:5,hh:3,hp:6,rad:7,dmg:1},captain:{hw:8,hh:5,hp:18,rad:11,dmg:2},wisp:{hw:4,hh:3,hp:1,rad:6,dmg:1,fly:true},wraith:{hw:10,hh:6,hp:24,rad:14,dmg:1,fly:true},crab:{hw:6,hh:4,hp:3,rad:7,dmg:1},gull:{hw:4,hh:3,hp:1,rad:6,dmg:1,fly:true},brine:{hw:14,hh:9,hp:26,rad:17,dmg:1}};
 const DV=[[1,0],[0,1],[-1,0],[0,-1]];
 const dirTo=(dx,dy)=>Math.abs(dx)>Math.abs(dy)?(dx>0?0:2):(dy>0?1:3);
-function mkEnemy(kind,tx,ty){const e=Object.assign({kind,x:tx*TS+8,y:ty*TS+8,state:'idle',t:.4+Math.random(),hopT:0,hopDur:.4,hx:0,hy:0,z:0,kbT:0,kbx:0,kby:0,flash:0,squash:0,dead:false,fx:1,anim:Math.random()*5,summonT:5},EDEF[kind]);e.maxHp=e.hp;if(kind==='bat')e.z=10;if(kind==='sentinel'){e.state='walk';e.ph=0;}if(kind==='beetle'||kind==='grim'){e.state='walk';e.dir=kind==='grim'?1:2;e.t=.5;e.cd=1;e.ph=0;}if(kind==='sentinel'||kind==='grim'||kind==='wraith')e.boss=true;
+function mkEnemy(kind,tx,ty){const e=Object.assign({kind,x:tx*TS+8,y:ty*TS+8,state:'idle',t:.4+Math.random(),hopT:0,hopDur:.4,hx:0,hy:0,z:0,kbT:0,kbx:0,kby:0,flash:0,squash:0,dead:false,fx:1,anim:Math.random()*5,summonT:5},EDEF[kind]);e.maxHp=e.hp;if(kind==='bat'||kind==='gull')e.z=10;if(kind==='sentinel'){e.state='walk';e.ph=0;}if(kind==='beetle'||kind==='grim'||kind==='crab'||kind==='brine'){e.state='walk';e.dir=(kind==='grim'||kind==='brine')?1:2;e.t=.5;e.cd=1;e.ph=0;}if(kind==='sentinel'||kind==='grim'||kind==='wraith'||kind==='brine')e.boss=true;
   if(kind==='guard'||kind==='captain'){e.state='walk';e.fa=Math.PI/2;e.t=.5;}if(kind==='plant'){e.state='hide';e.t=1+Math.random();}if(kind==='wisp')e.z=8;if(kind==='wraith'){e.state='drift';e.t=2;e.z=14;e.ph=0;}if(kind==='frog'){e.t=.6+Math.random();}return e;}
 function mkNpc(id,pal,tx,ty,talk,o){return Object.assign({id,pal,x:tx*TS+8,y:ty*TS+8,hw:5,hh:3,fx:0,fy:1,talk,wander:null,t:1+Math.random()*2,walk:0,vx:0,vy:0,walkT:0,moving:false},o||{});}
 
@@ -765,7 +787,19 @@ function objectives(){
     else if(!F.vis.mw1)o.push(F.hook?'Cross the lake to Mirewatch Tower. The old Warden posts might help.':'Find a way across the lake to Mirewatch Tower.');
     else if(!F.lantern)o.push('Explore Mirewatch Tower. Somewhere inside is a Warden relic.');else if(!F.mw_bk)o.push('Use the Ember Lantern to burn the gloomvines and find the great key.');else o.push('Open the great lock in the tower\'s gallery.');
     return o.concat(side());}
-  return['Chapter three is complete. Three shards are safe, and Morrow is watching.'].concat(side());}
+  if(!F.ch4)return['Tell Captain Venn about Mirewatch. He\'s in the Hall of Wardens.'].concat(side());
+  const side4=()=>{const o=side();if(F.glass_q&&!F.glass_done)o.push(`Side quest: sea glass for Coralie (${Math.min(5,F.glass||0)} of 5).`);if(F.vis&&F.vis.coast&&!F.maddox)o.push('Rumor: an old sailor at the Salted Gull saw something strange on the night of the green star.');return o;};
+  if(!F.gl_done){const o=[],v=F.vis||{};
+    if(!v.coast)o.push('Take Brackenford\'s east gate to the Saltmarrow Coast.');
+    else if(!F.gl_open)o.push('The causeway to Gullrock Light is locked. Someone in Port Gullhaven must have a key.');
+    else if(!v.gl1)o.push('Cross the causeway to Gullrock Light.');
+    else if(!F.hobb_free)o.push('Search Gullrock Light for Pell\'s father, Hobb.');
+    else if(!F.charm)o.push('Find the Warden relic hidden in the lighthouse cistern.');
+    else if(!F.gl_bk)o.push('Swim through the flooded rooms to find the great key.');
+    else o.push('Open the great lock in the cistern and climb to the lamp room.');
+    return o.concat(side4());}
+  if(!F.ch4_venn)return['Chapter four is complete. Tell Captain Venn about the ship with no lamps.'].concat(side4());
+  return['The Gilded Swan has sailed for Highcrown. More of Gallowmark is coming in future chapters.'].concat(side4());}
 
 /* ================= scenes ================= */
 const START={x:9,y:21};
@@ -814,9 +848,10 @@ function buildTown(){
     {x:16,y:22,w:7,h:5,door:3,roof:'#4f7d3e',kind:'inn'},{x:35,y:23,w:6,h:4,door:2,roof:'#a8743c'},{x:47,y:8,w:9,h:7,door:4,roof:'#3e4656',wall:'#9a9284',kind:'hall'}];
   for(const b of blds){g.fill(b.x,b.y,b.x+b.w-1,b.y+b.h-1,T.BLD);g.set(b.x+b.door,b.y+b.h-1,T.DOOR);b.spr=buildingSprite(b);}
   g.set(26,22,T.WELL);g.set(31,16,T.STALL);g.set(32,16,T.STALL);g.set(25,16,T.STALL);g.set(26,16,T.STALL);g.set(33,22,T.BOARD);
-  for(const[x,y]of[[17,14],[22,14],[39,14],[42,25],[42,28],[16,18],[38,28]])g.set(x,y,T.TREE);
+  for(const[x,y]of[[17,14],[22,14],[39,14],[42,25],[16,18]])g.set(x,y,T.TREE);
   for(const[x,y]of[[16,16],[17,17],[38,13],[42,15],[21,29],[24,29],[25,29],[32,29],[16,13],[23,12]])g.set(x,y,T.BUSH);
   g.fill(36,15,39,15,T.FENCE);g.fill(36,17,39,17,T.FENCE);
+  g.fill(38,27,43,28,T.COBBLE);g.set(44,27,F.ch4?T.COBBLE:T.GATE);g.set(44,28,F.ch4?T.COBBLE:T.GATE);g.fill(45,27,59,28,T.PATH);g.set(43,26,T.SIGN);
   g.set(14,27,F.met_fen?T.COBBLE:T.CRATE);g.set(13,27,T.GRASS);g.set(15,27,T.GRASS);
   g.set(12,17,T.SIGN);g.set(30,7,T.SIGN);g.set(47,18,T.SIGN);g.set(27,29,T.SIGN);
   const npcs=[];
@@ -829,13 +864,13 @@ function buildTown(){
   npcs.push(mkNpc('hilde',PAL.hilde,30,21,talkHilde,{wander:[25,17,33,23]}),mkNpc('tomas',PAL.tomas,22,19,talkTomas,{wander:[16,19,27,20]}));
   return{id:'town',name:'Brackenford',w:W,h:H,g,outdoor:true,buildings:blds,npcs,
     enemies:[mkEnemy('slime',6,24),mkEnemy('slime',8,13),mkEnemy('slime',54,25)],
-    signs:{'12,17':[L('Sign','BRACKENFORD. Market town of the river crossing. Founded long enough ago that nobody remembers when.')],'30,7':[L('Sign','North gate: the Old Quarry. Mind the bats.')],'47,18':[L('Sign','The Hall of Wardens. Only the proven may enter.')],'27,29':[L('Sign','SOUTH GATE. Beyond lies the Gloaming Fen. Closed by order of the Hall.')],
+    signs:{'12,17':[L('Sign','BRACKENFORD. Market town of the river crossing. Founded long enough ago that nobody remembers when.')],'30,7':[L('Sign','North gate: the Old Quarry. Mind the bats.')],'47,18':[L('Sign','The Hall of Wardens. Only the proven may enter.')],'43,26':[L('Sign','EAST GATE. The coast road to Port Gullhaven.'),L('','A fresh notice is nailed below: CLOSED BY ORDER OF THE CROWN.')],'27,29':[L('Sign','SOUTH GATE. Beyond lies the Gloaming Fen. Closed by order of the Hall.')],
       '33,22':[L('Notice','RECRUITS WANTED. The Hall of Wardens seeks the brave. Speak with Captain Venn outside the hall.'),L('Notice','Also: whoever keeps stealing pies from the Rusty Kettle, Marla knows it was you.'),L('Gazette','THE GALLOWMARK GAZETTE, Spring 1903. His Majesty King Edric the Kind reports that Her Highness Princess Rosalind is well, and hard at work on her great project at Highcrown Castle.'),L('','Under the notice, someone has scratched three words: WHERE IS SHE?')]},
     exits:[{x0:0,y0:18,x1:0,y1:21,to:'forest',tx:50,ty:16,face:'L'},{x0:27,y0:0,x1:30,y1:0,to:'quarry',tx:15,ty:21,face:'U'},
       {x0:19,y0:11,x1:19,y1:11,to:'chapel',tx:6,ty:10,face:'U'},{x0:35,y0:11,x1:35,y1:11,to:'smithy',tx:7,ty:8,face:'U'},
       {x0:19,y0:26,x1:19,y1:26,to:'inn',tx:8,ty:9,face:'U'},{x0:51,y0:14,x1:51,y1:14,to:'hall',tx:10,ty:14,face:'U',req:()=>F.hall_open,msg:'The great doors are barred.'},
       {x0:41,y0:11,x1:41,y1:11,req:()=>false,msg:'Locked. Someone inside is snoring.'},{x0:37,y0:26,x1:37,y1:26,to:'fenhouse',tx:6,ty:7,face:'U',req:()=>F.ch3,msg:'Locked. A child is coughing inside.'},
-      {x0:27,y0:35,x1:30,y1:35,to:'marsh',tx:31,ty:1,face:'D'}],
+      {x0:27,y0:35,x1:30,y1:35,to:'marsh',tx:31,ty:1,face:'D'},{x0:59,y0:27,x1:59,y1:28,to:'coast',tx:1,ty:20,face:'R'}],
     onEnter(){if(!F.town_seen){F.town_seen=true;say([L('Pip','Chimney smoke! That must be Brackenford.'),L('Pip','Those guards look grumpy, though.')]);}}};
 }
 function buildQuarry(){
@@ -879,7 +914,7 @@ function buildHall(){const g=room(20,16,T.STONE,10);for(const[x,y]of[[3,4],[16,4
     onEnter(){if(F.hall_open&&!F.boss_done)say([L('Venn','The Iron Sentinel has trained every Warden who ever lived. Today it tests you.'),L('Venn','Watch its fists. When it slams the ground, its core is exposed. Strike then.'),L('Pip','Here it comes!')],startBoss);}};}
 /* ================= the Hollow Deep ================= */
 function dungeonRoom(id,name,rows,o){const H=rows.length,W=rows[0].length,g=grid(W,H,T.STONE),torches=[],plates=new Set();
-  const M={'#':T.IWALL,'.':T.STONE,'T':T.TORCH,'D':T.DOOR,'P':T.PIT,'o':T.POST,'C':T.CHEST,'X':T.CRYSTAL,'=':T.BARS,'L':T.LOCK,'B':T.BIGLOCK,'I':T.PILLAR,'b':T.BARREL,'c':T.CRATE,'k':T.BLOCK,'_':T.PLATE,'z':T.BRAZ,'Z':T.BRAZL,'v':T.VINE};
+  const M={'#':T.IWALL,'.':T.STONE,'T':T.TORCH,'D':T.DOOR,'P':T.PIT,'o':T.POST,'C':T.CHEST,'X':T.CRYSTAL,'=':T.BARS,'L':T.LOCK,'B':T.BIGLOCK,'I':T.PILLAR,'b':T.BARREL,'c':T.CRATE,'k':T.BLOCK,'_':T.PLATE,'z':T.BRAZ,'Z':T.BRAZL,'v':T.VINE,'~':T.WATER};
   rows.forEach((row,y)=>{if(row.length!==W)console.warn('room row width',id,y,row.length);[...row].forEach((ch,x)=>{let t=M[ch];if(t===undefined)t=T.STONE;
     if(t===T.BARS&&((o.crystalFlag&&F[o.crystalFlag])||(o.barsFlag&&F[o.barsFlag])))t=T.DOOR;if(t===T.LOCK&&F[o.lockFlag])t=T.DOOR;if(t===T.BIGLOCK&&F[o.bigFlag])t=T.DOOR;
     if(t===T.VINE&&o.vineFlag&&F[o.vineFlag])t=(x===0||y===0||x===W-1||y===H-1)?T.DOOR:T.STONE;if(t===T.BRAZ&&o.brazFlag&&F[o.brazFlag])t=T.BRAZL;
@@ -1196,7 +1231,251 @@ function buildMW7(){const o={pickups:[]};
   "##########DD##########"],Object.assign(o,{dark:!F.mw_done,brazFlag:F.mw_done?'mw_done':null,
   exits:[{x0:10,y0:14,x1:11,y1:14,to:'mw6',tx:10,ty:2,face:'D',req:()=>!S.fight,msg:'The way out is sealed!'}],
   onEnter(){if(!F.mw_done)say([L('Pip','It\'s so dark... and so cold. Wren, something is in here with us.'),L('???','Who... comes to ring... the bell?'),L('???','None shall take it. NONE.')],startWraith);}}));}
-const BUILD={marsh:buildMarsh,hut:buildHut,fenhouse:buildFenHouse,mw1:buildMW1,mw2:buildMW2,mw3:buildMW3,mw4:buildMW4,mw5:buildMW5,mw6:buildMW6,mw7:buildMW7,hd1:buildHD1,hd2:buildHD2,hd3:buildHD3,hd4:buildHD4,hd5:buildHD5,hd6:buildHD6,hd7:buildHD7,forest:buildForest,town:buildTown,quarry:buildQuarry,smithy:buildSmithy,inn:buildInn,cellar:buildCellar,chapel:buildChapel,hall:buildHall};
+/* ================= chapter four: the Saltmarrow Coast ================= */
+const COAST_SHORE=y=>47+Math.round(Math.sin(y*.23)*2+Math.sin(y*.61));
+const COAST_SAND=y=>25+Math.round(Math.sin(y*.3+1)*2);
+function sandSpot(g,x,y){const ok=(a,b)=>g.get(a,b)===T.SAND;if(ok(x,y))return[x,y];for(let r=1;r<6;r++)for(let oy=-r;oy<=r;oy++)for(let ox=-r;ox<=r;ox++)if(ok(x+ox,y+oy))return[x+ox,y+oy];return[x,y];}
+function buildCoast(){
+  const W=72,H=44,g=grid(W,H,T.GRASS),r=rng(91);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){let t=T.GRASS;const south=H-5+Math.round(Math.sin(x*.37)*1.2);
+    if(x>=COAST_SHORE(y)||y>=south)t=T.WATER;
+    else if(x>=COAST_SAND(y)||y>=south-4)t=T.SAND;
+    if(t===T.SAND&&y<2)t=T.CLIFF;
+    if(t===T.GRASS){if(y<2||(x<2&&!(y>=19&&y<=22)))t=T.TREE;else if(y===2&&r()<.5)t=T.TREE;else if(x<6&&r()<.25)t=T.TREE;else if(r()<.05)t=T.TREE;else if(r()<.06)t=T.FLOWER;}
+    g.set(x,y,t);}
+  /* the road in from Brackenford */
+  for(let x=0;x<28;x++)for(const y of[20,21])g.set(x,y,T.PATH);
+  /* Port Gullhaven: plaza, harbor office, tavern, the fish stall and the royal crates */
+  g.fill(26,10,41,17,T.COBBLE);g.fill(28,18,29,21,T.COBBLE);
+  const xs31=COAST_SHORE(31);
+  const blds=[{x:27,y:5,w:6,h:5,door:2,roof:'#3e6a8a',wall:'#e8e0cc'},{x:34,y:4,w:7,h:6,door:3,roof:'#8a3a3a',kind:'inn'},
+    {x:19,y:10,w:4,h:4,door:1,roof:'#a8743c',wall:'#d8c8a0'},{x:12,y:14,w:5,h:4,door:2,roof:'#4a6a8a',wall:'#e4dccb'},
+    {x:57,y:30,w:4,h:4,door:1,kind:'light'}];
+  /* the lighthouse rock, its causeway and gate */
+  for(let y=27;y<=39;y++)for(let x=53;x<=66;x++){const dx=(x-59.5)/5.2,dy=(y-33)/4.6;if(dx*dx+dy*dy<1)g.set(x,y,T.SAND);}
+  for(let x=xs31;x<=55;x++)for(const y of[31,32])if(g.get(x,y)===T.WATER)g.set(x,y,T.BRIDGE);
+  const gx=xs31-1;g.set(gx,31,F.gl_open?T.SAND:T.GATE);g.set(gx,32,F.gl_open?T.SAND:T.GATE);
+  for(let x=gx-3;x<gx;x++)for(const y of[31,32])g.set(x,y,T.SAND);
+  for(const[x,y]of[[54,29],[64,30],[63,36],[55,36],[60,38]])g.set(x,y,T.ROCK);
+  /* the long pier */
+  for(let x=42;x<=58;x++)for(const y of[13,14])g.set(x,y,g.get(x,y)===T.WATER?T.BRIDGE:T.COBBLE);
+  g.fill(55,11,58,16,T.BRIDGE);for(let y=11;y<=16;y++)for(let x=55;x<=58;x++)if(g.get(x,y)!==T.BRIDGE)g.set(x,y,T.BRIDGE);
+  /* a tiny islet only a swimmer could reach */
+  g.fill(64,6,66,8,T.SAND);g.set(66,6,T.ROCK);
+  for(const b of blds){g.fill(b.x,b.y,b.x+b.w-1,b.y+b.h-1,T.BLD);g.set(b.x+b.door,b.y+b.h-1,T.DOOR);b.spr=b.kind==='light'?towerSprite(b):buildingSprite(b);}
+  g.fill(20,14,20,19,T.PATH);g.fill(14,18,14,19,T.PATH);
+  for(const[x,y]of[[39,11],[40,11],[39,16],[40,16],[41,16]])g.set(x,y,T.CRATE);
+  g.set(30,16,T.STALL);g.set(31,16,T.STALL);g.set(34,11,T.BOARD);
+  g.set(3,18,T.SIGN);g.set(gx-1,30,T.SIGN);
+  /* driftwood, rocks and shrubs */
+  for(let i=0;i<70;i++){const x=3+((r()*(W-6))|0),y=3+((r()*(H-6))|0),t=g.get(x,y);let np=false;for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){const u=g.get(x+ox,y+oy);if(u!==T.GRASS&&u!==T.SAND&&u!==T.FLOWER&&u!==T.TREE)np=true;}
+    if(np)continue;if(t===T.SAND&&!(y>=29&&y<=34&&x>gx-6))g.set(x,y,i%3?T.ROCK:T.STUMP);else if((t===T.GRASS||t===T.FLOWER)&&i%2)g.set(x,y,T.BUSH);}
+  /* pickups: sea glass, the islet's heart piece */
+  const pk=[];const GLASS=[['glass1',31,25],['glass2',44,7],['glass3',41,37],['glass4',28,34],['glass5',62,34]];
+  for(const[id,x,y]of GLASS)if(!F[id]){const[sx,sy]=sandSpot(g,x,y);pk.push({x:sx*TS+8,y:sy*TS+8,vx:0,vy:0,z:0,vz:0,type:'glass',flag:id,t:1});}
+  if(!F.hp_c)pk.push({x:65*TS+8,y:7*TS+8,vx:0,vy:0,z:0,vz:0,type:'hp',flag:'hp_c',t:1});
+  /* creatures */
+  const en=[];const putS=(k,x,y)=>{const[sx,sy]=sandSpot(g,x,y);en.push(mkEnemy(k,sx,sy));};const putG=(k,x,y)=>{const[sx,sy]=walkSpot(g,x,y);en.push(mkEnemy(k,sx,sy));};
+  putS('crab',33,26);putS('crab',43,22);putS('crab',38,32);putS('crab',30,30);putS('crab',45,37);putS('crab',60,36);
+  putS('gull',36,22);putS('gull',44,28);putS('gull',31,36);putG('slime',10,10);putG('slime',12,33);putG('slime',8,26);
+  const npcs=[mkNpc('coralie',PAL.coralie,23,16,talkCoralie,{wander:[20,15,25,18]}),mkNpc('holt',PAL.soldier,38,13,talkHolt,{fx:-1,fy:0})];
+  if(!F.hobb_free)npcs.push(mkNpc('pell',PAL.pell,gx-2,30,talkPell,{fx:1,fy:0}));
+  return{id:'coast',name:'Saltmarrow Coast',w:W,h:H,g,outdoor:true,coast:true,gpal:GP.coast,buildings:blds,npcs,enemies:en,pickups:pk,
+    edgeAt:(x,y)=>x<0?T.TREE:(y<0&&x<COAST_SAND(0))?T.TREE:(y<0&&x<COAST_SHORE(0))?T.CLIFF:T.WATER,
+    signs:{'3,18':[L('Sign','SALTMARROW COAST. Port Gullhaven ahead. Beware of crabs, gulls and tax collectors.')],[(gx-1)+',30']:[L('Sign','GULLROCK LIGHT. Causeway closed by order of the crown.')],
+      '34,11':[L('Gazette','THE GALLOWMARK GAZETTE, Summer 1903. His Majesty announces a Royal Bell Museum at Highcrown. Loyal citizens are thanked for their old bells.'),L('Notice','The Gullrock Light is closed for repairs. Its keeper has retired, with the thanks of the crown.'),L('','Under the notice, in a child\'s crooked letters: HE DID NOT RETIRE.')],
+      '39,11':[L('','A crate stamped with a golden crown. ROYAL CARGO: OLD BELLS FOR THE ROYAL MUSEUM, HIGHCROWN.'),L('','Something inside clinks when you lean on it.')],'40,11':[L('','ROYAL CARGO. OLD BELLS. Somebody has chalked a number on the lid: 31.')],
+      '39,16':[L('','A smaller crate: DELICATE INSTRUMENTS. HANDLE WITH CARE. By order of Chancellor Morrow.')],'40,16':[L('','ROYAL CARGO. The seal on this one is broken. Inside, packed in straw, is a cracked church bell.')],'41,16':[L('','ROYAL CARGO. TO THE CASTLE FORGE.'),L('Pip','The forge? I thought these were going to a museum.')]},
+    exits:[{x0:0,y0:19,x1:0,y1:22,to:'town',tx:58,ty:27,face:'L'},{x0:29,y0:9,x1:29,y1:9,to:'harbor',tx:6,ty:7,face:'U'},{x0:37,y0:9,x1:37,y1:9,to:'gulltav',tx:8,ty:9,face:'U'},
+      {x0:20,y0:13,x1:20,y1:13,req:()=>false,msg:'Locked. Coralie is out on the beach.'},{x0:14,y0:17,x1:14,y1:17,to:'hobbhouse',tx:5,ty:6,face:'U',req:()=>F.hobb_free,msg:'Locked. A note on the door says: GONE TO THE LIGHT. BACK SOON. HOBB.'},
+      {x0:58,y0:33,x1:58,y1:33,to:'gl1',tx:9,ty:11,face:'U'}],
+    onEnter(){if(!F.coast_seen){F.coast_seen=true;say([L('Pip','The sea! Smell that salt!'),L('Pip','That must be Port Gullhaven. And look, a lighthouse out on the rocks.'),L('Pip','...Why isn\'t it lit? It\'s nearly evening.')]);}}};}
+function buildHarbor(){const g=room(12,9,T.FLOOR,6);g.fill(3,4,8,4,T.COUNTER);g.set(2,2,T.BOARD);g.set(9,2,T.CRATE);g.set(10,2,T.CRATE);g.set(1,6,T.BARREL);g.set(10,6,T.TABLE);
+  return{id:'harbor',name:'Harbor Office',w:12,h:9,g,indoor:true,floor:T.FLOOR,wallC:'#7a8a9a',woodC:['#a8784a','#806040','#c4925c'],npcs:[mkNpc('brine',PAL.brine,6,3,talkBrine)],enemies:[],
+    signs:{'2,2':[L('Ledger','SHIPPING LEDGER. The Gilded Swan, royal charter. Cargo for Highcrown: 31 old bells, 2 crates marked INSTRUMENTS.'),L('Ledger','Night of the green star: 1 passenger. Name: left blank.'),L('','The entry is signed with a single letter: M.')]},
+    exits:[{x0:6,y0:8,x1:6,y1:8,to:'coast',tx:29,ty:10,face:'D'}]};}
+function buildGullTav(){const g=room(16,11,T.FLOOR,8);g.fill(2,4,6,4,T.COUNTER);g.set(2,2,T.BARREL);g.set(3,2,T.BARREL);g.set(5,2,T.BARREL);g.set(10,4,T.TABLE);g.set(12,7,T.TABLE);g.set(4,8,T.TABLE);g.set(14,2,T.CRATE);
+  return{id:'gulltav',name:'The Salted Gull',w:16,h:11,g,indoor:true,floor:T.FLOOR,wallC:'#8a6a58',woodC:['#9a6a42','#704a2c','#b88458'],
+    npcs:[mkNpc('wenna',PAL.wenna,4,3,talkWenna),mkNpc('maddox',PAL.maddox,11,5,talkMaddox,{fx:-1,fy:0}),mkNpc('fisher',PAL.bram,5,8,()=>F.shard4?[L('Fisher','A ship with no lamps went out at dawn. Bad luck, sailing dark.')]:[L('Fisher','Crabs are the size of cartwheels this year. Something\'s stirring them up out by the light.')],{fx:1,fy:0})],enemies:[],signs:{},
+    exits:[{x0:8,y0:10,x1:8,y1:10,to:'coast',tx:37,ty:10,face:'D'}]};}
+function buildHobbHouse(){const g=room(10,8,T.FLOOR,5);g.set(1,2,T.TABLE);g.set(7,2,T.BARREL);g.set(8,2,T.CRATE);g.set(8,5,T.TABLE);
+  return{id:'hobbhouse',name:'The Keeper\'s Cottage',w:10,h:8,g,indoor:true,floor:T.FLOOR,wallC:'#8a9aa8',npcs:[mkNpc('hobb',PAL.hobb,3,4,talkHobbHome),mkNpc('pell',PAL.pell,6,3,talkPellHome)],enemies:[],signs:{},
+    exits:[{x0:5,y0:7,x1:5,y1:7,to:'coast',tx:14,ty:18,face:'D'}]};}
+/* ---- Gullrock Light ---- */
+const GL_PAL={dg:'gl',keyFlag:'gl_keys',bigKey:'gl_bk',wallC:'#6a7c8c',wallTop:'#101820',stoneC:['#8e8778','#726c60','#a8a292'],tint:'rgba(90,150,210,.10)'};
+const glRoom=(id,name,rows,o)=>dungeonRoom(id,name,rows,Object.assign({},GL_PAL,o));
+const GL_CRATE=[L('','A crate stamped with a golden crown. OLD BELLS. TO HIGHCROWN.'),L('Pip','Hundreds of bells, all heading for the castle. Why does the King want them so badly?')];
+function buildGL1(){return glRoom('gl1','Gullrock Light',[
+  "#########LL#########",
+  "####T####LL####T####",
+  "#..................#",
+  "#..c............b..#",
+  "#..................#",
+  "D..................D",
+  "D..................D",
+  "#..................#",
+  "#..c~~~~....~~~~b..#",
+  "#...~~~~....~~~~...#",
+  "#..................#",
+  "#..................#",
+  "#########DD#########"],{lockFlag:'gl_l1',signs:{'3,3':GL_CRATE,'3,8':GL_CRATE},
+  enemies:[mkEnemy('crab',5,5),mkEnemy('crab',14,6),mkEnemy('rat',10,3)],
+  exits:[{x0:9,y0:12,x1:10,y1:12,to:'coast',tx:58,ty:34,face:'D'},{x0:9,y0:0,x1:10,y1:0,to:'gl4',tx:9,ty:12,face:'U'},{x0:0,y0:5,x1:0,y1:6,to:'gl2',tx:16,ty:5,face:'L'},{x0:19,y0:5,x1:19,y1:6,to:'gl3',tx:1,ty:7,face:'R'}],
+  onEnter(){if(!F.gl_seen1){F.gl_seen1=true;say([L('Pip','Listen to the waves booming under the floor. The sea gets right inside this rock.'),L('Pip','And look at all these crates. Someone has been using the lighthouse as a storeroom.'),L('Pip','Hobb has to be in here somewhere. Let\'s look around.')]);}}});}
+function buildGL2(){return glRoom('gl2','Gullrock: Bell Store',[
+  "##################",
+  "##################",
+  "#................#",
+  "#..cc..cc..cc....#",
+  "#................#",
+  "#................D",
+  "#................D",
+  "#................#",
+  "#..cc..cc..cc....#",
+  "#................#",
+  "#................#",
+  "##################"],{trap:'gl_t2',chests:{'9,7':{id:'gl_c2',item:'key',hidden:true}},signs:{'3,3':GL_CRATE,'7,3':[L('','This crate is open. It is full of little brass handbells, every one with its clapper pulled out.')],'11,8':[L('','DELICATE INSTRUMENTS. By order of Chancellor Morrow.'),L('','Inside there is nothing but a velvet cushion, with a hollow pressed into it the shape of a broken shard.')]},
+  enemies:F.gl_t2?[]:[mkEnemy('crab',5,5),mkEnemy('crab',12,6),mkEnemy('rat',4,9),mkEnemy('rat',13,9)],
+  exits:[{x0:17,y0:5,x1:17,y1:6,to:'gl1',tx:1,ty:5,face:'R'}]});}
+function buildGL3(){const o={barsFlag:'gl_p3',enemies:[mkEnemy('crab',4,10),mkEnemy('guard',15,9)],npcs:[],
+  exits:[{x0:0,y0:6,x1:0,y1:7,to:'gl1',tx:18,ty:5,face:'L'}],
+  onEnter(){if(!F.gl_seen3){F.gl_seen3=true;say([L('???','Hello? Is somebody out there? Please!'),L('Pip','That voice came from behind those bars! Maybe the golden plates open them.')]);}}};
+  if(!F.hobb_free)o.npcs.push(mkNpc('hobb',PAL.hobb,15,3,talkHobbCell));
+  return glRoom('gl3','Gullrock: Keeper\'s Cells',[
+  "####################",
+  "####T#########T#####",
+  "#..........#.......#",
+  "#..k.......#.......#",
+  "#..........#.......#",
+  "#.....k....#.......#",
+  "D..........###==####",
+  "D..................#",
+  "#.......k..........#",
+  "#...._....._.......#",
+  "#..................#",
+  "#..b............c..#",
+  "####################"],o);}
+function buildGL4(){const cap=mkEnemy('captain',10,9);
+  return glRoom('gl4','Gullrock: Cistern',[
+  "#########BB#########",
+  "####T####BB####T####",
+  "#..................D",
+  "#..................D",
+  "#~~~~~~~~~~~~~~~~~~#",
+  "#~~~~~~~~~~~~~~~~~~#",
+  "#~~~~~~~~~~~~~~~~~~#",
+  "#..................#",
+  "#..I............I..#",
+  "#..................#",
+  "#..................#",
+  "#..................#",
+  "#..b............c..#",
+  "#########DD#########"],{trap:'gl_t4',bigFlag:'gl_bl',chests:{'10,10':{id:'gl_c4',item:'charm',hidden:true}},
+  enemies:F.gl_t4?[]:[cap],
+  exits:[{x0:9,y0:13,x1:10,y1:13,to:'gl1',tx:9,ty:2,face:'D'},{x0:9,y0:0,x1:10,y1:0,to:'gl6',tx:10,ty:13,face:'U'},{x0:19,y0:2,x1:19,y1:3,to:'gl5',tx:1,ty:5,face:'R'}],
+  onShut(){const b=enemies.find(e=>e.kind==='captain');if(b){S.boss=b;$('boss-name').textContent='Captain of the Crown Guard';$('boss').hidden=false;updateBossBar();}},
+  onEnter(){if(!F.gl_t4)say([L('Pip','A whole lake inside the lighthouse! And something big is guarding it.'),L('Pip','That\'s no Hollowguard. It wears the King\'s colors.')]);
+    else if(!F.charm)say([L('Pip','The chest! Whatever the first keepers left behind is in there.')]);}});}
+function buildGL5(){return glRoom('gl5','Gullrock: Flooded Stair',[
+  "##################",
+  "##################",
+  "#~~~~~~~~~~~~~~~~#",
+  "#~~~~~~~~~~~~~~~~#",
+  "#~~~~.......~~~~~#",
+  "D..~~...C...~~~~~#",
+  "D..~~.......~~~~~#",
+  "#~~~~~~~~~~~~~~~~#",
+  "#~~~~~~~~~~~~~~~~#",
+  "#~~~~~~~~~~~~~...#",
+  "#~~~~~~~~~~~~~.C.#",
+  "##################"],{chests:{'8,5':{id:'gl_c5',item:'bk3'},'15,10':{id:'gl_c5b',item:'marks'}},
+  enemies:[mkEnemy('crab',6,4),mkEnemy('crab',10,6)],
+  exits:[{x0:0,y0:5,x1:0,y1:6,to:'gl4',tx:18,ty:2,face:'L'}],
+  onEnter(){if(!F.gl_seen5){F.gl_seen5=true;say([L('Pip','The stair is completely flooded. Good thing you can swim now!'),L('Pip','There\'s a chest on that little island.')]);}}});}
+function buildGL6(){const o={pickups:[]};
+  if(F.gl_done&&!F.shard4)o.pickups.push({x:10*TS+8,y:7*TS,vx:0,vy:0,z:0,vz:0,type:'shard',t:1});
+  if(F.gl_done&&!F.gl_hc)o.pickups.push({x:12*TS+8,y:7*TS,vx:0,vy:0,z:0,vz:0,type:'hc',flag:'gl_hc',t:1});
+  return glRoom('gl6','Gullrock: Lamp Room',[
+  "######################",
+  "######################",
+  "#....................#",
+  "#....................#",
+  "#....I..........I....#",
+  "#....................#",
+  "#....................#",
+  "#....................#",
+  "#....................#",
+  "#....................#",
+  "#....I..........I....#",
+  "#....................#",
+  "#....................#",
+  "#....................#",
+  "##########DD##########"],Object.assign(o,{
+  exits:[{x0:10,y0:14,x1:11,y1:14,to:'gl4',tx:9,ty:2,face:'D',req:()=>!S.fight,msg:'The way out is sealed!'}],
+  onEnter(){if(!F.gl_done)say([L('Pip','The lamp room. The great lamp is dark...'),L('Pip','Wait. Something is curled around it. Something with claws.'),L('','The floor shakes. A crab as big as a cart heaves itself off the lamp, barnacles rattling.'),L('Pip','Its shell is like armor! Make it charge into a pillar, then hit it while it\'s dazed!')],startBrine);}}));}
+/* ---- chapter four foes and boss ---- */
+function startBrine(){const b=mkEnemy('brine',11,6);enemies.push(b);S.fight=true;S.boss=b;$('boss-name').textContent='Brinemaw';$('boss').hidden=false;updateBossBar();
+  S.shut=[];for(let i=0;i<map.length;i++)if(map[i]===T.DOOR){map[i]=T.BARS;S.shut.push(i);}
+  shake(3,.6);SFX.roar();burst(b.x,b.y,30,['#9ab8a0','#e8e0c8','#7fd0ff'],120,.7,100,2);toast('Brinemaw, the Lamp Crab!',2.4);}
+function brineDefeated(e){S.fight=false;$('boss').hidden=true;F.gl_done=true;shots=[];shake(4,.8);SFX.slam();if(S.shut){for(const i of S.shut)map[i]=T.DOOR;S.shut=null;}
+  enemies.forEach(o=>{if(o!==e&&!o.dead){o.dead=true;burst(o.x,o.y-6,10,ecol(o),60,.4);}});
+  const cx=clamp(e.x,3*TS,(MW-3)*TS),cy=clamp(e.y,4*TS,(MH-3)*TS);
+  say([L('Pip','It\'s scuttling off into the sea! And look what it was guarding...')],()=>{
+    pickups.push({x:cx-14,y:cy,vx:0,vy:0,z:0,vz:90,type:'shard',t:0},{x:cx+16,y:cy,vx:0,vy:0,z:0,vz:90,type:'hc',flag:'gl_hc',t:0});saveGame();});}
+function shard4Cutscene(){say([L('','You got the fourth Dawnbell Shard. It sat at the heart of the great lamp, and every night it shone out over the sea.'),
+  L('Pip','The first Wardens hid a shard inside a lighthouse! Right where every ship could see it, and nobody would guess.'),
+  L('','The four shards chime together. You see the garden of white roses again. The girl in the silver circlet looks up, as if she can hear you.'),
+  L('','Her hair is gold as wheat.'),L('Pip','Gold hair... Wren, Maddox said the girl they carried onto that ship had gold hair.'),
+  L('Pip','And the green star fell into the sea right here, the same night we fell through the forest pool. You don\'t think...'),
+  L('Morrow','Four shards. You do make this easy, little Warden.'),L('Morrow','The Gilded Swan sails for Highcrown at dawn. Do enjoy the view.'),
+  L('Pip','Out there! A ship with no lamps, sliding out of the harbor. That has to be it.'),L('Pip','Wherever that ship is going, we\'re going too. But first, Captain Venn needs to hear about this.')],
+  ()=>{saveGame();SFX.win();setTimeout(()=>openMenu('chapter4'),700);});}
+/* ---- chapter four people ---- */
+function talkPell(n){if(F.gl_open)return[L('Pell','The gate\'s open. Please find my dad. He\'s tall, and he smells like lamp oil.')];
+  return{lines:[L('Pell','Are you a real Warden? With a real sword?'),L('Pell','My dad keeps the Gullrock Light. He hasn\'t come home since the night the green star fell.'),
+    L('Pell','The soldiers say he retired. Dad would never leave the light. And now it\'s gone dark, and nobody\'s allowed on the causeway.'),
+    L('Pell','I took his spare key off the hook. I\'m too scared to go out there alone...'),L('Pell','Will you find him? Please?'),L('','Pell unlocks the causeway gate with a shaky hand.')],
+    after(){F.gl_open=true;for(let y=0;y<MH;y++)for(let x=0;x<MW;x++)if(tileAt(x,y)===T.GATE){setT(x,y,T.SAND);repaint(x,y);burst(x*TS+8,y*TS+8,8,['#f0c65a','#ffffff'],50,.4);}SFX.gate();toast('New goal: cross the causeway to Gullrock Light',3);saveGame();}};}
+function talkPellHome(){return F.shard4?[L('Pell','Dad says the lamp is lit again. You can see it from my window!')]:[L('Pell','You found him! You really, really found him!'),L('Pell','When I grow up, I\'m going to be a Warden too.')];}
+function talkHobbCell(n){if(!F.gl_p3)return[L('Hobb','The bars! The golden plates on the floor work them. Push those blocks onto the plates!')];
+  return{lines:[L('Hobb','A boy with a sword? And a... glowing bug?'),L('Pip','Sprite!'),L('Hobb','Bless you both. I\'m Hobb, keeper of the Gullrock Light. Did my Pell send you?'),
+    L('Hobb','Weeks back, on the night the green star fell, I was up in the lamp room. I watched it come down in the sea past Gullrock.'),
+    L('Hobb','And there was a royal boat already waiting under the cliffs, with no lamps lit. As if they knew exactly where it would fall.'),
+    L('Hobb','They pulled something out of the water and rowed it to the Gilded Swan. I wrote it all in my logbook like a fool, and told old Maddox at the Salted Gull.'),
+    L('Hobb','Next morning the Chancellor\'s men took my log and locked me in here with their bells. Then that great crab moved into my lamp room and the light went out.'),
+    L('Hobb','The brutes hung the key to the cistern stair right outside my cell. Take it.'),
+    L('Hobb','And Warden? The first keepers said a relic sleeps in the cistern. A charm that lets a body swim like a seal. You\'ll need it to reach the lamp.'),
+    L('Hobb','I\'ll find my own way home. Go!')],
+    after(){F.hobb_free=true;F.gl_keys=(F.gl_keys||0)+1;npcs=npcs.filter(m=>m!==n);burst(n.x,n.y-6,10,['#ffffff','#a6dbf3'],50,.4);gotItem('Small Key');}};}
+function talkHobbHome(){if(!F.hobb_reward)return{lines:[L('Hobb','Home, and Pell safe. I owe you more than I can pay, Warden. But take this, for a start.'),L('','Hobb gives you 30 marks and refills your potions.'),
+      L('Hobb','I\'ve kept that light for twenty years. Before me, the Wardens kept it. The King closed their Hall, and the very next week his men came asking about my lamp.'),
+      L('Hobb','I never knew why. Now I think I do.')],after(){F.hobb_reward=true;marks+=30;potions=Math.max(potions,F.bag?5:3);updateHud(true);SFX.coin();saveGame();}};
+  if(F.shard4)return[L('Hobb','The lamp\'s lit again, with plain oil this time. The sea doesn\'t know the difference.'),L('Hobb','Watch yourself in Highcrown, Warden. Whatever they fished out of my sea, they wanted it badly.')];
+  return[L('Hobb','Go careful up in the lamp room. That crab didn\'t like me one bit.')];}
+function talkCoralie(){const n=Math.min(5,F.glass||0);
+  if(F.glass_done)return[L('Coralie','The tide brings everything back in the end, dearie. Everything.')];
+  if(!F.glass_q)return{lines:[L('Coralie','Sea glass, dearie. The tide brings it in, smooth as boiled sweets. I\'ve collected it for sixty years.'),L('Coralie','My eyes aren\'t what they were. Find me five pieces along the beach, and I\'ll give you something special.')],after(){F.glass_q=true;toast('Side quest: find 5 pieces of sea glass for Coralie',2.8);saveGame();}};
+  if(n<5)return[L('Coralie',`You've found ${n} of 5. Look along the sand, and out on the rocks by the light.`)];
+  return{lines:[L('Coralie','Oh, they\'re lovely. Green as a wave, blue as a gull\'s egg. Here, I\'ve kept this tucked away for a hero.'),
+    L('Coralie','Funny thing. Last spring the envoy\'s men paid every fisher a silver mark for each old bell we dragged up.'),
+    L('Coralie','One bell came up cracked, and the crack glowed blue. They took that one away in a terrible hurry.'),
+    L('Pip','Glowed blue... like a shard! Wren, the King might already have one of his own.')],after(){F.glass_done=true;F.hp_glass=true;addHeartPiece();saveGame();}};}
+function talkHolt(){if(F.shard4)return[L('Holt','Ten years a soldier. Lately the orders feel... wrong. Loading crying girls onto ships isn\'t what I signed up for.'),L('Holt','If you see Captain Venn, tell him Private Holt asked after him. He\'ll know what I mean.')];
+  return[L('Holt','Halt! Royal cargo. No touching, no peeking, no asking.'),L('Holt','...Off the record? These museum bells go straight to the castle forge. Funny sort of museum.')];}
+function talkBrine(){if(F.shard4)return[L('Brine','The Gilded Swan sailed at dawn without even signing my book! Most irregular.'),L('Brine','Still, the King knows best. ...Doesn\'t he?')];
+  return[L('Brine','Harbormaster Brine, at your service! Port Gullhaven, finest little harbor in Gallowmark.'),L('Brine','Those crates? Royal cargo, very important. Old bells for His Majesty\'s new Bell Museum. Isn\'t that a lovely idea?'),
+    L('Brine','Mind you, I\'ve never known a museum to need three hundred bells. But the King knows best!')];}
+function talkWenna(){return F.maddox?[L('Wenna','Old Maddox talked your ear off, did he? Don\'t repeat any of it outside. Soldiers drink here.')]:[L('Wenna','Welcome to the Salted Gull! Soldiers drink free, by order of the crown. Everyone else pays double, by order of me.'),L('Wenna','Old Maddox in the corner tells tall tales. Some of them are even true.')];}
+function talkMaddox(){if(F.maddox)return[L('Maddox','Gold as wheat, I tell you. Not black. I know what I saw.')];
+  return{lines:[L('Maddox','Sit, sit. You have the look of someone who asks questions. Dangerous habit round here.'),
+    L('Maddox','Night of the green star, I was mending nets on the long pier. The King\'s own ship, the Gilded Swan, came in with no lamps lit.'),
+    L('Maddox','They carried a girl aboard. Wrapped in a sea-soaked cloak, with a silver circlet on her brow. And she was humming a little tune, sweet as a lullaby.'),
+    L('Pip','Wren... a silver circlet. Like the girl in your dream.'),
+    L('Maddox','The soldiers said it was Princess Rosalind, home from a voyage. But I crewed the royal yacht when Rosalind was small. Her hair was black as a crow\'s wing.'),
+    L('Maddox','This girl\'s hair was gold as wheat. I told Hobb the lamp keeper, and Hobb wrote it down. Now Hobb\'s gone.'),L('Maddox','You didn\'t hear any of this from me.')],after(){F.maddox=true;saveGame();}};}
+
+const COAST_IDS=new Set(['coast','harbor','gulltav','hobbhouse','gl1','gl2','gl3','gl4','gl5','gl6']);
+const BUILD={coast:buildCoast,harbor:buildHarbor,gulltav:buildGullTav,hobbhouse:buildHobbHouse,gl1:buildGL1,gl2:buildGL2,gl3:buildGL3,gl4:buildGL4,gl5:buildGL5,gl6:buildGL6,marsh:buildMarsh,hut:buildHut,fenhouse:buildFenHouse,mw1:buildMW1,mw2:buildMW2,mw3:buildMW3,mw4:buildMW4,mw5:buildMW5,mw6:buildMW6,mw7:buildMW7,hd1:buildHD1,hd2:buildHD2,hd3:buildHD3,hd4:buildHD4,hd5:buildHD5,hd6:buildHD6,hd7:buildHD7,forest:buildForest,town:buildTown,quarry:buildQuarry,smithy:buildSmithy,inn:buildInn,cellar:buildCellar,chapel:buildChapel,hall:buildHall};
 
 /* ================= npc talk ================= */
 function talkGuard(){F.met_guard=true;if(F.quest)return[L('Guard','Captain Venn vouched for you, so you may pass. Behave yourself.')];
@@ -1224,7 +1503,13 @@ function talkVennHall(){
       L('Pip',lastInput==='touch'?'Hold SWORD, then let go to spin! Let\'s go, Wren!':(lastInput==='pad'?'Hold the sword button, then let go to spin! Let\'s go, Wren!':'Hold J, then let go to spin! Let\'s go, Wren!'))],
     after(){F.ch3=true;F.spin=true;toast('New goal: find Mirewatch Tower in the Gloaming Fen, south of town',3.4);saveGame();}};
   if(!F.mw_done)return[L('Venn','The south gate is open. Mirewatch lies somewhere in the Gloaming Fen. And Wren? Watch Morrow\'s soldiers.')];
-  if(F.shard3)return[L('Venn','Three shards... and Morrow sending you to fetch them like a hunting dog. He\'s playing a long game.'),L('Venn','I\'ll tell you something I\'ve told no one. The King closed every Hall of Wardens twenty years ago. I kept this one open in secret.'),L('Venn','Corwin, Wick, your friend Fen\'s mother... everyone who looks too closely at the castle seems to disappear. Be careful, Wren.')];
+  if(F.shard3&&!F.ch4)return{lines:[L('Venn','Three shards... and Morrow sending you to fetch them like a hunting dog. He\'s playing a long game.'),L('Venn','I\'ll tell you something I\'ve told no one. The King closed every Hall of Wardens twenty years ago. I kept this one open in secret.'),L('Venn','Corwin, Wick, your friend Fen\'s mother... everyone who looks too closely at the castle seems to disappear.'),
+    L('Venn','Brother Aldous says the shards sing toward the sea now. East, to the Saltmarrow Coast.'),L('Venn','And every week, wagons with the royal seal roll out through our east gate to Port Gullhaven, loaded with old bells.'),
+    L('Venn','The crown chained that gate so nobody would ask questions. I had a key cut. Go and see what they\'re shipping.'),L('Pip','The sea! I\'ve never seen the sea. ...Well, not this one.')],
+    after(){F.ch4=true;toast('New goal: take the east gate to the Saltmarrow Coast',3.4);saveGame();}};
+  if(F.ch4&&!F.shard4)return[L('Venn','The east gate is open. Port Gullhaven lies at the end of the coast road. Keep your head down around the royal crates.')];
+  if(F.shard4){const first=!F.ch4_venn;F.ch4_venn=true;saveGame();return[L('Venn','Four shards. And a girl in a silver circlet carried onto the King\'s own ship, the night the green star fell.'),L('Venn','Princess Rosalind had black hair. Everyone in Gallowmark knows that. So who is up in that castle?'),
+    L('Venn','There\'s a rumor in Thornmoor of someone who relights the lamps the soldiers put out. When the road opens, we should find them.')].concat(first?[L('Pip','Wren... I think we already know who it is. We just don\'t want to say it yet.')]:[]);}
   return[L('Venn','Two shards, and the Grapple Claw of the first Wardens. Gallowmark hasn\'t seen your like in an age.'),L('Venn','Keep those shards close. Morrow will not stay polite forever.')];}
 function talkTilda(){return{lines:[L('Tilda','Fresh goods for brave folk! Potions to mend you, and something rarer for the well-off.')],after(){openMenu('shop');}};}
 function talkBram(){if(F.ch3)return[L('Bram','The south gate\'s open again? Bring me back some fen turnips. They\'re purple and they scream a bit.')];return[L('Bram','Apples, pears, turnips! No? Suit yourself.'),L('Bram','Did you hear? A royal envoy rode in last week. Chancellor Morrow. Hasn\'t smiled once.')];}
@@ -1281,9 +1566,9 @@ function talkSoldier(){return F.mw_morrow?[L('Soldier','The Chancellor says you 
 function gotItem(name){SFX.item();toast('You got: '+name,3);updateHud(true);saveGame();}
 
 /* ================= physics ================= */
-function hitsSolid(x,y,hw,hh,fly){const x0=Math.floor((x-hw)/TS),x1=Math.floor((x+hw-.01)/TS),y0=Math.floor((y-hh)/TS),y1=Math.floor((y+hh-.01)/TS);
-  for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const t=tileAt(tx,ty);if(SOLID[t]&&!(fly&&(t===T.PIT||t===T.WATER||t===T.LILY)))return true;}return false;}
-function blocked(e,x,y){if(hitsSolid(x,y,e.hw,e.hh,e.fly))return true;
+function hitsSolid(x,y,hw,hh,fly,swim){const x0=Math.floor((x-hw)/TS),x1=Math.floor((x+hw-.01)/TS),y0=Math.floor((y-hh)/TS),y1=Math.floor((y+hh-.01)/TS);
+  for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const t=tileAt(tx,ty);if(SOLID[t]&&!(fly&&(t===T.PIT||t===T.WATER||t===T.LILY))&&!(swim&&(t===T.WATER||t===T.LILY)))return true;}return false;}
+function blocked(e,x,y){if(hitsSolid(x,y,e.hw,e.hh,e.fly,e===P&&!!F.charm))return true;
   if(e===P){for(const n of npcs)if(Math.abs(n.x-x)<n.hw+e.hw&&Math.abs(n.y-y)<n.hh+e.hh+1)return true;}
   else if(e.talk&&P){if(Math.abs(P.x-x)<P.hw+e.hw&&Math.abs(P.y-y)<P.hh+e.hh+1)return true;}
   return false;}
@@ -1337,7 +1622,7 @@ function newGame(){F={sword:1};marks=0;potions=0;playTime=0;tut=0;tutDist=0;swun
     L('Pip','And the woods are crawling with slimes. Good thing you brought your practice blade.'),L('Pip','Let\'s find a way out of here. I\'ll stay close.')],()=>toast('Goal: clear the slimes and find the path east',3));}
 function continueGame(fullHeal){const s=loadSave();if(!s){newGame();return;}F=s.F||{sword:1};marks=s.marks||0;potions=s.potions||0;playTime=s.playTime||0;tut=Math.max(4,s.tut||0);hint('');
   P=newPlayer();P.maxHp=s.maxHp||6;P.hp=fullHeal?P.maxHp:Math.max(2,s.hp||P.maxHp);mode='play';beginPlay();loadScene(s.scene,s.tx,s.ty,'D');P.inExit=true;
-  if(S.onEnter&&(S.id==='hall'||S.id==='hd7'||S.id==='mw7'))S.onEnter();}
+  if(S.onEnter&&(S.id==='hall'||S.id==='hd7'||S.id==='mw7'||S.id==='gl6'))S.onEnter();}
 
 /* ================= gameplay ================= */
 function facingDir(fx,fy){return Math.abs(fx)>Math.abs(fy)?(fx>0?'R':'L'):(fy>0?'D':'U');}
@@ -1345,7 +1630,7 @@ function interactTarget(){
   let best=null,bd=1e9;for(const n of npcs){const dx=n.x-P.x,dy=n.y-P.y,d=Math.hypot(dx,dy);if(d<34&&d<bd&&(dx*P.fx+dy*P.fy)/(d||1)>.55){best=n;bd=d;}}
   if(best)return{npc:best};
   for(const r of[12,26]){const tx=Math.floor((P.x+P.fx*r)/TS),ty=Math.floor((P.y+P.fy*r)/TS),t=tileAt(tx,ty);
-    if((t===T.SIGN||t===T.BOARD)&&S.signs[tx+','+ty])return{lines:S.signs[tx+','+ty]};
+    if((t===T.SIGN||t===T.BOARD||t===T.CRATE)&&S.signs[tx+','+ty])return{lines:S.signs[tx+','+ty]};
     if(t===T.ALTAR)return{altar:true};
     if(t===T.CHEST){const k=tx+','+ty;if(S.chests&&S.chests[k]&&!F[S.chests[k].id])return{chest:k};break;}
     if(t===T.STALL||t===T.COUNTER)continue;if(SOLID[t])break;}
@@ -1366,21 +1651,23 @@ function knock(e,vx,vy,t){if(e.boss||e.fixed)return;e.kbx=vx;e.kby=vy;e.kbT=t;if
 function damageEnemy(e,o){o=o||{};
   if(e.kind==='sentinel'&&e.state!=='stun'){SFX.clank();hitstop=.04;burst(e.x,e.y-14,6,['#ffffff','#c8d0dc'],90,.25);if(!S.hinted){S.hinted=true;toast('Its armor is too thick! Wait for the slam, then hit the glowing core.',3);}return;}
   if(e.kind==='grim'&&e.state!=='flip'){SFX.clank();hitstop=.04;burst(e.x,e.y-8,6,['#ffffff','#c8d0dc'],90,.25);if(!S.hinted){S.hinted=true;toast('Its shell is too hard! When its jaws open, throw the Grapple Claw.',3);}return;}
+  if(e.kind==='brine'&&e.state!=='daze'&&e.state!=='flip'){SFX.clank();hitstop=.04;burst(e.x,e.y-8,6,['#ffffff','#9ab8a0'],90,.25);if(!S.hinted){S.hinted=true;toast('Its shell is like iron! Make it crash into a pillar, then strike.',3);}return;}
   if(e.kind==='wisp'){SFX.swing();burst(e.x,e.y-e.z,4,['#a8fff0'],40,.2);if(!F.wisp_tip){F.wisp_tip=true;toast(F.lantern?'Your blade passes right through! Try the lantern\'s fire.':'Your blade passes right through it! Steer clear for now.',2.8);}return;}
   if(e.kind==='wraith'&&e.state!=='reveal'){SFX.swing();if(!S.hinted){S.hinted=true;toast('Your sword passes through the shadow! Light the braziers, or hit it with fire.',3);}return;}
   if(e.kind==='plant'&&e.state==='hide'&&!o.ranged){SFX.clank();hitstop=.03;burst(e.x,e.y-8,5,['#ffffff','#e88ab4'],70,.25);if(!F.plant_tip){F.plant_tip=true;toast('Its bulb is too tough. Strike when it opens, or block a seed back at it!',3);}return;}
   if((e.kind==='guard'||e.kind==='captain')&&!o.spin&&!o.ranged&&e.state!=='recover'){const tx=P.x-e.x,ty=P.y-e.y,l=Math.hypot(tx,ty)||1;
     if((Math.cos(e.fa)*tx+Math.sin(e.fa)*ty)/l>.25){SFX.clank();hitstop=.04;burst(e.x+Math.cos(e.fa)*7,e.y+Math.sin(e.fa)*5-8,6,['#ffffff','#d8b050'],80,.25);P.kbx=tx/l*120;P.kby=ty/l*120;P.kbT=.1;
       if(!F.guard_tip){F.guard_tip=true;toast('It blocks with its shield! Hit it after it lunges, strike from behind, or use a spin attack.',3.4);}return;}}
-  if(e.kind==='beetle'&&e.state!=='flip'&&!o.spin){const[vx,vy]=DV[e.dir],tx=P.x-e.x,ty=P.y-e.y,l=Math.hypot(tx,ty)||1;
+  if((e.kind==='beetle'||e.kind==='crab')&&e.state!=='flip'&&!o.spin){const[vx,vy]=DV[e.dir],tx=P.x-e.x,ty=P.y-e.y,l=Math.hypot(tx,ty)||1;
     if((vx*tx+vy*ty)/l>.35){SFX.clank();hitstop=.03;burst(e.x+vx*6,e.y+vy*6-4,5,['#ffffff','#6fc2b8'],80,.25);P.kbx=tx/l*110;P.kby=ty/l*110;P.kbT=.1;
       if(!F.beetle_hint){F.beetle_hint=true;toast(F.hook?'Armored in front! Flip it with the Grapple Claw, or strike from behind.':'Armored in front! Strike it from behind.',3);}return;}}
-  if(e.kind==='grim')e.t-=.22;
+  if(e.kind==='grim'||e.kind==='brine')e.t-=.22;
   let dmg=o.dmg||F.sword||1;if(o.spin)dmg*=2;e.hp-=dmg;e.flash=.13;const a=Math.atan2(e.y-P.y,e.x-P.x);const kb=e.kind==='big'||e.kind==='ratking'||e.kind==='captain'?90:170;knock(e,Math.cos(a)*kb,Math.sin(a)*kb,.18);
   if(e.kind==='guard'||e.kind==='captain'){e.state='recover';e.t=Math.max(e.t,.35);}
   SFX.hit();hitstop=.055;burst(e.x,e.y-5-e.z,6,ecol(e),80,.3);
   if(S.boss===e)updateBossBar();
   if(e.kind==='grim'&&e.ph===0&&e.hp<=e.maxHp/2&&e.hp>0){e.ph=1;toast('Grimhide is furious! Watch for falling rocks!',2.6);dropRocks(4);}
+  if(e.kind==='brine'&&e.ph===0&&e.hp<=e.maxHp/2&&e.hp>0){e.ph=1;toast('Brinemaw is furious! Watch out for its bubbles!',2.6);}
   if(e.kind==='sentinel'&&e.ph===0&&e.hp<=e.maxHp/2&&e.hp>0){e.ph=1;toast('Ash is pouring out of the Sentinel!',2.4);shake(2,.5);burst(e.x,e.y-16,30,['#3a3240','#6a6170','#ff5a3c'],90,.8);}
   if(e.kind==='captain'&&!e.ph&&e.hp<=e.maxHp/2&&e.hp>0){e.ph=1;toast('The Captain\'s visor blazes red. It\'s getting faster!',2.4);}
   if(e.kind==='wraith'&&e.hp>0){e.rh=(e.rh||0)+1;if(e.rh>=5)e.t=0;}
@@ -1397,6 +1684,7 @@ function killEnemy(e){
   else if(e.kind==='sentinel')bossDefeated(e);
   else if(e.kind==='grim')grimDefeated(e);
   else if(e.kind==='wraith')wraithDefeated(e);
+  else if(e.kind==='brine')brineDefeated(e);
   else if(e.kind==='captain'){drop(e.x,e.y,'heart');drop(e.x,e.y,'heart');for(let i=0;i<5;i++)drop(e.x,e.y,'coin');$('boss').hidden=true;S.boss=null;}
   else if(e.kind==='wisp'){}
   else{if(Math.random()<.7)drop(e.x,e.y,'coin');if(P.hp<P.maxHp&&Math.random()<.25)drop(e.x,e.y,'heart');}
@@ -1438,8 +1726,8 @@ function updateHook(dt){const h=P.hk;if(!h){P.state='normal';return;}
     if(d<=sp){P.x=lx;P.y=ly;endHook();P.inv=Math.max(P.inv,.15);burst(P.x,P.y+3,6,['#8a8074','#ffffff'],40,.3);}
     else{P.x+=ax/d*sp;P.y+=ay/d*sp;}}}
 function hookEnemy(e){
-  if(e.kind==='beetle'){if(e.state!=='flip'){e.state='flip';e.t=2.6;SFX.latch();hitstop=.05;burst(e.x,e.y-4,8,['#ffffff','#6fc2b8'],70,.3);}return;}
-  if(e.kind==='grim'){if(e.state==='wind'||e.state==='charge'){e.state='flip';e.t=2.6;SFX.latch();SFX.slam();shake(3,.4);hitstop=.08;burst(e.x,e.y-6,20,['#ffffff','#ff8a3a','#8a6a9a'],100,.5);if(!S.flipHint){S.flipHint=true;toast('It flipped over! Strike its soft belly!',2.4);}}
+  if(e.kind==='beetle'||e.kind==='crab'){if(e.state!=='flip'){e.state='flip';e.t=2.6;SFX.latch();hitstop=.05;burst(e.x,e.y-4,8,['#ffffff','#6fc2b8'],70,.3);}return;}
+  if(e.kind==='grim'||e.kind==='brine'){if(e.state==='wind'||e.state==='charge'){e.state='flip';e.t=2.6;SFX.latch();SFX.slam();shake(3,.4);hitstop=.08;burst(e.x,e.y-6,20,['#ffffff','#ff8a3a','#8a6a9a'],100,.5);if(!S.flipHint){S.flipHint=true;toast('It flipped over! Strike its soft belly!',2.4);}}
     else{SFX.clank();burst(e.x,e.y-8,5,['#ffffff','#c8d0dc'],80,.2);if(!S.hookHint){S.hookHint=true;toast('The claw bounces off. Wait until its jaws open!',2.4);}}return;}
   if(e.kind==='guard'||e.kind==='captain'){if(e.state!=='recover'){e.state='recover';e.t=e.kind==='captain'?1.1:1.5;SFX.latch();hitstop=.05;burst(e.x,e.y-8,8,['#ffffff','#d8b050'],70,.3);if(!F.yank_tip){F.yank_tip=true;toast('The claw yanked its shield aside! Strike now!',2.4);}}return;}
   if(e.kind==='wisp')return;
@@ -1450,7 +1738,7 @@ function hitCrystal(tx,ty){if(!S.crystalFlag||F[S.crystalFlag]){SFX.clank();retu
   SFX.gate();burst(tx*TS+8,ty*TS,16,['#ffb040','#fff0a0','#ffffff'],80,.5);shake(1.5,.3);toast('The crystal flares orange. Bars rumble open nearby!',2.6);saveGame();}
 function tryDoor(nx,ny){const tx=Math.floor((P.x+nx*(P.hw+3))/TS),ty=Math.floor((P.y+ny*(P.hh+3))/TS),t=tileAt(tx,ty);
   if(t!==T.LOCK&&t!==T.BIGLOCK)return;
-  const kf=S.keyFlag||'hd_keys',bk=S.bigKey||'hd_bk',bn=S.dg==='mw'?'Mire Key':'Belfry Key';
+  const kf=S.keyFlag||'hd_keys',bk=S.bigKey||'hd_bk',bn=S.dg==='gl'?'Gull Key':S.dg==='mw'?'Mire Key':'Belfry Key';
   if(t===T.LOCK){if((F[kf]||0)>0){F[kf]--;F[S.lockFlag]=true;openGroup(tx,ty,t);toast('Unlocked!',1.6);}else if(toastT<=0)toast('Locked. A small key would open this door.',2);}
   else{if(F[bk]){F[S.bigFlag]=true;openGroup(tx,ty,t);toast('The '+bn+' turns with a deep clang!',2.2);}else if(toastT<=0)toast('A great lock shaped like a bell. You need a special key.',2.2);}}
 function openGroup(tx,ty,t){const st=[[tx,ty]];while(st.length){const[x,y]=st.pop();if(tileAt(x,y)!==t)continue;setT(x,y,T.DOOR);burst(x*TS+8,y*TS+8,8,['#f0c65a','#ffffff','#8a94a8'],60,.4);st.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);}
@@ -1459,7 +1747,7 @@ function nudgeOut(){if(!hitsSolid(P.x,P.y,P.hw,P.hh))return;const tx=Math.floor(
 function openChest(k){const c=S.chests[k];if(!c||F[c.id])return;F[c.id]=true;const[x,y]=k.split(',').map(Number);burst(x*TS+8,y*TS+4,14,['#fff1a8','#f0c65a','#ffffff'],70,.6,-30);SFX.item();
   const touch=lastInput==='touch';let lines;
   const kf=S.keyFlag||'hd_keys';
-  if(c.item==='key'){F[kf]=(F[kf]||0)+1;lines=[L('','You found a Small Key! It opens one locked door in '+(S.dg==='mw'?'Mirewatch Tower.':'the Hollow Deep.'))];}
+  if(c.item==='key'){F[kf]=(F[kf]||0)+1;lines=[L('','You found a Small Key! It opens one locked door in '+(S.dg==='gl'?'Gullrock Light.':S.dg==='mw'?'Mirewatch Tower.':'the Hollow Deep.'))];}
   else if(c.item==='marks25'){marks+=25;lines=[L('','You found 25 marks!')];}
   else if(c.item==='bk2'){F.mw_bk=true;lines=[L('','You found the Mire Key! Green bronze, cold as pond water, with a bell for a handle.'),L('Pip','The great lock in the gallery, across the chasm. Let\'s go!')];}
   else if(c.item==='lantern'){F.lantern=true;lines=[L('','You found the Ember Lantern! A Warden\'s lamp whose flame never goes out.'),
@@ -1470,6 +1758,8 @@ function openChest(k){const c=S.chests[k];if(!c||F[c.id])return;F[c.id]=true;con
   else if(c.item==='hook'){F.hook=true;lines=[L('','You found the Grapple Claw! A relic of the first Wardens, on a chain that never seems to run out.'),
     L('Pip',touch?'Tap CLAW to throw it. It grabs wooden posts and pulls you right across.':'Press F to throw it. It grabs wooden posts and pulls you right across.'),
     L('Pip','It stuns monsters, too. And I bet it could flip one of those armored beetles onto its back.')];}
+  else if(c.item==='charm'){F.charm=true;lines=[L('','You found the Mariner\'s Charm! A Warden\'s sea-glass charm on a cord of braided kelp. While you wear it, deep water can\'t pull you under.'),L('Pip','You can swim now! Just walk into deep water. You can\'t swing your sword out there, though.'),L('Pip','The far side of the cistern. Let\'s swim for it!')];}
+  else if(c.item==='bk3'){F.gl_bk=true;lines=[L('','You found the Gull Key! Sea-green bronze crusted with salt, with a bell for a handle.'),L('Pip','The great lock across the cistern. The lamp room must be up there!')];}
   updateHud(true);saveGame();say(lines);}
 function updateTrap(){if(!S.trap||F[S.trap])return;
   if(!S.shut){if(!enemies.length)return;const near=S.exits.some(ex=>{const cx=clamp(P.x,ex.x0*TS,(ex.x1+1)*TS),cy=clamp(P.y,ex.y0*TS,(ex.y1+1)*TS);return Math.hypot(P.x-cx,P.y-cy)<TS*1.6;});
@@ -1477,17 +1767,18 @@ function updateTrap(){if(!S.trap||F[S.trap])return;
   else if(enemies.length===0){for(const i of S.shut)map[i]=T.DOOR;S.shut=null;F[S.trap]=true;
     for(const k in S.chests){const c=S.chests[k];if(!c.hidden)continue;const[x,y]=k.split(',').map(Number);setT(x,y,T.CHEST);burst(x*TS+8,y*TS+6,18,['#fff1a8','#f0c65a','#a6dbf3','#ffffff'],70,.7,-20);}
     nudgeOut();SFX.gate();toast('The bars lift, and a chest appears!',2.2);saveGame();}}
-function updateBeetle(e,dt,dist,dxp,dyp){const boss=e.kind==='grim',p2=boss&&e.ph===1;e.t-=dt;e.cd=Math.max(0,(e.cd||0)-dt);
+function updateBeetle(e,dt,dist,dxp,dyp){const boss=e.kind==='grim'||e.kind==='brine',brine=e.kind==='brine',p2=boss&&e.ph===1;e.t-=dt;e.cd=Math.max(0,(e.cd||0)-dt);
   if(e.state==='walk'){const sp=boss?(p2?46:34):26,[vx,vy]=DV[e.dir],ox=e.x,oy=e.y;moveBody(e,vx*sp*dt,vy*sp*dt);const stuck=Math.hypot(e.x-ox,e.y-oy)<sp*dt*.4;
     if(e.t<=0||stuck){e.dir=Math.random()<(boss?.85:.65)?dirTo(dxp,dyp):(Math.random()*4)|0;e.t=boss?.6+Math.random()*.5:.6+Math.random()*.9;
       if(boss){e.walks=(e.walks||0)+1;if(e.walks>=(p2?2:3)&&e.cd<=0){e.walks=0;e.state='wind';e.dir=dirTo(dxp,dyp);e.t=p2?.55:.8;}}}
     if(e.state==='walk'&&e.cd<=0&&dist<(boss?170:110)&&(Math.abs(dxp)<(boss?12:9)||Math.abs(dyp)<(boss?12:9))){const d=dirTo(dxp,dyp);if(boss||d===e.dir){e.dir=d;e.state='wind';e.t=boss?(p2?.55:.8):.4;}}}
-  else if(e.state==='wind'){if(e.t<=0){e.state='charge';e.t=boss?2.5:1;if(boss)SFX.roar();}}
+  else if(e.state==='wind'){if(e.t<=0){e.state='charge';e.t=boss?2.5:1;if(boss)SFX.roar();if(brine&&p2)for(const sp of[-.4,0,.4])fireAt(e,P.x,P.y,125,'bubble',1,sp);}}
   else if(e.state==='charge'){const sp=boss?(p2?235:190):115,[vx,vy]=DV[e.dir],ox=e.x,oy=e.y;moveBody(e,vx*sp*dt,vy*sp*dt);
     if(boss&&Math.random()<.5)parts.push({x:e.x-vx*12,y:e.y+6,vx:0,vy:-10,life:.35,max:.35,col:'#8a8074',g:0,sz:2});
     const stuck=Math.hypot(e.x-ox,e.y-oy)<sp*dt*.3;
     if(stuck||e.t<=0){e.cd=1.2;
-      if(stuck&&boss){e.state='daze';e.t=p2?.7:1;SFX.slam();shake(3,.35);burst(e.x+vx*14,e.y+vy*10,16,['#8a8074','#cdb98a','#ffffff'],90,.5);if(p2)dropRocks(5);}
+      if(stuck&&boss){e.state='daze';e.t=brine?(p2?1.5:2):(p2?.7:1);SFX.slam();shake(3,.35);burst(e.x+vx*14,e.y+vy*10,16,['#8a8074','#cdb98a','#ffffff'],90,.5);if(p2&&!brine)dropRocks(5);
+        if(brine){if(!S.dazeHint){S.dazeHint=true;toast('It\'s dazed! Strike now!',1.8);}if(p2&&enemies.filter(o=>o.kind==='crab'&&!o.dead).length<2)for(const s2 of[-1,1]){const c=mkEnemy('crab',0,0);c.x=e.x+s2*30;c.y=e.y+22;if(hitsSolid(c.x,c.y,c.hw,c.hh)){c.x=e.x;c.y=e.y+24;}enemies.push(c);}}}
       else{e.state='walk';e.t=.7;if(stuck){burst(e.x+vx*8,e.y,6,['#8a8074','#ffffff'],60,.3);SFX.clank();}}}}
   else if(e.state==='daze'){if(e.t<=0){e.state='walk';e.t=.4;}}
   else if(e.state==='flip'){if(e.t<=0){e.state='recover';e.t=.35;burst(e.x,e.y,10,['#8a8074','#cdb98a'],60,.4);}}
@@ -1516,6 +1807,7 @@ function shardCutscene(){
 /* ---- chapter three systems: lantern, shots, blocks, braziers, vines, new foes ---- */
 const ECOLS={slime:['#dcffb8','#7fd85a','#3e9446','#fff'],big:['#f2c9ff','#b866c4','#6c2d7c','#fff'],rat:['#c8a8a0','#7d6a60','#fff'],ratking:['#c8a8a0','#f0c65a','#7d6a60','#fff'],bat:['#c8a8e0','#6a4a8a','#fff'],sentinel:['#7f8796','#ff5a3c','#fff1a0','#3a3240'],beetle:['#6fc2b8','#2f6a6e','#f0c65a','#fff'],grim:['#8a6a9a','#ff8a3a','#ecd0a0','#2a1e30'],
   frog:['#9ae06a','#62a83a','#f0e080','#fff'],plant:['#e88ab4','#b04878','#4ab04a','#fff'],guard:['#98a6bc','#66728a','#40e8c8','#fff'],captain:['#9a8a9a','#c83a3a','#ff6a4a','#fff'],wisp:['#a8fff0','#40c8a8','#ffffff'],wraith:['#9a8acc','#3a2a5c','#ffe8a0','#ffffff']};
+Object.assign(ECOLS,{crab:['#f08a5a','#c8482a','#ffd0a0','#fff'],gull:['#ffffff','#c8d0dc','#f0c65a'],brine:['#9ab8a0','#5a7a6a','#e8e0c8','#7fd0ff']});
 const ecol=e=>e.sk==='mslime'?['#d8fbff','#58c8d0','#2a7a90','#fff']:ECOLS[e.kind]||['#fff'];
 const FIRE=['#fff4b0','#ffc040','#ff7a1a','#e04a1a'];
 function fireLamp(){if(!F.lantern||P.lampCd>0)return;let dx=P.fx,dy=P.fy;if(lock){dx=lock.x-P.x;dy=lock.y-P.y;}const l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;
@@ -1537,7 +1829,7 @@ function flameHit(e){burst(e.x,e.y-6-e.z,10,FIRE,70,.4,-30);
   if(e.kind==='wisp'||e.kind==='plant'){e.hp=0;killEnemy(e);return;}
   if(e.kind==='wraith'){if(e.state!=='reveal'&&e.state!=='shriek')wraithReveal(e,2.6);return;}
   if(e.kind==='guard'||e.kind==='captain'){e.state='recover';e.t=1.1;e.flash=.13;SFX.hit();return;}
-  if(e.boss||(e.kind==='beetle'&&e.state!=='flip')){SFX.clank();return;}
+  if(e.boss||((e.kind==='beetle'||e.kind==='crab')&&e.state!=='flip')){SFX.clank();return;}
   e.hp-=1;e.flash=.13;e.stun=.9;SFX.hit();if(e.hp<=0)killEnemy(e);}
 function updateShots(dt){for(const s of shots){s.life-=dt;if(s.life<=0)continue;
   for(let k=0;k<3&&s.life>0;k++){s.x+=s.vx*dt/3;s.y+=s.vy*dt/3;const tx=Math.floor(s.x/TS),ty=Math.floor((s.y+4)/TS),t=tileAt(tx,ty);const passable=!SOLID[t]||t===T.PIT||t===T.WATER||t===T.LILY;
@@ -1553,7 +1845,7 @@ function updateShots(dt){for(const s of shots){s.life-=dt;if(s.life<=0)continue;
   shots=shots.filter(s=>s.life>0);}
 function drawShot(s,cx,cy){const x=Math.round(s.x-cx),y=Math.round(s.y-cy);
   if(s.kind==='flame'){for(let i=0;i<3;i++){ctx.fillStyle=FIRE[i];const r=5-i*1.5;ctx.beginPath();ctx.arc(x,y,r+Math.sin(time*30+i)*.8,0,7);ctx.fill();}return;}
-  shadow(x,y+8,6);if(s.kind==='orb'){ctx.fillStyle='#1b1420';ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.fill();ctx.fillStyle='#8a5ad0';ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();ctx.fillStyle='#e0c8ff';ctx.fillRect(x-2,y-2,2,2);return;}
+  shadow(x,y+8,6);if(s.kind==='bubble'){ctx.fillStyle='#1b1420';ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.fill();ctx.fillStyle='#7fd0ff';ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();ctx.fillStyle='#ffffff';ctx.fillRect(x-2,y-2,2,2);return;}if(s.kind==='orb'){ctx.fillStyle='#1b1420';ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.fill();ctx.fillStyle='#8a5ad0';ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();ctx.fillStyle='#e0c8ff';ctx.fillRect(x-2,y-2,2,2);return;}
   ctx.fillStyle='#1b1420';ctx.fillRect(x-2,y-2,5,5);ctx.fillStyle=s.from==='p'?'#fff4b0':'#c8e07a';ctx.fillRect(x-1,y-1,3,3);ctx.fillStyle='#ffffff';ctx.fillRect(x-1,y-1,1,1);}
 /* pushable blocks and pressure plates */
 function tryPush(nx,ny,dt,moved){if(!S.plates||moved||P.shield){P.push=0;return;}const card=Math.abs(nx)>.8?[Math.sign(nx),0]:Math.abs(ny)>.8?[0,Math.sign(ny)]:null;if(!card){P.push=0;return;}
@@ -1612,12 +1904,13 @@ function morrowIsland(){F.mw_morrow=true;const m=mkNpc('morrow',PAL.morrow,49,21
 function updatePlayer(dt){
   P.inv=Math.max(0,P.inv-dt);P.rollCd=Math.max(0,P.rollCd-dt);P.hookCd=Math.max(0,P.hookCd-dt);P.lampCd=Math.max(0,P.lampCd-dt);
   const px0=P.x,py0=P.y;
+  {const ct=tileAt(Math.floor(P.x/TS),Math.floor(P.y/TS)),was=P.swim;P.swim=!!F.charm&&(ct===T.WATER||ct===T.LILY);if(P.swim&&!was){P.charge=0;if(P.state==='roll'||P.state==='attack'||P.state==='spin')P.state='normal';SFX.roll();burst(P.x,P.y,10,['#ffffff','#9fe0fb','#3d9ee6'],60,.4);if(!F.swim_tip){F.swim_tip=true;toast('Swimming! You can\'t use your sword in deep water.',2.6);}}}
   const[ix,iy]=moveInput();const mag=Math.hypot(ix,iy);
   if(lock&&(lock.dead||Math.hypot(lock.x-P.x,lock.y-P.y)>190)){lock=null;$('b-target').classList.remove('lit');}
   if(edge.target)toggleLock();
   if(edge.item)usePotion();
-  if(edge.hook&&F.hook&&P.state==='normal'&&P.kbT<=0&&P.hookCd<=0&&P.charge<.12)startHook();
-  if(edge.lamp&&F.lantern&&(P.state==='normal'||P.state==='attack')&&P.kbT<=0)fireLamp();
+  if(edge.hook&&F.hook&&!P.swim&&P.state==='normal'&&P.kbT<=0&&P.hookCd<=0&&P.charge<.12)startHook();
+  if(edge.lamp&&F.lantern&&!P.swim&&(P.state==='normal'||P.state==='attack')&&P.kbT<=0)fireLamp();
   if(lock){const dx=lock.x-P.x,dy=lock.y-P.y,l=Math.hypot(dx,dy)||1;if(P.state!=='roll'){P.fx=dx/l;P.fy=dy/l;}}
   if(P.kbT>0){P.kbT-=dt;moveBody(P,P.kbx*dt,P.kby*dt);P.kbx*=.86;P.kby*=.86;}
   else if(P.state==='hook')updateHook(dt);
@@ -1632,17 +1925,18 @@ function updatePlayer(dt){
     const fa=Math.atan2(P.fy,P.fx)+pr*Math.PI*2;cutAt(P.x+Math.cos(fa)*14,P.y+Math.sin(fa)*14);cutAt(P.x+Math.cos(fa)*22,P.y+Math.sin(fa)*22);
     if(P.spinT>=SPIN_T)P.state='normal';}
   else{
-    P.shield=!!held.shield;const charging=P.charge>.12;const spd=P.shield?38:charging?42:74;
-    if(held.sword&&!P.shield&&!P.noCharge&&F.spin&&mode==='play'){const was=P.charge<CHARGE_T;P.charge+=dt;if(was&&P.charge>=CHARGE_T)SFX.charged();}
+    P.shield=!!held.shield&&!P.swim;const charging=P.charge>.12;const spd=P.swim?50:P.shield?38:charging?42:74;
+    if(held.sword&&!P.shield&&!P.noCharge&&F.spin&&!P.swim&&mode==='play'){const was=P.charge<CHARGE_T;P.charge+=dt;if(was&&P.charge>=CHARGE_T)SFX.charged();}
     else{if(!held.sword&&P.charge>=CHARGE_T&&!P.shield){P.state='spin';P.spinT=0;P.hitSet=new Set();P.cutSet=new Set();SFX.spin();}P.charge=0;if(!held.sword)P.noCharge=false;}
     if(mag>.15){const m=Math.min(1,mag),nx=ix/mag,ny=iy/mag;const ox=P.x,oy=P.y;moveBody(P,nx*spd*m*dt,ny*spd*m*dt,true);P.walkT+=dt*m*(P.shield||charging?.6:1);P.moving=true;tutDist+=spd*m*dt;if(!lock&&!P.shield&&!charging){P.fx=nx;P.fy=ny;}if(S.dungeon)tryDoor(nx,ny);tryPush(nx,ny,dt,Math.hypot(P.x-ox,P.y-oy)>spd*m*dt*.3);}else{P.moving=false;P.push=0;}
+    if(P.swim&&P.moving&&Math.random()<.35)parts.push({x:P.x+(Math.random()-.5)*10,y:P.y+2,vx:(Math.random()-.5)*20,vy:-14,life:.4,max:.4,col:Math.random()<.5?'#ffffff':'#9fe0fb',g:40,sz:1});
     if(edge.sword){const it=P.shield?null:interactTarget();if(it)P.noCharge=true;
       if(it&&it.npc)talkTo(it.npc);
       else if(it&&it.lines)say(it.lines);
       else if(it&&it.chest)openChest(it.chest);
       else if(it&&it.altar){P.hp=P.maxHp;updateHud(true);saveGame();SFX.save();burst(P.x,P.y-10,16,['#fff1a0','#ffffff','#a6dbf3'],50,.8,-30);say([L('','You kneel at the altar. Your hearts are restored and your journey is saved.')]);}
-      else startAttack();}
-    if(mode==='play'&&edge.roll&&P.rollCd<=0){let dx=P.fx,dy=P.fy;if(mag>.15){dx=ix/mag;dy=iy/mag;}P.rdx=dx;P.rdy=dy;P.state='roll';P.rollT=0;P.shield=false;SFX.roll();}
+      else if(!P.swim)startAttack();}
+    if(mode==='play'&&edge.roll&&P.rollCd<=0&&!P.swim){let dx=P.fx,dy=P.fy;if(mag>.15){dx=ix/mag;dy=iy/mag;}P.rdx=dx;P.rdy=dy;P.state='roll';P.rollT=0;P.shield=false;SFX.roll();}
   }
   if(P.state!=='normal')P.shield=false;
   let lbl='Sword';if(P.state==='normal'&&!P.shield){const it=interactTarget();if(it)lbl=it.npc?'Talk':it.altar?'Pray':it.chest?'Open':'Read';}
@@ -1653,6 +1947,7 @@ function updatePlayer(dt){
   if(hit&&!P.inExit){if(hit.req&&!hit.req()){P.x=px0;P.y=py0;if(toastT<=0)toast(hit.msg,1.8);hit=null;}else if(hit.to){startWarp(hit);return;}}
   P.inExit=!!hit;
   if(S.id==='town'&&!F.ch3&&P.y>28.6*TS&&P.x>27*TS&&P.x<31*TS&&toastT<=0)toast(F.hd_done?'The south gate is barred. Captain Venn holds the key.':'The south gate is barred shut.',2);
+  if(S.id==='town'&&!F.ch4&&P.x>42.4*TS&&P.y>26.5*TS&&P.y<29*TS&&toastT<=0)toast(F.mw_done?'The east gate is chained shut by order of the crown. Captain Venn might know a way.':'The east gate is chained shut by order of the crown.',2);
   if(S.id==='marsh'&&!F.mw_morrow&&P.x>45*TS&&P.y>16*TS&&P.y<26*TS&&P.state==='normal'){morrowIsland();return;}
   if(S.id==='town'&&!F.inside&&P.x>15*TS&&P.x<44*TS&&P.y>6*TS&&P.y<30*TS)F.inside=true;
   if(S.id==='forest'&&S.gate===0&&P.x>(MW-8)*TS&&Math.abs(P.y-16.9*TS)<3*TS&&toastT<=0)toast(`Brambles block the path. Slimes left: ${enemies.filter(e=>!e.dead).length}`,2.4);
@@ -1663,7 +1958,7 @@ function updateEnemies(dt){
     const dxp=P.x-e.x,dyp=P.y-e.y,dist=Math.hypot(dxp,dyp)||1;
     if(e.kbT>0){e.kbT-=dt;moveBody(e,e.kbx*dt,e.kby*dt);e.kbx*=.85;e.kby*=.85;}
     else if(e.stun>0){e.stun-=dt;if(e.kind==='bat')e.z=Math.max(4,e.z-dt*20);}
-    else if(e.kind==='beetle'||e.kind==='grim')updateBeetle(e,dt,dist,dxp,dyp);
+    else if(e.kind==='beetle'||e.kind==='grim'||e.kind==='crab'||e.kind==='brine')updateBeetle(e,dt,dist,dxp,dyp);
     else if(e.kind==='slime'||e.kind==='big'){
       if(e.state==='idle'){e.t-=dt;if(e.t<=0){const chase=dist<(e.kind==='big'?130:105);const a=chase?Math.atan2(dyp,dxp)+(Math.random()-.5)*.6:Math.random()*6.283;
         const sp=e.kind==='big'?42:(chase?62:30);e.hx=Math.cos(a)*sp;e.hy=Math.sin(a)*sp;e.state='hop';e.hopT=0;e.hopDur=e.kind==='big'?.6:.42;}}
@@ -1673,7 +1968,7 @@ function updateEnemies(dt){
       if(e.state==='idle'){e.t-=dt;if(e.t<=0){const chase=dist<(king?160:120);const a=chase?Math.atan2(dyp,dxp)+(Math.random()-.5)*.5:Math.random()*6.283;const sp=king?70:(chase?100:45);e.hx=Math.cos(a)*sp;e.hy=Math.sin(a)*sp;e.state='dart';e.hopT=0;e.hopDur=king?.55:.35;if(e.hx)e.fx=Math.sign(e.hx);if(chase&&Math.random()<.3)SFX.squeak();}}
       else{e.hopT+=dt;moveBody(e,e.hx*dt,e.hy*dt);if(e.hopT>=e.hopDur){e.state='idle';e.t=(king?.7:.4)+Math.random()*.6;}}
       if(king){e.summonT-=dt;if(e.summonT<=0){e.summonT=7;const rats=enemies.filter(o=>o.kind==='rat'&&!o.dead).length;if(rats<3){for(const s of[-1,1]){const n=mkEnemy('rat',0,0);n.x=e.x+s*14;n.y=e.y;if(hitsSolid(n.x,n.y,n.hw,n.hh))n.x=e.x;enemies.push(n);}SFX.squeak();toast('The Rat King squeaks for help!',1.6);}}}}
-    else if(e.kind==='bat'){e.z=10+Math.sin(e.anim*5)*2;const chase=dist<110;let vx,vy;
+    else if(e.kind==='bat'||e.kind==='gull'){e.z=10+Math.sin(e.anim*5)*2;const chase=dist<110;let vx,vy;
       if(chase){const a=Math.atan2(dyp,dxp)+Math.sin(e.anim*3)*.9;vx=Math.cos(a)*52;vy=Math.sin(a)*52;}else{vx=Math.cos(e.anim*.9+e.x)*25;vy=Math.sin(e.anim*1.3+e.y)*25;}
       moveBody(e,vx*dt,vy*dt);}
     else if(e.kind==='sentinel')updateSentinel(e,dt,dist,dxp,dyp);
@@ -1684,9 +1979,9 @@ function updateEnemies(dt){
     else if(e.kind==='wraith')updateWraith(e,dt,dist,dxp,dyp);
     if(!e.boss&&!e.fixed)for(const o of enemies){if(o===e||o.dead||o.boss)continue;const ddx=e.x-o.x,ddy=e.y-o.y,dd=Math.hypot(ddx,ddy);const min=e.rad+o.rad-2;if(dd>0&&dd<min){const push=(min-dd)*.5;moveBody(e,ddx/dd*push,ddy/dd*push);}}
     const zOk=e.fly?true:e.z<5;
-    const safe=(e.kind==='sentinel'&&e.state==='stun')||e.state==='flip'||e.state==='recover'||e.stun>0||(e.kind==='wraith'&&e.state!=='dive');
+    const safe=(e.kind==='sentinel'&&e.state==='stun')||e.state==='flip'||e.state==='recover'||e.stun>0||(e.kind==='wraith'&&e.state!=='dive')||(e.kind==='brine'&&e.state==='daze');
     const reachX=(e.kind==='guard'||e.kind==='captain')&&e.state==='lunge'?12:5;
-    if(dist<e.rad+reachX&&zOk&&mode==='play'&&!safe){hurtPlayer(e,e.kind==='grim'&&e.state==='charge'?2:e.dmg);if(e.kind==='bat'&&P.inv>0){e.kbx=-dxp/dist*120;e.kby=-dyp/dist*120;e.kbT=.3;}}
+    if(dist<e.rad+reachX&&zOk&&mode==='play'&&!safe){hurtPlayer(e,(e.kind==='grim'||e.kind==='brine')&&e.state==='charge'?2:e.dmg);if((e.kind==='bat'||e.kind==='gull')&&P.inv>0){e.kbx=-dxp/dist*120;e.kby=-dyp/dist*120;e.kbT=.3;}}
   }
   const before=enemies.length;enemies=enemies.filter(e=>!e.dead);if(enemies.length!==before)updateHud();}
 function updateSentinel(e,dt,dist,dxp,dyp){
@@ -1698,7 +1993,7 @@ function updateSentinel(e,dt,dist,dxp,dyp){
 function updateNpcs(dt){for(const n of npcs){if(!n.wander)continue;
   if(n.walk>0){n.walk-=dt;const ox=n.x,oy=n.y;moveBody(n,n.vx*dt,n.vy*dt);const[x0,y0,x1,y1]=n.wander;if(n.x<x0*TS||n.x>x1*TS+16||n.y<y0*TS||n.y>y1*TS+16){n.x=ox;n.y=oy;n.walk=0;}n.walkT+=dt;n.moving=n.walk>0&&(ox!==n.x||oy!==n.y);}
   else{n.moving=false;n.t-=dt;if(n.t<=0){const d=[[1,0],[-1,0],[0,1],[0,-1]][(Math.random()*4)|0];n.vx=d[0]*26;n.vy=d[1]*26;n.fx=d[0];n.fy=d[1];n.walk=.6+Math.random()*.9;n.t=1.2+Math.random()*2.2;}}}}
-const KEEP_P=new Set(['shard','hc','cap','hp','lily']);
+const KEEP_P=new Set(['shard','hc','cap','hp','lily','glass']);
 function updatePickups(dt){
   for(const p of pickups){p.t+=dt;if(p.hooked)continue;p.vz-=260*dt;p.z+=p.vz*dt;if(p.z<0){p.z=0;p.vz=-p.vz*.4;if(Math.abs(p.vz)<15)p.vz=0;}
     const fr=p.z>0?1:.85;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=fr;p.vy*=fr;
@@ -1706,8 +2001,9 @@ function updatePickups(dt){
     if(p.t>.35&&d<(keep?13:8)){p.dead=true;
       if(p.type==='coin'){marks++;SFX.coin();}else if(p.type==='heart'){P.hp=Math.min(P.maxHp,P.hp+2);SFX.heart();}
       else if(p.type==='ore'){F.ore=(F.ore||0)+1;SFX.item();toast(`Iron ore: ${F.ore} of 3`+(F.ore>=3?'. Take it to Odo!':''),2.2);}
-      else if(p.type==='shard'){SFX.item();if(S.id==='hd7'){F.shard2=true;shard2Cutscene();}else if(S.id==='mw7'){F.shard3=true;shard3Cutscene();}else shardCutscene();}
+      else if(p.type==='shard'){SFX.item();if(S.id==='hd7'){F.shard2=true;shard2Cutscene();}else if(S.id==='mw7'){F.shard3=true;shard3Cutscene();}else if(S.id==='gl6'){F.shard4=true;shard4Cutscene();}else shardCutscene();}
       else if(p.type==='cap'){F[p.flag]=true;F.caps=(F.caps||0)+1;SFX.item();toast(`Glowcap: ${F.caps} of 5`+(F.caps>=5?'. Take them to Old Wick!':''),2.4);saveGame();}
+      else if(p.type==='glass'){F[p.flag]=true;F.glass=(F.glass||0)+1;SFX.item();toast(`Sea glass: ${F.glass} of 5`+(F.glass>=5?(F.glass_q?'. Take it to Coralie!':'. Someone in Port Gullhaven might like these.'):''),2.4);saveGame();}
       else if(p.type==='hp'){F[p.flag]=true;addHeartPiece();}
       else if(p.type==='lily'){F.lily=true;SFX.item();say([L('','You picked a Moonlily! Its petals glow softly, like a little moon.'),L('Pip','Nell needs this. Let\'s get it back to Brackenford!')]);saveGame();}
       else if(p.type==='hc'){F[p.flag||'hd_hc']=true;P.maxHp+=2;P.hp=P.maxHp;SFX.heart();toast('You got a Heart Container! One more heart for Wren.',2.8);saveGame();}
@@ -1765,7 +2061,9 @@ function drawSword(px,py,fa,p,glow,raw){const a=raw?fa:(glow!==undefined&&p===.5
   for(let r=3;r<=len;r++){const x=Math.round(px+Math.cos(a)*r),y=Math.round(py+Math.sin(a)*r);ctx.fillStyle=r<6?'#6e4320':(r===6?'#f0c65a':'#1b1420');ctx.fillRect(x-1,y-1,3,3);}
   for(let r=3;r<=len;r++){const x=Math.round(px+Math.cos(a)*r),y=Math.round(py+Math.sin(a)*r);ctx.fillStyle=r<6?'#9a6a3a':(r===6?'#ffe08a':(glow&&Math.floor(time*16)%2?'#fff6c0':(r>len-3?'#ffffff':(iron?'#b8c8e0':'#d8e2ee'))));ctx.fillRect(x,y,1,1);if(r>6)ctx.fillRect(x+(Math.abs(Math.sin(a))>.7?1:0),y+(Math.abs(Math.sin(a))>.7?0:1),1,1);}}
 function drawPlayer(cx,cy){
-  const x=Math.round(P.x-cx),y=Math.round(P.y-cy);shadow(x,y+3,12);
+  const x=Math.round(P.x-cx),y=Math.round(P.y-cy);
+  if(P.swim){if(P.inv>0&&Math.floor(P.inv*14)%2===0&&mode==='play')return;const d=facingDir(P.fx,P.fy),f=P.moving?(Math.floor(P.walkT*6)%2):0,spr=HERO[d][f];ctx.drawImage(spr,0,0,spr.width,13,x-9,y-12+Math.round(Math.sin(time*4)),spr.width,13);ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(x,y+1,9+Math.sin(time*5),3,0,0,7);ctx.stroke();return;}
+  shadow(x,y+3,12);
   if(P.inv>0&&Math.floor(P.inv*14)%2===0&&mode==='play')return;
   const d=facingDir(P.fx,P.fy);const f=P.moving?(Math.floor(P.walkT*8)%2):0;const spr=HERO[d][f];
   const fa=Math.atan2(P.fy,P.fx);const swordUp=P.state==='attack'&&d==='U';const sh=SHIELD[F.sword>1?1:0];
@@ -1801,7 +2099,8 @@ function drawEnemy(e,cx,cy){const x=Math.round(e.x-cx),y=Math.round(e.y-cy);let 
     s=SPR[e.sk||e.kind][fi];if(e.flash>0)s=whiteOf(s);ctx.drawImage(s,x-(s.width>>1),y+(big?7:5)-s.height-Math.round(e.z));return;}
   if(e.kind==='rat'||e.kind==='ratking'){const king=e.kind==='ratking';shadow(x,y+(king?6:4),king?24:12);const f=e.state==='dart'?(Math.floor(e.anim*14)%2):0;s=SPR[e.kind][f][e.fx<0?1:0];if(e.flash>0)s=whiteOf(s);ctx.drawImage(s,x-(s.width>>1),y+(king?7:5)-s.height);return;}
   if(e.kind==='bat'){shadow(x,y+4,8);s=SPR.bat[Math.floor(e.anim*10)%2];if(e.flash>0)s=whiteOf(s);ctx.drawImage(s,x-8,y-Math.round(e.z)-6);return;}
-  if(e.kind==='beetle'||e.kind==='grim'){const boss=e.kind==='grim',set=boss?SPR.grim:SPR.beetle;shadow(x,y+(boss?10:5),boss?34:14);
+  if(e.kind==='gull'){shadow(x,y+4,8);s=SPR.gull[Math.floor(e.anim*6)%2];if(e.flash>0)s=whiteOf(s);ctx.drawImage(s,x-9,y-Math.round(e.z)-6);if(e.stun>0)stars(7,14+e.z);return;}
+  if(e.kind==='beetle'||e.kind==='grim'||e.kind==='crab'||e.kind==='brine'){const boss=e.kind==='grim'||e.kind==='brine',set=SPR[e.kind];shadow(x,y+(boss?10:5),boss?34:14);
     const k=(e.state==='flip'||e.state==='recover')?'belly':(e.state==='wind'||e.state==='charge')?'open':'shell';
     const f=(e.state==='walk'||e.state==='charge'||e.state==='flip')?Math.floor(e.anim*(e.state==='charge'?16:8))%2:0;
     s=set[k][f][e.dir];if(e.flash>0)s=whiteOf(s);const ox=e.state==='wind'?Math.round((Math.random()-.5)*(boss?3:2)):0;
@@ -1813,7 +2112,7 @@ function drawEnemy(e,cx,cy){const x=Math.round(e.x-cx),y=Math.round(e.y-cy);let 
     if(e.flash>0)s=whiteOf(s);const bob=e.state==='walk'?Math.round(Math.abs(Math.sin(e.anim*5))*1.5):0;const sx=x-16+(e.state==='wind'?Math.round((Math.random()-.5)*2):0);ctx.drawImage(s,sx,y+8-s.height-bob);
     if(e.state==='stun'){ctx.fillStyle='#fff1a0';for(let i=0;i<3;i++){const a=time*4+i*2.09;ctx.fillRect(Math.round(x+Math.cos(a)*10),Math.round(y-38+Math.sin(a)*3),2,2);}}}}
 function drawPickup(p,cx,cy){const x=Math.round(p.x-cx),y=Math.round(p.y-cy);if(p.t>11&&!KEEP_P.has(p.type)&&p.type!=='ore'&&Math.floor(p.t*8)%2)return;shadow(x,y+2,6);const z=Math.round(p.z);
-  if(p.type==='cap'||p.type==='lily'||p.type==='hp'){const b=Math.round(Math.sin(time*3+p.x)*2);if(p.type==='cap')ctx.drawImage(CAP_IMG,x-5,y-12-z+b);else if(p.type==='lily')ctx.drawImage(LILY_IMG,x-6,y-13-z+b);else ctx.drawImage(HP_IMG,x-9,y-20-z+b,18,16);
+  if(p.type==='cap'||p.type==='lily'||p.type==='hp'||p.type==='glass'){const b=Math.round(Math.sin(time*3+p.x)*2);if(p.type==='cap')ctx.drawImage(CAP_IMG,x-5,y-12-z+b);else if(p.type==='glass')ctx.drawImage(GLASS_IMG,x-5,y-11-z+b);else if(p.type==='lily')ctx.drawImage(LILY_IMG,x-6,y-13-z+b);else ctx.drawImage(HP_IMG,x-9,y-20-z+b,18,16);
     if(Math.floor(time*4+p.x)%5===0){ctx.fillStyle='#ffffff';ctx.fillRect(x+4,y-14+b,1,1);}return;}
   if(p.type==='coin')ctx.drawImage(COIN[Math.floor(time*6+p.x)%2],x-4,y-6-z);
   else if(p.type==='heart')ctx.drawImage(HEARTS[2],x-4,y-7-z+Math.round(Math.sin(time*4)));
@@ -1899,6 +2198,7 @@ function updateHud(force){if(!P)return;let c2=null,n2=0;
   else if(S&&S.id==='cellar'&&!F.rats_clear){c2='rat';n2=enemies.filter(e=>!e.dead).length;}
   else if(S&&S.dungeon&&(F[S.keyFlag||'hd_keys']||0)>0){c2='key';n2=F[S.keyFlag||'hd_keys'];}
   else if(F.wick_q&&!F.wick_done&&S&&(S.id==='marsh'||S.id==='hut')){c2='cap';n2=`${Math.min(5,F.caps||0)}/5`;}
+  else if(F.glass_q&&!F.glass_done&&S&&S.id==='coast'){c2='glass';n2=`${Math.min(5,F.glass||0)}/5`;}
   else if(F.odo_asked&&!F.craft){c2='ore';n2=`${Math.min(3,F.ore||0)}/3`;}
   const k=[P.hp,P.maxHp,marks,c2,n2,potions,F.lantern,F.hook].join('|');if(k===hudKey&&!force)return;hudKey=k;
   const hs=$('hearts');hs.innerHTML='';for(let i=0;i<P.maxHp/2;i++){const im=document.createElement('img');im.alt='';const f=P.hp>=2*(i+1)?2:(P.hp===2*i+1?1:0);im.src=HEART_URL[f];hs.appendChild(im);}
@@ -1916,7 +2216,11 @@ const DUNGEONS={
   mw:{name:'Mirewatch Tower',entry:'mw1',exitLabel:'to the fen',boss:'mw7',done:'mw_done',bigName:'Great door',
     rooms:{mw7:[1,0,'Bell Loft'],mw5:[0,1,'Braziers'],mw6:[1,1,'Gallery'],mw2:[0,2,'Dark Hall'],mw1:[1,2,'Entry'],mw3:[2,2,'Blocks'],mw4:[2,3,'Armory']},
     links:[['mw1','mw2'],['mw1','mw3'],['mw3','mw4','mw_p3','bars'],['mw1','mw6','mw_l1','key'],['mw6','mw5','mw_vine','vine'],['mw6','mw7','mw_bl','big']],
-    chests:{mw2:[['mw_c2','mw_t2']],mw3:[['mw_c3',null]],mw4:[['mw_c4','mw_t4']],mw5:[['mw_c5','mw_br5']]},pits:{mw6:'h'}}};
+    chests:{mw2:[['mw_c2','mw_t2']],mw3:[['mw_c3',null]],mw4:[['mw_c4','mw_t4']],mw5:[['mw_c5','mw_br5']]},pits:{mw6:'h'}},
+  gl:{name:'Gullrock Light',entry:'gl1',exitLabel:'to the coast',boss:'gl6',done:'gl_done',bigName:'Great door',
+    rooms:{gl6:[1,0,'Lamp Room'],gl4:[1,1,'Cistern'],gl5:[2,1,'Stair'],gl2:[0,2,'Bell Store'],gl1:[1,2,'Entry'],gl3:[2,2,'Cells']},
+    links:[['gl1','gl2'],['gl1','gl3'],['gl1','gl4','gl_l1','key'],['gl4','gl5'],['gl4','gl6','gl_bl','big']],
+    chests:{gl2:[['gl_c2','gl_t2']],gl4:[['gl_c4','gl_t4']],gl5:[['gl_c5',null],['gl_c5b',null]]},pits:{gl4:'h',gl5:'w'}}};
 /* the realm of Gallowmark: explored regions plus the lands still to come */
 const REGIONS=[
   {id:'heart',name:'The Heartlands',x:118,y:74,w:150,h:96,col:'#a8c078',known:()=>true},
@@ -1924,7 +2228,7 @@ const REGIONS=[
   {id:'ashen',name:'The Ashen Peaks',x:140,y:14,w:126,h:46,col:'#b0a090'},
   {id:'frost',name:'Frostmere',x:22,y:16,w:100,h:52,col:'#c8dce8'},
   {id:'thorn',name:'Thornmoor',x:18,y:84,w:84,h:62,col:'#8aa070'},
-  {id:'salt',name:'Saltmarrow Coast',x:282,y:96,w:98,h:66,col:'#d8cca0'},
+  {id:'salt',name:'Saltmarrow Coast',x:282,y:96,w:98,h:66,col:'#d8cca0',known:()=>mapVisited('coast')},
   {id:'sun',name:'The Sunscar Wastes',x:98,y:176,w:216,h:36,col:'#e0c080'}];
 const TOWN_DOORS={smithy:[35,11],inn:[19,26],cellar:[19,26],chapel:[19,11],hall:[51,14],fenhouse:[37,26]};
 function mapVisited(id){const v=F.vis||{};if(v[id])return true;if(id==='forest')return true;if(id==='town')return!!(F.forest_clear||F.inside||F.quest);if(id==='quarry')return!!F.quarry_seen;return false;}
@@ -1945,7 +2249,7 @@ function drawRealmMap(g){mapPaper(g);
   const H=REGIONS[0],sx=H.x+6,sy=H.y+6;const box=(x,y,w,h,c,n,on)=>{if(!on)return;g.fillStyle=c;g.fillRect(sx+x,sy+y,w,h);g.strokeStyle=INK;g.lineWidth=1;g.strokeRect(sx+x+.5,sy+y+.5,w-1,h-1);mapText(g,n,sx+x+w/2,sy+y+(h>24?8:h/2),8,INK);};
   box(0,30,40,26,'#86a660','Wood',true);box(50,26,50,30,'#c8bc9c','Brackenford',mapVisited('town'));box(62,0,30,22,'#b4a68a','Quarry',mapVisited('quarry'));box(46,60,60,24,'#7aa07a','Fen',mapVisited('marsh'));
   mapText(g,'The Heartlands',H.x+H.w/2,H.y-8,11,INK,'rgba(216,196,148,.95)');
-  const here=S?S.id:'';const spot={forest:[20,43],town:[75,41],quarry:[77,11],marsh:[76,72]};let k=TOWN_DOORS[here]?'town':here.startsWith('hd')?'quarry':(here.startsWith('mw')||here==='hut')?'marsh':here;if(spot[k]&&P)mapYou(g,sx+spot[k][0],sy+spot[k][1]);
+  const here=S?S.id:'';const spot={forest:[20,43],town:[75,41],quarry:[77,11],marsh:[76,72]};let k=TOWN_DOORS[here]?'town':here.startsWith('hd')?'quarry':(here.startsWith('mw')||here==='hut')?'marsh':here;if(spot[k]&&P)mapYou(g,sx+spot[k][0],sy+spot[k][1]);if(P&&COAST_IDS.has(here)){const R2=REGIONS.find(r=>r.id==='salt');mapYou(g,R2.x+R2.w/2,R2.y+R2.h/2+14);}
 }
 function drawWorldMap(g){mapPaper(g);const sc=1.75,TX=150,QY=16,TY=QY+24*sc+10,QX=TX+(28.5-15.5)*sc,MY=TY+36*sc+8,MX=TX+(28.5-31.5)*sc,FX=18,FY=TY+6;
   const here=S?S.id:'',hereTown=here==='town'||TOWN_DOORS[here];
@@ -1974,6 +2278,14 @@ function drawWorldMap(g){mapPaper(g);const sc=1.75,TX=150,QY=16,TY=QY+24*sc+10,Q
     if(F.vis&&F.vis.mw1)mapText(g,'Mirewatch',MXX+64*ms+30,MY+16*ms,11,'#2a5a4a');
     if(here==='marsh'&&P)mapYou(g,MXX+P.x/TS*ms,MY+P.y/TS*ms);if((here.startsWith('mw'))&&P)mapYou(g,MXX+48.5*ms,MY+19*ms);if(here==='hut'&&P)mapYou(g,MXX+9.5*ms,MY+11*ms);}
   else if(F.ch3){g.strokeStyle=INK_L;g.setLineDash([4,3]);g.strokeRect(TX+10,MY,90,36);g.setLineDash([]);mapText(g,'Gloaming Fen?',TX+55,MY+18,11,INK_L);}
+  {const CX=302,CY=TY+40,cw=90,ch=40;
+    if(mapVisited('coast')){g.save();g.strokeStyle=INK_L;g.lineWidth=2;g.setLineDash([4,3]);g.beginPath();g.moveTo(TX+60*sc,TY+27.5*sc);g.lineTo(CX,CY+ch*.5);g.stroke();g.restore();
+      g.fillStyle='#a8c078';g.fillRect(CX,CY,cw,ch);g.fillStyle='#e8d49a';g.fillRect(CX+cw*.35,CY,cw*.32,ch);g.fillStyle='#5a90c0';g.fillRect(CX+cw*.66,CY,cw*.34,ch);
+      g.fillStyle='#e8d49a';g.beginPath();g.arc(CX+cw*.82,CY+ch*.74,5,0,7);g.fill();g.fillStyle='#f4f0e0';g.fillRect(CX+cw*.82-2,CY+ch*.74-9,4,8);g.fillStyle='#c83a3a';g.fillRect(CX+cw*.82-2,CY+ch*.74-6,4,2);
+      g.fillStyle='#8a3a3a';g.fillRect(CX+cw*.47,CY+5,6,5);g.fillStyle='#3e6a8a';g.fillRect(CX+cw*.38,CY+6,5,4);
+      g.strokeStyle=INK;g.lineWidth=2;g.strokeRect(CX,CY,cw,ch);mapText(g,'Saltmarrow Coast',CX+cw/2,CY-8,11);
+      if(here==='coast'&&P)mapYou(g,CX+P.x/TS/72*cw,CY+P.y/TS/44*ch);else if(here.startsWith('gl')&&P)mapYou(g,CX+cw*.82,CY+ch*.74);else if((here==='harbor'||here==='gulltav'||here==='hobbhouse')&&P)mapYou(g,CX+cw*.45,CY+ch*.3);}
+    else if(F.ch4){g.strokeStyle=INK_L;g.setLineDash([4,3]);g.strokeRect(CX,CY,cw,ch);g.setLineDash([]);mapText(g,'The coast?',CX+cw/2,CY+ch/2,11,INK_L);}}
   mapText(g,'The Heartlands',62,MAP_H-14,13,INK);}
 function drawDeepMap(g,key){mapPaper(g);const D=DUNGEONS[key],rows=Math.max(...Object.values(D.rooms).map(r=>r[1]))+1,cols=Math.max(...Object.values(D.rooms).map(r=>r[0]))+1;
   const cw=66,gx=16,gy=10,ch=Math.min(36,Math.floor((MAP_H-58-(rows-1)*gy)/rows)),ox=Math.round((MAP_W-(cols*cw+(cols-1)*gx))/2),oy=28;
@@ -1999,13 +2311,13 @@ function drawDeepMap(g,key){mapPaper(g);const D=DUNGEONS[key],rows=Math.max(...O
   mapYou(g,22,ly);g.fillStyle=INK;g.fillText('You',32,ly+1);g.fillStyle='#f0c65a';g.fillRect(64,ly-3,8,6);g.fillStyle=INK;g.fillText('Chest',76,ly+1);
   g.fillStyle='#f0c65a';g.fillRect(118,ly-3,8,6);g.strokeStyle='#1b1420';g.strokeRect(118,ly-3,8,6);g.fillStyle=INK;g.fillText('Key door',130,ly+1);
   g.fillStyle='#e04a3a';g.fillRect(186,ly-4,9,8);g.fillStyle=INK;g.fillText(D.bigName,199,ly+1);
-  const kf=key==='mw'?'mw_keys':'hd_keys';if(F[kf])g.fillText(`Small keys: ${F[kf]}`,300,ly+1);}
+  const kf=key==='mw'?'mw_keys':key==='gl'?'gl_keys':'hd_keys';if(F[kf])g.fillText(`Small keys: ${F[kf]}`,300,ly+1);}
 let menuFrom='play',menuKind='';
 function openMenu(kind,arg){const h=$('menu-h'),b=$('menu-body'),row=$('menu-row'),keys=$('menu-keys');row.innerHTML='';b.innerHTML='';keys.textContent='';menuKind=kind;
   const btn=(label,fn,dis)=>{const el=document.createElement('button');el.textContent=label;if(dis)el.disabled=true;el.addEventListener('click',e=>{e.stopPropagation();audioInit();fn();});row.appendChild(el);return el;};
   if(mode!=='paused')menuFrom=(mode==='dialog'||mode==='dead')?'play':mode;mode='paused';
   if(kind==='pause'){h.textContent='Paused';
-    const tok=F.ch3?`<div class="tokens"><span class="${F.lantern?'got':''}">Ember Lantern</span><span class="${F.mw_bk?'got':''}">Mire Key</span><span class="${F.shard3?'got':''}">Third shard</span><span class="${F.hpieces?'got':''}">Heart pieces ${F.hpieces%4||0}/4</span></div>`:F.ch2?`<div class="tokens"><span class="${F.hook?'got':''}">Grapple Claw</span><span class="${F.hd_bk?'got':''}">Belfry Key</span><span class="${F.shard2?'got':''}">Second shard</span></div>`:F.quest?`<div class="tokens"><span class="${F.courage?'got':''}">Courage</span><span class="${F.craft?'got':''}">Craft</span><span class="${F.kindness?'got':''}">Kindness</span></div>`:'';
+    const tok=F.ch4?`<div class="tokens"><span class="${F.charm?'got':''}">Mariner's Charm</span><span class="${F.gl_bk?'got':''}">Gull Key</span><span class="${F.shard4?'got':''}">Fourth shard</span><span class="${F.hpieces?'got':''}">Heart pieces ${F.hpieces%4||0}/4</span></div>`:F.ch3?`<div class="tokens"><span class="${F.lantern?'got':''}">Ember Lantern</span><span class="${F.mw_bk?'got':''}">Mire Key</span><span class="${F.shard3?'got':''}">Third shard</span><span class="${F.hpieces?'got':''}">Heart pieces ${F.hpieces%4||0}/4</span></div>`:F.ch2?`<div class="tokens"><span class="${F.hook?'got':''}">Grapple Claw</span><span class="${F.hd_bk?'got':''}">Belfry Key</span><span class="${F.shard2?'got':''}">Second shard</span></div>`:F.quest?`<div class="tokens"><span class="${F.courage?'got':''}">Courage</span><span class="${F.craft?'got':''}">Craft</span><span class="${F.kindness?'got':''}">Kindness</span></div>`:'';
     b.innerHTML=`<div class="goal">${objectives().map(o=>`<div>${o}</div>`).join('')}</div>${tok}`;
     btn('Resume',closeMenu);btn('Map',()=>openMenu('map'));const mb=btn(musicOn?'Music: on':'Music: off',()=>{musicOn=!musicOn;store.set('db-music',musicOn);mb.textContent=musicOn?'Music: on':'Music: off';});const s=btn(muted?'Sound: off':'Sound: on',()=>{muted=!muted;store.set('db-muted',muted);s.textContent=muted?'Sound: off':'Sound: on';});
     btn('Save and quit',()=>{saveGame();location.reload();});
@@ -2021,6 +2333,7 @@ function openMenu(kind,arg){const h=$('menu-h'),b=$('menu-body'),row=$('menu-row
   else if(kind==='chapter'){h.textContent='Chapter one complete';b.innerHTML=`<p>Wren is a Warden of Brackenford, with a Dawnbell shard and a new enemy.</p><p>Play time ${fmt(playTime)} &middot; ${marks} marks</p><p>Captain Venn has more to say. Talk to him before you leave the Hall.</p>`;btn('Keep exploring',closeMenu);}
   else if(kind==='chapter2'){h.textContent='Chapter two complete';b.innerHTML=`<p>Wren conquered the Hollow Deep, claimed the Grapple Claw and saved a second Dawnbell shard from Morrow.</p><p>Play time ${fmt(playTime)} &middot; ${marks} marks &middot; ${P.maxHp/2} hearts</p><p>That's the end of this build. More of Gallowmark is coming.</p>`;btn('Keep exploring',closeMenu);}
   else if(kind==='chapter3'){h.textContent='Chapter three complete';b.innerHTML=`<p>Wren freed the Bogwraith, claimed the Ember Lantern and saved a third Dawnbell shard. Morrow is watching every step.</p><p>Play time ${fmt(playTime)} &middot; ${marks} marks &middot; ${P.maxHp/2} hearts &middot; heart pieces ${F.hpieces||0}</p><p>Somewhere in Highcrown Castle, a princess nobody has seen in years is humming a song from Hollowmere. The road to the capital is coming in future chapters.</p>`;btn('Keep exploring',closeMenu);}
+  else if(kind==='chapter4'){h.textContent='Chapter four complete';b.innerHTML=`<p>Wren freed the keeper of Gullrock Light, earned the Mariner's Charm and saved a fourth Dawnbell shard. A ship with no lamps has sailed for Highcrown.</p><p>Play time ${fmt(playTime)} &middot; ${marks} marks &middot; ${P.maxHp/2} hearts &middot; heart pieces ${F.hpieces||0}</p><p>A girl with gold hair and a silver circlet, and a princess whose hair was black. The next answers wait in Thornmoor, in future chapters.</p>`;btn('Keep exploring',closeMenu);}
   else if(kind==='shop'){h.textContent='Tilda\'s Stall';b.innerHTML=`<p>You have ${marks} marks.</p>`;
     const buy=(cost,fn)=>()=>{if(marks<cost)return;marks-=cost;fn();SFX.coin();updateHud(true);openMenu('shop');};
     btn(`Potion: 15${potions?` (have ${potions})`:''}`,buy(15,()=>{potions++;}),potions>=(F.bag?5:3)||marks<15);
@@ -2112,11 +2425,11 @@ const R3=(()=>{
 
   /* ---------- scene look ---------- */
   let ST={};
-  function sceneStyle(){const marsh=S.gpal===GP.marsh,quarry=S.id==='quarry';
+  function sceneStyle(){const marsh=S.gpal===GP.marsh,quarry=S.id==='quarry',coast=!!S.coast;
     if(S.indoor)return{indoor:true,lit:!!(S.dark||S.dungeon),amb:S.dark?.16:S.dungeon?.55:1,sky:0x0b0a08,fogN:30,fogF:60};
-    return{outdoor:true,marsh,quarry,sky:marsh?0xd2b8cc:0x9fd4ff,water:marsh?0x3a7f88:0x3d8fc9,
+    return{outdoor:true,marsh,quarry,coast,sky:marsh?0xd2b8cc:coast?0xaee0ff:0x9fd4ff,water:marsh?0x3a7f88:coast?0x2a9ad0:0x3d8fc9,
       grass:marsh?{top:rgb('#5aa060'),side:rgb('#4f7a4a')}:quarry?{top:rgb('#9a8a6a'),side:rgb('#7a6448')}:{top:[.40,.72,.30],side:[.45,.52,.27]}};}
-  const tAt=(x,y)=>{if(x<0||y<0||x>=MW||y>=MH){if(S.indoor)return -1;return S.id==='quarry'?T.CLIFF:S.id==='town'?T.WALL:T.TREE;}return map[y*MW+x];};
+  const tAt=(x,y)=>{if(x<0||y<0||x>=MW||y>=MH){if(S.indoor)return -1;if(S.edgeAt)return S.edgeAt(x,y);return S.id==='quarry'?T.CLIFF:S.id==='town'?T.WALL:T.TREE;}return map[y*MW+x];};
   const isW=(x,y)=>tAt(x,y)===T.WATER;
   const wallish=t=>t===T.IWALL||t===T.TORCH||t===T.BARS||t===T.LOCK||t===T.BIGLOCK;
 
@@ -2137,7 +2450,8 @@ const R3=(()=>{
       for(let y=-3;y<-1;y++)set(x,y,z,S.indoor?B.dark:B.dirt);
       let top=floorB;
       if(t===T.PATH||t===T.BRAMBLE)top=B.path;else if(t===T.COBBLE||t===T.BLD||t===T.WELL||t===T.STALL||t===T.BOARD)top=S.indoor?floorB:B.cobble;
-      else if(t===T.STONE)top=S.indoor?B.sfloor:B.stone;else if(t===T.FLOOR)top=B.wfloor;
+      else if(t===T.STONE)top=S.indoor?B.sfloor:B.stone;else if(t===T.FLOOR)top=B.wfloor;else if(t===T.SAND)top=B.sand;
+      if(S.coast&&top===floorB&&t!==T.GRASS&&t!==T.FLOWER&&t!==T.TREE&&t!==T.BUSH&&(x>=COAST_SAND(z)-1||z>=30))top=B.sand;
       else if(t===T.DOOR&&S.indoor)top=B.dark;else if(t===T.CAVE||t===T.STAIRS)top=B.dark;
       set(x,-1,z,top);
       if(t===T.CLIFF){set(x,0,z,B.cliff);set(x,1,z,B.cliff);if(hash(x*3,z*5)<.4)set(x,2,z,B.cliff);}
@@ -2241,11 +2555,18 @@ const R3=(()=>{
       case T.DOOR:if(S.indoor){const side=(x===0||x===MW-1);if(side){B(.2,2.1,.15,WOODD,cx,0,z+.08);B(.2,2.1,.15,WOODD,cx,0,z+.92);}else{B(.15,2.1,.2,WOODD,x+.08,0,cz);B(.15,2.1,.2,WOODD,x+.92,0,cz);}}break;
       case T.CAVE:B(1.1,.3,.4,C_('#8a7658'),cx,1.9,z+.2);B(.25,1.9,.4,C_('#8a7658'),x+.1,0,z+.2);B(.25,1.9,.4,C_('#8a7658'),x+.9,0,z+.2);break;
       case T.FLOWER:{const fc=['#fff6e0','#ffd84a','#f59ac0','#a8c8ff'];for(let i=0;i<4;i++){const fx=x+.18+hash(x*5+i,z)*.64,fz=z+.18+hash(x,z*5+i)*.64;const fy=i*.012;B(.03,.14+fy,.03,C_('#3f8a34'),fx,0,fz);B(.08,.05,.08,C_(fc[((hash(x+i,z*3)*4)|0)]),fx,.14+fy,fz);B(.04,.035,.04,C_('#ffe060'),fx,.19+fy,fz);}break;}
+      case T.SAND:if(h<.12){const sc2=[C_('#f4e8d8'),C_('#e8a0a0'),C_('#c8d8e8')][(hash(x,z*7)*3)|0];B(.09,.04,.07,sc2,x+.2+h*5,0,z+.3+h*3,h*20);}else if(h>.9)B(.16,.06,.1,C_('#9a8a70'),x+.5,0,z+.5,h*9);break;
       case T.GRASS:if(!S.indoor&&h<.3){for(let i=0;i<3;i++){const gx=x+.15+hash(x*9+i,z)*.7,gz=z+.15+hash(x,z*9+i)*.7,gh=.08+hash(i,x)*.12;B(.05,gh,.05,ST.marsh?C_('#4a8a50'):C_('#4f9a38'),gx,0,gz);}}break;
       }}
     /* buildings */
     if(S.buildings)for(const b of S.buildings)building(acc,b);}
   function building(acc,b){const B=(w,h,d,c,x,y,z,ry)=>boxF(acc,w,h,d,c,x,y,z,ry);const x0=b.x,z0=b.y,w=b.w,d=b.h,cx=x0+w/2,cz=z0+d/2;
+    if(b.kind==='light'){const white=C_('#f2efe6'),red=C_('#c83a3a'),st=C_('#8a8478'),dk=C_('#3a3440');B(w+.3,.5,d+.3,st,cx,0,cz);
+      for(let i=0;i<7;i++)B(w-.5-i*.14,.8,d-.5-i*.14,i%2?red:white,cx,.5+i*.8,cz);const top=.5+7*.8;
+      B(w-.7,.14,d-.7,dk,cx,top,cz);for(const[qx,qz]of[[-1,-1],[1,-1],[-1,1],[1,1]])B(.1,1,.1,dk,cx+qx*.62,top+.14,cz+qz*.62);
+      B(1.1,.9,1.1,C_(F.gl_done?'#fff0a0':'#5a6a78'),cx,top+.18,cz);B(1.6,.12,1.6,dk,cx,top+1.14,cz);B(1.1,.4,1.1,red,cx,top+1.26,cz);B(.5,.3,.5,red,cx,top+1.66,cz);B(.1,.3,.1,dk,cx,top+1.96,cz);
+      B(.8,1.3,.08,C_('#1a1410'),x0+b.door+.5,.5,z0+d-.25-.04);B(.9,.1,.1,st,x0+b.door+.5,1.8,z0+d-.25-.04);
+      for(const[hy,dx]of[[2.4,-.4],[4.0,.4]])B(.26,.36,.06,C_(F.gl_done?'#ffd080':'#2a3040'),cx+dx,hy,z0+d-.25-.16-((hy-.5)/.8|0)*.07);return;}
     if(b.kind==='tower'){const st=C_('#7a8a7e'),sd=C_('#5a6a5e');B(w-.2,4.6,d-.2,st,cx,0,cz);for(let y=0;y<4.6;y+=.5)B(w-.1,.06,d-.1,sd,cx,y,cz);
       for(let i=0;i<w;i++)for(const s of[-1,1]){if(i%2)continue;B(.5,.45,.5,st,x0+.35+i,4.6,cz+s*(d/2-.35));B(.5,.45,.5,st,cx+s*(w/2-.35),4.6,z0+.35+i);}
       B(.8,1.3,.08,C_('#1a1410'),x0+b.door+.5,0,z0+d-.08);B(.3,.5,.06,C_('#ffd080'),cx-.8,2.6,z0+d-.08);B(.3,.5,.06,C_('#ffd080'),cx+.8,3.4,z0+d-.08);
@@ -2286,7 +2607,7 @@ const R3=(()=>{
     const ts=tSig();if(ts!==treeSig){if(treeMesh){scene.remove(treeMesh);treeMesh.geometry.dispose();treeMesh=null;}const a=buildTrees();if(a){treeMesh=accMesh(a,new THREE.MeshBasicMaterial({vertexColors:true}));scene.add(treeMesh);}treeSig=ts;}
     objs.add(accMesh(buildTerrain(),worldMat()));
     dyn=[];const acc=newAcc();buildProps(acc);decor(acc);if(acc.pos.length)objs.add(accMesh(acc,worldMat()));
-    if(ST.outdoor){water=new THREE.Mesh(new THREE.PlaneGeometry(MW+PAD*2,MH+PAD*2),new THREE.MeshBasicMaterial({color:ST.water,transparent:true,opacity:.72,depthWrite:false}));
+    if(ST.outdoor||map.includes(T.WATER)){water=new THREE.Mesh(ST.outdoor?new THREE.PlaneGeometry(MW+PAD*2,MH+PAD*2):new THREE.PlaneGeometry(MW,MH),new THREE.MeshBasicMaterial({color:ST.water||0x2f86c0,transparent:true,opacity:.72,depthWrite:false}));
       water.rotation.x=-Math.PI/2;water.position.set(MW/2,-.25,MH/2);water.renderOrder=2;objs.add(water);}
     dynG=new THREE.Group();objs.add(dynG);
     for(const d of dyn){if(d.k==='flame'){const g=new THREE.Group();g.position.set(d.x,d.y,d.z);g.scale.setScalar(d.s||1);
@@ -2370,6 +2691,14 @@ const R3=(()=>{
       const shell=grp(0,0,0,b);box(.6,.22,.66,P_.m,0,.12,0,shell);box(.46,.12,.5,P_.l,0,.34,-.02,shell);box(.04,.13,.62,P_.d,0,.3,0,shell);for(const[x,z]of[[-.16,.1],[.16,-.12],[.15,.16],[-.14,-.18]])box(.08,.02,.08,P_.spot,x,.41,z,shell);
       box(.3,.18,.18,P_.head,0,.14,.4,b);const jl=grp(-.08,.12,.48,b),jr=grp(.08,.12,.48,b);box(.05,.05,.18,P_.jaw,0,0,.08,jl);box(.05,.05,.18,P_.jaw,0,0,.08,jr);M.jl=jl;M.jr=jr;
       for(const q of[-1,1])for(const z of[-.2,0,.2])box(.16,.05,.05,P_.leg,q*.36,.06,z,b);box(.5,.04,.56,P_.belly,0,.01,0,b);M.face=3;M.shell=shell;}
+    else if(k==='crab'||k==='brine'){sc=k==='brine'?2.4:1;const P_=k==='brine'?{m:0x5a7a6a,l:0x9ab8a0,d:0x2e3c3a,claw:0x6a8a78,tip:0xe8a060,spot:0xe8e0c8,leg:0x24302e,belly:0xd8b890}:{m:0xc8482a,l:0xf08a5a,d:0x7a2418,claw:0xd85a34,tip:0xffd0a0,spot:0xffd0a0,leg:0x7a2418,belly:0xf0d0b0};
+      const shell=grp(0,0,0,b);box(.66,.2,.5,P_.m,0,.14,0,shell);box(.5,.1,.38,P_.l,0,.29,0,shell);box(.06,.03,.3,P_.d,0,.35,0,shell);
+      if(k==='brine')for(const[x,z]of[[-.18,.08],[.16,-.1],[.05,.14],[-.08,-.12],[.22,.1],[-.24,-.04]])box(.08,.07,.08,P_.spot,x,.37,z,shell);
+      for(const q of[-1,1]){box(.04,.12,.04,P_.d,q*.1,.32,.22,b);box(.07,.07,.07,0x1b1420,q*.1,.41,.22,b);}
+      const jl=grp(-.24,.16,.26,b),jr=grp(.24,.16,.26,b);for(const[j,q]of[[jl,-1],[jr,1]]){box(.1,.08,.18,P_.claw,0,0,.06,j);box(.16,.12,.16,P_.claw,0,0,.2,j);box(.05,.07,.13,P_.tip,q*-.045,0,.33,j);box(.05,.06,.1,P_.tip,q*.045,-.01,.31,j);}M.jl=jl;M.jr=jr;
+      for(const q of[-1,1])for(const z of[-.14,0,.14]){const l=box(.22,.04,.04,P_.leg,q*.42,.07,z,b);l.rotation.z=q*-.4;}box(.56,.04,.42,P_.belly,0,.03,0,b);M.face=3;M.shell=shell;}
+    else if(k==='gull'){box(.16,.14,.3,0xffffff,0,0,0,b);box(.12,.12,.12,0xffffff,0,.06,.18,b);box(.04,.04,.1,0xf0c65a,0,.05,.28,b);box(.1,.02,.12,0x8a94a8,0,.02,-.2,b);
+      for(const q of[-1,1]){box(.03,.03,.02,0x1b1420,q*.05,.08,.245,b);const w=grp(q*.08,.04,0,b);box(.34,.02,.14,0xe8ecf0,q*.17,0,0,w);box(.12,.025,.12,0x8a94a8,q*.38,0,-.01,w);q<0?M.wl=w:M.wr=w;}M.face=0;}
     else if(k==='sentinel'){sc=1;const ph=e.ph?1:0,metal=ph?0x6a6170:0x7f8796,dark=ph?0x3f3646:0x545b68,light=ph?0x91859a:0xaab3c2;
       for(const q of[-1,1]){box(.34,.7,.36,dark,q*.3,.35,0,b);box(.4,.14,.48,dark,q*.3,.07,.05,b);}box(1.1,.9,.7,metal,0,1.15,0,b);box(.9,.16,.6,light,0,1.62,0,b);
       M.core=box(.3,.3,.04,0x4a5060,0,1.2,.36,b);const hd=box(.5,.36,.46,light,0,1.88,0,b);box(.34,.06,.02,0xff4a3a,0,1.9,.24,b);
@@ -2387,15 +2716,15 @@ const R3=(()=>{
       box(.46,.42,.44,rob2,0,1.55,-.02,b);box(.32,.28,.06,0x0a0612,0,1.52,.2,b);for(const q of[-1,1])M['eye'+q]=box(.07,.05,.02,new THREE.MeshBasicMaterial({color:0xe0c0ff}),q*.08,1.55,.23,b);
       M.al=grp(-.36,1.25,0,b);M.ar=grp(.36,1.25,0,b);for(const a of[M.al,M.ar]){box(.16,.5,.16,rob,0,-.25,0,a);box(.18,.12,.18,0xc0b0e0,0,-.52,.04,a);}M.face=1;}
     else{box(.5,.5,.5,0xc04040,0,.25,0,b);M.face=1;}
-    g.scale.setScalar(sc);M.sc=sc;M.mats=ownMats(g);M.bl=blob(k==='grim'||k==='sentinel'||k==='wraith'?1.6:k==='big'||k==='ratking'?1.1:.65);scene.add(g);return M;}
+    g.scale.setScalar(sc);M.sc=sc;M.mats=ownMats(g);M.bl=blob(k==='grim'||k==='brine'||k==='sentinel'||k==='wraith'?1.6:k==='big'||k==='ratking'?1.1:.65);scene.add(g);return M;}
   function poseEnemy(M,e){const k=e.kind,x=e.x/TS,z=e.y/TS,hz=(e.z||0)/TS;M.g.position.set(x,hz,z);M.bl.position.set(x,.012,z);M.bl.scale.setScalar(1-Math.min(.5,(e.z||0)/40));
     const toP=Math.atan2(P.x-e.x,P.y-e.y);let yaw=toP;
     if(M.face===2)yaw=(e.fx||1)<0?-Math.PI/2:Math.PI/2;else if(M.face===3)yaw=[Math.PI/2,0,-Math.PI/2,Math.PI][e.dir|0];else if(M.face===4&&e.fa!==undefined)yaw=Math.atan2(Math.cos(e.fa),Math.sin(e.fa));
     M.g.rotation.y=yaw;const fl=e.flash>0?.8:0;for(const m of M.mats)m.emissive.setScalar(fl);M.b.rotation.set(0,0,0);M.b.position.set(0,0,0);M.b.scale.set(1,1,1);
     if(k==='slime'||k==='big'){const sq=e.squash||0;M.b.scale.set(1+sq,(1-sq)+((e.z||0)>1?.12:0),1+sq);}
     else if(k==='rat'||k==='ratking'){if(e.state==='dart')M.b.position.y=Math.abs(Math.sin(e.anim*28))*.05;}
-    else if(k==='bat'){M.g.position.y=.45+hz;const f=Math.sin(e.anim*30)*.8;M.wl.rotation.z=f;M.wr.rotation.z=-f;}
-    else if(k==='beetle'||k==='grim'){const flip=e.state==='flip'||e.state==='recover';if(flip){M.b.rotation.z=Math.PI;M.b.position.y=.45;}
+    else if(k==='bat'||k==='gull'){M.g.position.y=(k==='gull'?.5:.45)+hz;const f=Math.sin(e.anim*(k==='gull'?11:30))*(k==='gull'?.6:.8);M.wl.rotation.z=f;M.wr.rotation.z=-f;}
+    else if(k==='beetle'||k==='grim'||k==='crab'||k==='brine'){const flip=e.state==='flip'||e.state==='recover';if(flip){M.b.rotation.z=Math.PI;M.b.position.y=.45;}
       const open=e.state==='wind'||e.state==='charge';M.jl.rotation.y=open?.5:.1;M.jr.rotation.y=open?-.5:-.1;if(e.state==='wind')M.b.position.x=(Math.random()-.5)*.05;
       if(e.state==='walk'||e.state==='charge')M.b.position.y+=Math.abs(Math.sin(e.anim*(e.state==='charge'?16:8)))*.03;}
     else if(k==='sentinel'){const arms=e.state==='wind'?1:(e.state==='slam'||e.state==='stun')?2:0;const a=arms===1?-2.7:arms===2?-1.4:-.1;M.al.rotation.x=a;M.ar.rotation.x=a;
@@ -2408,7 +2737,7 @@ const R3=(()=>{
     else if(k==='wraith'){const rev=e.state==='reveal';for(const m of M.rob){m.opacity=rev?1:.45+Math.sin(time*3)*.12;m.transparent=!rev;}M.g.position.y=hz+.05;
       const wv=e.state==='wind'?-2.4:-.4+Math.sin(time*2)*.2;M.al.rotation.x=wv;M.ar.rotation.x=wv;if(e.state==='wind')M.b.position.x=(Math.random()-.5)*.08;}
     const dazed=e.stun>0||e.state==='daze'||(k==='sentinel'&&e.state==='stun')||((k==='guard'||k==='captain')&&e.state==='recover'&&e.t>.4)||(k==='wraith'&&e.state==='reveal');
-    return dazed?(k==='grim'||k==='sentinel'||k==='wraith'?2.6:k==='captain'?2:1.2)*M.sc:0;}
+    return dazed?(k==='grim'||k==='brine'||k==='sentinel'||k==='wraith'?(k==='brine'?1.4:2.6):k==='captain'?2:1.2)*M.sc:0;}
   function blob(s){const m=new THREE.Mesh(new THREE.PlaneGeometry(s,s),new THREE.MeshBasicMaterial({map:BLOB,transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;scene.add(m);return m;}
   function buildActors(){
     H=personModel(PAL.wren,{armed:true});hero=H.root;scene.add(hero);heroBlob=blob(.75);
@@ -2429,6 +2758,7 @@ const R3=(()=>{
     if(type==='coin'){B(.2,.2,.05,0xf0c65a,0,0,0);B(.08,.08,.06,0xc8962a,0,0,0);}
     else if(type==='heart'||type==='hc'||type==='hp'){const r=type==='hp'?0xff90b0:0xe8434f,k=type==='heart'?1:1.6;B(.1*k,.1*k,.06,r,-.05*k,.03*k,0);B(.1*k,.1*k,.06,r,.05*k,.03*k,0);B(.12*k,.08*k,.06,r,0,-.04*k,0);B(.05*k,.05*k,.06,r,0,-.1*k,0);
       if(type!=='heart')B(.5,.5,.5,new THREE.MeshBasicMaterial({color:0xffa0b0,transparent:true,opacity:.18,depthWrite:false}),0,0,0);}
+    else if(type==='glass'){B(.16,.08,.13,new THREE.MeshBasicMaterial({color:0x5ad8b8}),0,0,0);B(.06,.05,.05,new THREE.MeshBasicMaterial({color:0xffffff}),-.03,.05,.02);B(.4,.4,.4,new THREE.MeshBasicMaterial({color:0x7ae0c8,transparent:true,opacity:.16,depthWrite:false}),0,0,0);}
     else if(type==='ore'){B(.18,.14,.16,0x8e919d,0,0,0);B(.08,.1,.08,0xf0c65a,.04,.06,.02);}
     else if(type==='cap'){B(.05,.12,.05,0xe8f0e0,0,-.04,0);B(.18,.08,.18,new THREE.MeshBasicMaterial({color:0x60f0c0}),0,.05,0);}
     else if(type==='lily'){for(let i=0;i<5;i++){const p=B(.08,.04,.16,0xf8f0ff,0,0,0);p.rotation.y=i*1.26;p.position.set(Math.sin(i*1.26)*.06,0,Math.cos(i*1.26)*.06);}B(.06,.06,.06,0xffd84a,0,.03,0);}
@@ -2436,6 +2766,7 @@ const R3=(()=>{
     scene.add(g);return g;}
   function shotModel(kind,from){const g=new THREE.Group();
     if(kind==='flame'){box(.22,.22,.22,new THREE.MeshBasicMaterial({color:0xff8a2a}),0,0,0,g);box(.12,.12,.12,new THREE.MeshBasicMaterial({color:0xffe070}),0,.06,0,g);}
+    else if(kind==='bubble'){box(.22,.22,.22,new THREE.MeshBasicMaterial({color:0x7fd0ff,transparent:true,opacity:.8,depthWrite:false}),0,0,0,g);box(.07,.07,.07,new THREE.MeshBasicMaterial({color:0xffffff}),-.05,.05,.08,g);}
     else if(kind==='orb'){box(.18,.18,.18,new THREE.MeshBasicMaterial({color:0x8a5ad0}),0,0,0,g);box(.08,.08,.08,new THREE.MeshBasicMaterial({color:0xe0c8ff}),-.04,.05,.06,g);}
     else box(.12,.12,.12,new THREE.MeshBasicMaterial({color:from==='p'?0xfff4b0:0xc8e07a}),0,0,0,g);
     scene.add(g);return g;}
@@ -2485,12 +2816,12 @@ const R3=(()=>{
     c3.style.display='block';
     if(!scene||builtSig!==mapSig()||!built||built.id!==S.id)buildWorld();
     const px=P.x/TS,pz=P.y/TS,yaw=Math.atan2(P.fx,P.fy);
-    hero.position.set(px,0,pz);
+    hero.position.set(px,P.swim?-.42:0,pz);
     let d=yaw-hero.rotation.y;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;hero.rotation.y+=d*.35;
     const pst=poseHero(time-(draw.pt||time));draw.pt=time;
     if(pst==='spin'){const sp=window.__r3pose?window.__r3pose.spinT||0:P.spinT;hero.rotation.y=yaw+(sp/SPIN_T)*Math.PI*2;}
     hero.visible=!(P.inv>0&&Math.floor(P.inv*14)%2===0&&mode==='play');
-    heroBlob.position.set(px,.01,pz);
+    heroBlob.position.set(px,.01,pz);heroBlob.visible=!P.swim;
     pipG.position.set(pip.x/TS,1.55+Math.sin(time*3)*.08,pip.y/TS);pipG.rotation.y=time*1.5;wingL.rotation.y=Math.sin(time*30)*.8;wingR.rotation.y=-Math.sin(time*30)*.8;
     ring.visible=!!lock;if(lock){const big=lock.boss||lock.rad>10;ring.position.set(lock.x/TS,.04,lock.y/TS);ring.rotation.y=time*2;ring.scale.setScalar(big?2:1);}
     /* npcs */
