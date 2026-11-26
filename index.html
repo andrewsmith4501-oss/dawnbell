@@ -66,7 +66,7 @@ button:focus-visible{outline:3px solid var(--edge);outline-offset:3px}
 #b-hook{color:var(--b-hook);width:56px;height:56px;right:calc(194px + env(safe-area-inset-right,0px));bottom:calc(102px + env(safe-area-inset-bottom,0px));font-size:12px}
 #b-lamp{color:var(--b-lamp);width:54px;height:54px;right:calc(186px + env(safe-area-inset-right,0px));bottom:calc(170px + env(safe-area-inset-bottom,0px));font-size:12px}
 #app.desk .btn,#app.desk #stick{display:none!important}
-#keyhelp{position:absolute;left:50%;bottom:calc(8px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font:500 13px var(--ui);color:var(--ink-dim);background:rgba(20,16,11,.6);padding:4px 12px;border-radius:6px;pointer-events:none;white-space:nowrap;display:none;transition:opacity .8s}
+#keyhelp{position:absolute;left:50%;bottom:calc(8px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font:500 13px var(--ui);color:var(--ink-dim);background:rgba(20,16,11,.6);padding:4px 12px;border-radius:6px;pointer-events:none;width:max-content;max-width:94%;text-align:center;display:none;transition:opacity .8s}
 #app.desk #keyhelp{display:block}
 #keyhelp.gone{opacity:0}
 @media (min-height:700px) and (pointer:fine){#hud{transform:scale(1.5);transform-origin:top left}}
@@ -677,7 +677,7 @@ function bindBtn(el,k){
 bindBtn($('b-sword'),'sword');bindBtn($('b-shield'),'shield');bindBtn($('b-roll'),'roll');bindBtn($('b-target'),'target');bindBtn($('b-item'),'item');bindBtn($('b-hook'),'hook');bindBtn($('b-lamp'),'lamp');
 const zone=$('stickzone'),stickEl=$('stick'),knob=$('knob');
 function stickHome(){const r=zone.getBoundingClientRect();stickEl.style.left=(Math.max(80,r.left+110))+'px';stickEl.style.top=(r.bottom-90)+'px';}
-zone.addEventListener('pointerdown',e=>{e.preventDefault();if(stick.id!==null)return;audioInit();setInput('touch');stick.id=e.pointerId;try{zone.setPointerCapture(e.pointerId);}catch(_){}stick.ox=e.clientX;stick.oy=e.clientY;stickEl.style.left=e.clientX+'px';stickEl.style.top=e.clientY+'px';stickEl.classList.add('live');knob.style.transform='';});
+zone.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;e.preventDefault();if(stick.id!==null)return;audioInit();setInput('touch');stick.id=e.pointerId;try{zone.setPointerCapture(e.pointerId);}catch(_){}stick.ox=e.clientX;stick.oy=e.clientY;stickEl.style.left=e.clientX+'px';stickEl.style.top=e.clientY+'px';stickEl.classList.add('live');knob.style.transform='';});
 zone.addEventListener('pointermove',e=>{if(e.pointerId!==stick.id)return;let dx=e.clientX-stick.ox,dy=e.clientY-stick.oy;const max=44,l=Math.hypot(dx,dy);if(l>max){dx=dx/l*max;dy=dy/l*max;}knob.style.transform=`translate(${dx}px,${dy}px)`;stick.mx=dx/max;stick.my=dy/max;});
 const stickUp=e=>{if(e.pointerId!==stick.id)return;stick.id=null;stick.mx=stick.my=0;knob.style.transform='';stickEl.classList.remove('live');stickHome();};
 zone.addEventListener('pointerup',stickUp);zone.addEventListener('pointercancel',stickUp);
@@ -697,8 +697,15 @@ document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
 document.addEventListener('contextmenu',e=>e.preventDefault());
 function setInput(k){lastInput=k;const desk=k!=='touch';$('app').classList.toggle('desk',desk);if(desk)keyHelp();}
 function keyHelp(){const el=$('keyhelp');const t=lastInput==='pad'?'Stick move · A sword · B roll · RB shield · LB target · X claw · Y lamp · RT potion · Start pause · Back map':
-  'WASD move · J sword · K shield · Space roll · L target · F claw · G lamp · E potion · M map · Esc pause';if(el.textContent!==t){el.textContent=t;el.classList.remove('gone');clearTimeout(keyHelp.tm);keyHelp.tm=setTimeout(()=>el.classList.add('gone'),20000);}}
+  'WASD move · J or click sword · K or right-click shield · Space roll · L target · F claw · G lamp · E potion · M map · Esc pause';if(el.textContent!==t){el.textContent=t;el.classList.remove('gone');clearTimeout(keyHelp.tm);keyHelp.tm=setTimeout(()=>el.classList.add('gone'),20000);}}
 addEventListener('pointerdown',e=>{if(e.pointerType==='touch')setInput('touch');},true);
+/* mouse: left button = sword (hold for a spin), right button = shield */
+const mouseB={sword:false,shield:false};
+function syncMouse(e){if(e.pointerType!=='mouse')return;const inGame=e.target===cv||e.target===zone;const sw=inGame&&mode==='play'&&!!(e.buttons&1),sh=inGame&&mode==='play'&&!!(e.buttons&2);
+  if(sw!==mouseB.sword){mouseB.sword=sw;sw?press('sword'):release('sword');}if(sh!==mouseB.shield){mouseB.shield=sh;sh?press('shield'):release('shield');}}
+for(const ev of['pointerdown','pointermove','pointerup'])addEventListener(ev,e=>{if(e.pointerType!=='mouse')return;if(ev==='pointerdown'&&(e.target===cv||e.target===zone)){audioInit();if(lastInput!=='pad')setInput('key');}syncMouse(e);});
+addEventListener('pointercancel',()=>{if(mouseB.sword)release('sword');if(mouseB.shield)release('shield');mouseB.sword=mouseB.shield=false;});
+$('app').addEventListener('contextmenu',e=>e.preventDefault());
 if(!matchMedia('(pointer:coarse)').matches)setTimeout(()=>setInput('key'),0);
 /* gamepads (Xbox / PlayStation / most USB and Bluetooth pads) */
 const PADMAP={0:'sword',1:'roll',2:'hook',3:'lamp',4:'target',5:'shield',7:'item',6:'target'};const pad={mx:0,my:0,prev:[],on:false};
@@ -1995,7 +2002,7 @@ function openMenu(kind,arg){const h=$('menu-h'),b=$('menu-body'),row=$('menu-row
     b.innerHTML=`<div class="goal">${objectives().map(o=>`<div>${o}</div>`).join('')}</div>${tok}`;
     btn('Resume',closeMenu);btn('Map',()=>openMenu('map'));const mb=btn(musicOn?'Music: on':'Music: off',()=>{musicOn=!musicOn;store.set('db-music',musicOn);mb.textContent=musicOn?'Music: on':'Music: off';});const s=btn(muted?'Sound: off':'Sound: on',()=>{muted=!muted;store.set('db-muted',muted);s.textContent=muted?'Sound: off':'Sound: on';});
     btn('Save and quit',()=>{saveGame();location.reload();});
-    keys.innerHTML='Keyboard: WASD or arrows &middot; J sword / talk (hold to spin) &middot; K shield &middot; Space roll &middot; L lock on &middot; F claw &middot; G lamp &middot; E potion &middot; M map &middot; Esc pause<br>Controller: stick move &middot; A sword &middot; B roll &middot; RB shield &middot; LB target &middot; X claw &middot; Y lamp &middot; RT potion &middot; Start pause &middot; Back map';}
+    keys.innerHTML='Keyboard: WASD or arrows &middot; J or left click sword / talk (hold to spin) &middot; K or right click shield &middot; Space roll &middot; L lock on &middot; F claw &middot; G lamp &middot; E potion &middot; M map &middot; Esc pause<br>Controller: stick move &middot; A sword &middot; B roll &middot; RB shield &middot; LB target &middot; X claw &middot; Y lamp &middot; RT potion &middot; Start pause &middot; Back map';}
   else if(kind==='map'){const view=arg||(S&&S.dg?S.dg:'world');const titles={world:'Map of the Heartlands',realm:'The Realm of Gallowmark'};h.textContent=titles[view]||('Map of '+DUNGEONS[view].name);
     const cv=document.createElement('canvas');cv.className='map';const dpr=Math.min(3,devicePixelRatio||1);cv.width=MAP_W*dpr;cv.height=MAP_H*dpr;cv.setAttribute('role','img');cv.setAttribute('aria-label',h.textContent);b.appendChild(cv);
     const g=cv.getContext('2d');const draw=()=>{g.setTransform(dpr,0,0,dpr,0,0);if(view==='world')drawWorldMap(g);else if(view==='realm')drawRealmMap(g);else drawDeepMap(g,view);};draw();
