@@ -422,7 +422,7 @@ function objSprite(t,tx,ty){switch(t){
 let AC=null,muted=store.get('db-muted',false),noiseBuf=null;
 function audioInit(){if(AC){if(AC.state==='suspended')AC.resume();return;}try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){AC=null;}}
 function tone(type,f0,f1,dur,vol,delay){if(!AC||muted)return;const t=AC.currentTime+(delay||0);const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);if(f1)o.frequency.exponentialRampToValueAtTime(f1,t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+dur+.03);}
-function noise(dur,vol,freq,q,delay,ftype){if(!AC||muted)return;if(!noiseBuf){noiseBuf=AC.createBuffer(1,AC.sampleRate*.5|0,AC.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
+function noise(dur,vol,freq,q,delay,ftype){if(!AC||muted)return;getNoise();
   const t=AC.currentTime+(delay||0);const s=AC.createBufferSource();s.buffer=noiseBuf;const f=AC.createBiquadFilter();f.type=ftype||'bandpass';f.frequency.setValueAtTime(freq,t);f.Q.value=q||1;const g=AC.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(f).connect(g).connect(AC.destination);s.start(t);s.stop(t+dur+.02);}
 const SFX={swing(){noise(.12,.22,1900,1.4);},hit(){tone('square',260,90,.09,.1);noise(.06,.18,800);},die(){tone('triangle',380,900,.12,.13);noise(.22,.14,500,.8,.05);},
   hurt(){tone('sawtooth',330,70,.25,.12);},coin(){tone('square',988,0,.06,.06);tone('square',1319,0,.14,.06,.06);},heart(){[660,880,1100].forEach((f,i)=>tone('triangle',f,0,.12,.1,i*.08));},
@@ -434,6 +434,81 @@ const SFX={swing(){noise(.12,.22,1900,1.4);},hit(){tone('square',260,90,.09,.1);
   hook(){tone('square',700,1700,.14,.05);noise(.14,.1,4200,2);},latch(){tone('square',1400,700,.07,.08);noise(.07,.22,3000,3);},
   keyturn(){tone('square',700,0,.05,.08);tone('square',1100,0,.09,.08,.07);},roar(){tone('sawtooth',110,45,.55,.14);noise(.5,.22,300,.6,0,'lowpass');},
   thud(){noise(.22,.24,240,.7,0,'lowpass');tone('sine',90,40,.2,.12);}};
+
+/* ================= music ================= */
+/* Original chiptune score. Patterns are 16th-note steps: a note name starts a note, "." holds it, "-" is silence, "X*n" repeats a token n steps. */
+let musicOn=store.get('db-music',true),battleT=0;
+const NOTE_I={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+function noteHz(n){const m=/^([A-G])([#b]?)(-?\d)$/.exec(n);if(!m)return 0;const k=NOTE_I[m[1]]+(m[2]==='#'?1:m[2]==='b'?-1:0)+(+m[3]+1)*12;return 440*Math.pow(2,(k-69)/12);}
+function parsePat(src){const toks=[];for(const t of src.split(/\s+/)){if(!t||t==='|')continue;const m=/^(.+?)\*(\d+)$/.exec(t),base=m?m[1]:t,n=m?+m[2]:1;toks.push(base);for(let i=1;i<n;i++)toks.push(base==='-'?'-':'.');}
+  const ev=new Array(toks.length).fill(null);for(let i=0;i<toks.length;i++){const t=toks[i];if(t==='.'||t==='-')continue;let len=1;while(i+len<toks.length&&toks[i+len]==='.')len++;ev[i]={n:t,f:noteHz(t),len};}return ev;}
+const xN=(s,n)=>Array(n).fill(s).join(' ');
+const ARP={D:'D4 F#4 A4 F#4',Bm:'B3 D4 F#4 D4',G:'G3 B3 D4 B3',A:'A3 C#4 E4 C#4',G4:'G4 B4 D5 B4',Em:'E4 G4 B4 G4',C:'C4 E4 G4 E4',D4:'D4 F#4 A4 F#4'};
+const SONGS={
+  title:{bpm:88,ch:[
+    {w:'square',v:.05,p:"A4*2 D5*2 F#5*4 E5*2 D5*2 A4*4 | B4*2 D5*2 F#5*4 A5*4 F#5*4 | G5*4 F#5*2 E5*2 D5*4 B4*4 | C#5*4 E5*4 A4*4 -*4 | D5*2 E5*2 F#5*2 G5*2 A5*4 B5*4 | A5*2 G5*2 F#5*2 E5*2 C#5*4 A4*4 | B4*2 D5*2 G5*4 F#5*2 E5*2 D5*4 | E5*4 C#5*4 D5*8"},
+    {w:'square',v:.016,d:.5,p:[xN(ARP.D,4),xN(ARP.Bm,4),xN(ARP.G,4),xN(ARP.A,4),xN(ARP.G,4),xN(ARP.A,4),xN(ARP.Bm,2),xN(ARP.G,2),xN(ARP.A,2),xN(ARP.D,2)].join(' ')},
+    {w:'triangle',v:.13,d:.95,p:"D3*8 A2*8 | B2*8 F#2*8 | G2*8 D3*8 | A2*8 E2*8 | G2*8 B2*8 | A2*8 C#3*8 | B2*8 G2*8 | A2*8 D3*8"}]},
+  forest:{bpm:100,ch:[
+    {w:'square',v:.045,p:"D5*4 B4*2 D5*2 G5*8 | F#5*2 E5*2 D5*2 B4*2 E5*8 | C5*2 E5*2 G5*4 A5*2 G5*2 E5*4 | F#5*8 D5*4 -*4 | B5*4 A5*2 G5*2 D5*4 G5*4 | G5*2 F#5*2 E5*4 B4*4 E5*4 | E5*2 F#5*2 G5*4 C5*2 E5*2 A5*4 | G5*4 F#5*4 G5*4 -*4"},
+    {w:'square',v:.016,d:.55,p:[xN(ARP.G4,4),xN(ARP.Em,4),xN(ARP.C,4),xN(ARP.D4,4)].join(' ')},
+    {w:'triangle',v:.12,d:.9,p:"G2*6 G2*2 D3*8 | E2*6 E2*2 B2*8 | C3*6 C3*2 G2*8 | D3*6 D3*2 A2*8"},
+    {drum:true,v:.35,p:"h . . . h . . . h . . . h . h ."}]},
+  town:{bpm:120,ch:[
+    {w:'square',v:.045,p:"C5*2 A4*2 C5*2 F5*4 E5*2 F5*2 G5*2 | E5*4 C5*4 G4*4 -*4 | A4*2 C5*2 F5*2 A5*4 G5*2 F5*2 E5*2 | G5*8 -*4 C5*2 D5*2 | D5*4 F5*2 D5*2 Bb4*4 D5*2 F5*2 | C5*4 A4*2 C5*2 F5*4 -*4 | E5*2 G5*2 E5*2 C5*2 D5*2 E5*2 G4*4 | F5*8 -*8"},
+    {w:'square',v:.022,d:.4,p:"-*4 A4*4 -*4 A4*4 | -*4 G4*4 -*4 G4*4 | -*4 A4*4 -*4 A4*4 | -*4 G4*4 -*4 G4*4 | -*4 F4*4 -*4 F4*4 | -*4 A4*4 -*4 A4*4 | -*4 G4*4 -*4 G4*4 | -*4 A4*4 -*4 A4*4"},
+    {w:'triangle',v:.13,d:.8,p:"F2*4 -*4 C3*4 -*4 | C3*4 -*4 G2*4 -*4 | F2*4 -*4 C3*4 -*4 | C3*4 -*4 G2*4 -*4 | Bb2*4 -*4 F2*4 -*4 | F2*4 -*4 C3*4 -*4 | C3*4 -*4 G2*4 -*4 | F2*4 -*4 C3*4 -*4"},
+    {drum:true,v:.5,p:"k . . . s . . . k . k . s . . ."}]},
+  quarry:{bpm:104,ch:[
+    {w:'square',v:.045,p:"E5*4 A4*4 C5*2 D5*2 E5*4 | F5*2 E5*2 D5*2 C5*2 A4*8 | D5*4 G4*4 B4*2 C5*2 D5*4 | E5*4 B4*4 -*8 | A5*4 G5*2 E5*2 C5*4 E5*4 | F5*4 A5*4 G5*2 F5*2 E5*4 | D5*2 E5*2 F5*4 G5*4 B4*4 | E5*8 -*8"},
+    {w:'triangle',v:.12,d:.6,p:[xN('A2*2 A3*2',4),xN('F2*2 F3*2',4),xN('G2*2 G3*2',4),xN('E2*2 E3*2',4)].join(' ')},
+    {drum:true,v:.5,p:"k . h . s . h . k . k . s . h ."}]},
+  indoor:{bpm:100,ch:[
+    {w:'square',v:.035,p:"E5*6 D5*2 C5*4 | C5*6 A4*6 | A4*2 C5*2 F5*4 E5*2 D5*2 | D5*6 -*6 | G5*4 E5*2 C5*4 E5*2 | E5*2 D5*2 C5*4 A4*4 | F5*4 A5*4 G5*2 F5*2 | D5*4 B4*4 C5*4"},
+    {w:'triangle',v:.11,d:.7,p:"C3*4 G3*4 E3*4 | A2*4 E3*4 C3*4 | F2*4 C3*4 A2*4 | G2*4 D3*4 B2*4"}]},
+  chapel:{bpm:60,ch:[
+    {w:'triangle',v:.08,p:"C5*8 A4*4 C5*4 | D5*8 F5*4 D5*4 | C5*4 A4*4 F4*4 A4*4 | G4*8 -*8 | A4*4 D5*4 F5*4 E5*4 | D5*8 F5*4 D5*4 | C5*4 E5*4 G5*4 E5*4 | F5*8 -*8"},
+    {w:'square',v:.018,d:.98,p:"A4*16 Bb4*16 A4*16 G4*16 F4*16 F4*16 E4*16 F4*16"},
+    {w:'triangle',v:.06,d:.98,p:"F4*16 D4*16 C4*16 E4*16 D4*16 D4*16 C4*16 C4*16"},
+    {w:'triangle',v:.1,d:.98,p:"F2*16 Bb1*16 F2*16 C2*16 D2*16 Bb1*16 C2*16 F2*16"}]},
+  deep:{bpm:76,ch:[
+    {w:'triangle',v:.085,p:"-*16 | E5*6 F5*2 E5*4 -*4 | -*8 G5*4 F5*4 | E5*8 -*8 | B5*6 A5*2 G5*4 F5*4 | E5*12 -*4 | -*16 | D5*4 E5*4 F5*4 -*4"},
+    {w:'square',v:.014,d:.5,p:"B4*2 E5*2 G5*2 E5*2 B4*2 F5*2 G5*2 F5*2 | B4*2 E5*2 G5*2 E5*2 A4*2 D5*2 F5*2 D5*2"},
+    {w:'triangle',v:.13,d:.9,p:"E2*4 -*4 E2*2 -*2 F2*4 | E2*4 -*4 E2*2 -*2 D2*4"},
+    {drum:true,v:.4,p:"k . . . . . . . . . k . . . . ."}]},
+  battle:{bpm:144,ch:[
+    {w:'square',v:.045,p:"D5*3 F5*3 A5*2 G#5*2 A5*2 F5*2 D5*2 | E5*3 F5*3 G5*2 A5*4 -*4 | D5*3 F5*3 A5*2 C6*2 A5*2 F5*2 D5*2 | C#5*4 E5*4 A4*4 -*4"},
+    {w:'triangle',v:.14,d:.7,p:[xN('D2*2 D3*2',2),'Bb1*2 Bb2*2 C2*2 C3*2',xN('D2*2 D3*2',2),'Bb1*2 Bb2*2 C2*2 C3*2',xN('D2*2 D3*2',2),'Bb1*2 Bb2*2 C2*2 C3*2',xN('A1*2 A2*2',3),'C#2*2 E2*2'].join(' ')},
+    {drum:true,v:.55,p:"k . h . s . h . k . k . s . h h"}]},
+  boss:{bpm:150,ch:[
+    {w:'square',v:.05,p:"C5*4 G4*4 C5*2 Eb5*2 G5*4 | F5*2 Eb5*2 D5*2 Eb5*2 C5*4 -*4 | Ab5*4 G5*2 F5*2 Eb5*4 C5*4 | D5*4 B4*4 G4*4 B4*2 D5*2"},
+    {w:'square',v:.016,d:.5,p:[xN('C4 Eb4 G4 Eb4',8),xN('Ab3 C4 Eb4 C4',4),xN('G3 B3 D4 B3',4)].join(' ')},
+    {w:'triangle',v:.15,d:.7,p:"C2*2 C2*2 C3*2 C2*2 Eb2*2 C2*2 G1*2 C2*2 | C2*2 C2*2 C3*2 C2*2 Eb2*2 C2*2 G1*2 C2*2 | Ab1*2 Ab1*2 Ab2*2 Ab1*2 G1*2 G1*2 G2*2 B1*2 | G1*2 G1*2 G2*2 G1*2 B1*2 D2*2 F2*2 G2*2"},
+    {drum:true,v:.6,p:"k . s . k k s . k . s . k k s s"}]}};
+const MUS={id:null,want:null,song:null,out:null,master:null,step:0,next:0,vol:-1};
+function getNoise(){if(!noiseBuf){noiseBuf=AC.createBuffer(1,AC.sampleRate*.5|0,AC.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}return noiseBuf;}
+function musicSwitch(id){const old=MUS.out;if(old){old.gain.setTargetAtTime(0,AC.currentTime,.12);setTimeout(()=>{try{old.disconnect();}catch(_){}},1500);}
+  MUS.id=id;MUS.song=id?SONGS[id]:null;MUS.out=null;if(!MUS.song)return;
+  for(const c of MUS.song.ch)if(!c.ev)c.ev=parsePat(c.p);
+  MUS.out=AC.createGain();MUS.out.gain.value=1;MUS.out.connect(MUS.master);MUS.step=0;MUS.next=AC.currentTime+.12;}
+function musicNote(c,e,t,sd){const out=MUS.out;
+  if(c.drum){if(e.n==='k'){const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(40,t+.12);g.gain.setValueAtTime(c.v*.5,t);g.gain.exponentialRampToValueAtTime(.001,t+.14);o.connect(g).connect(out);o.start(t);o.stop(t+.16);return;}
+    const h=e.n==='h',src=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain(),d=h?.035:.1;src.buffer=getNoise();f.type=h?'highpass':'bandpass';f.frequency.value=h?7000:1800;
+    g.gain.setValueAtTime(c.v*(h?.18:.32),t);g.gain.exponentialRampToValueAtTime(.001,t+d);src.connect(f).connect(g).connect(out);src.start(t);src.stop(t+d+.02);return;}
+  if(!e.f)return;const dur=e.len*sd*(c.d||.85),o=AC.createOscillator(),g=AC.createGain();o.type=c.w;o.frequency.setValueAtTime(e.f,t);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(c.v,t+.008);g.gain.setTargetAtTime(c.v*.65,t+.02,.09);g.gain.setTargetAtTime(0,t+dur,.03);o.connect(g).connect(out);o.start(t);o.stop(t+dur+.25);}
+function musicTick(){if(!AC)return;
+  if(!MUS.master){MUS.master=AC.createGain();MUS.master.gain.value=0;MUS.master.connect(AC.destination);}
+  const tv=(muted||!musicOn)?0:(mode==='paused'&&menuKind!=='chapter'&&menuKind!=='chapter2'?.3:.8);
+  if(MUS.vol!==tv){MUS.vol=tv;MUS.master.gain.setTargetAtTime(tv,AC.currentTime,.08);}
+  if(MUS.want!==MUS.id)musicSwitch(MUS.want);
+  const s=MUS.song;if(!s)return;const sd=60/s.bpm/4;
+  if(tv===0||MUS.next<AC.currentTime-.5){MUS.next=Math.max(MUS.next,AC.currentTime);if(tv===0)return;}
+  while(MUS.next<AC.currentTime+.25){for(const c of s.ch){const e=c.ev[MUS.step%c.ev.length];if(e)musicNote(c,e,MUS.next,sd);}MUS.step++;MUS.next+=sd;}}
+function desiredTrack(){if(mode==='title')return'title';if(!S||!P)return null;
+  if(mode==='paused'&&(menuKind==='chapter'||menuKind==='chapter2'))return'title';
+  if(S.fight)return'boss';if(battleT>0)return'battle';
+  const id=S.id;if(id==='forest')return'forest';if(id==='town')return'town';if(id==='quarry')return'quarry';if(id==='chapel')return'chapel';if(id==='cellar'||S.dungeon)return'deep';return'indoor';}
 
 /* ================= input ================= */
 const held={},edge={};let lastInput='touch';
@@ -823,7 +898,7 @@ function talkTo(n){const dx=P.x-n.x,dy=P.y-n.y;if(Math.abs(dx)>Math.abs(dy)){n.f
 function loadScene(id,tx,ty,face){
   S=BUILD[id]();MW=S.w;MH=S.h;map=S.g.m;renderGround();
   if(P){P.x=tx*TS+8;P.y=ty*TS+8;const f={U:[0,-1],D:[0,1],L:[-1,0],R:[1,0]}[face||'D'];P.fx=f[0];P.fy=f[1];P.state='normal';P.kbT=0;P.inExit=true;}
-  enemies=S.enemies||[];npcs=S.npcs||[];pickups=S.pickups||[];parts=[];lock=null;
+  enemies=S.enemies||[];npcs=S.npcs||[];pickups=S.pickups||[];parts=[];lock=null;battleT=0;
   S.hookT=[];for(let i=0;i<map.length;i++)if(map[i]===T.POST||map[i]===T.CRYSTAL)S.hookT.push([i%MW,(i/MW)|0]);$('b-target').classList.remove('lit');S.fight=false;
   if(P){pip.x=P.x-10;pip.y=P.y-22;cam.x=P.x-VW/2;cam.y=P.y-VH/2;clampCam();}
   $('boss').hidden=true;
@@ -1106,14 +1181,17 @@ function step(dt){
   else if(mode==='fade'){fade=clamp(fade+fadeDir*dt*4,0,1);
     if(fadeDir>0&&fade>=1&&pendingWarp){const w=pendingWarp;pendingWarp=null;loadScene(w.to,w.tx,w.ty,w.face);saveGame();fadeDir=-1;}
     else if(fadeDir<0&&fade<=0){mode='play';if(S.onEnter)S.onEnter();}}
-  else if(mode==='dialog'){updateDialog(dt);updatePip(dt);updateParts(dt);if(P)updateCamera(dt);}
+  else if(mode==='dialog'){battleT=Math.max(0,battleT-dt);updateDialog(dt);updatePip(dt);updateParts(dt);if(P)updateCamera(dt);}
   else if(mode==='play'&&!portrait){
     if(hitstop>0)hitstop-=dt;
-    else{playTime+=dt;updatePlayer(dt);if(mode==='play'){updateEnemies(dt);updateNpcs(dt);updatePickups(dt);updateScene(dt);if(S.id==='forest'&&tut<4)updateTutorial(dt);else if(tut<4){tut=4;hint('');}}}
+    else{playTime+=dt;updatePlayer(dt);
+      if(P&&S){const near=enemies.some(e=>!e.dead&&!e.boss&&Math.hypot(e.x-P.x,e.y-P.y)<100)||(S.trap&&S.shut&&!F[S.trap]);battleT=near?3:Math.max(0,battleT-dt);}
+      if(mode==='play'){updateEnemies(dt);updateNpcs(dt);updatePickups(dt);updateScene(dt);if(S.id==='forest'&&tut<4)updateTutorial(dt);else if(tut<4){tut=4;hint('');}}}
     updatePip(dt);updateParts(dt);updateCamera(dt);}
   else if(mode==='dead'||mode==='paused')updateParts(dt);
   if(shakeT>0)shakeT-=dt;
   lb+=(((lock&&mode==='play')||(S&&S.fight)?14:0)-lb)*Math.min(1,dt*10);
+  MUS.want=desiredTrack();if(AC)musicTick();
   for(const k in edge)edge[k]=false;}
 
 /* ================= render ================= */
@@ -1293,7 +1371,7 @@ function openMenu(kind,arg){const h=$('menu-h'),b=$('menu-body'),row=$('menu-row
   if(kind==='pause'){h.textContent='Paused';
     const tok=F.ch2?`<div class="tokens"><span class="${F.hook?'got':''}">Grapple Claw</span><span class="${F.hd_bk?'got':''}">Belfry Key</span><span class="${F.shard2?'got':''}">Second shard</span></div>`:F.quest?`<div class="tokens"><span class="${F.courage?'got':''}">Courage</span><span class="${F.craft?'got':''}">Craft</span><span class="${F.kindness?'got':''}">Kindness</span></div>`:'';
     b.innerHTML=`<div class="goal">${objectives().map(o=>`<div>${o}</div>`).join('')}</div>${tok}`;
-    btn('Resume',closeMenu);btn('Map',()=>openMenu('map'));const s=btn(muted?'Sound: off':'Sound: on',()=>{muted=!muted;store.set('db-muted',muted);s.textContent=muted?'Sound: off':'Sound: on';});
+    btn('Resume',closeMenu);btn('Map',()=>openMenu('map'));const mb=btn(musicOn?'Music: on':'Music: off',()=>{musicOn=!musicOn;store.set('db-music',musicOn);mb.textContent=musicOn?'Music: on':'Music: off';});const s=btn(muted?'Sound: off':'Sound: on',()=>{muted=!muted;store.set('db-muted',muted);s.textContent=muted?'Sound: off':'Sound: on';});
     btn('Save and quit',()=>{saveGame();location.reload();});
     keys.innerHTML='Keyboard: WASD or arrows &middot; J sword / talk &middot; K shield &middot; Space roll &middot; L lock on &middot; F claw &middot; E potion &middot; M map &middot; Esc pause';}
   else if(kind==='map'){const deepOk=!!(F.vis&&F.vis.hd1),view=arg||(S&&S.dungeon?'deep':'world');h.textContent=view==='deep'?'Map of the Hollow Deep':'Map of Gallowmark';
@@ -1319,14 +1397,15 @@ function closeMenu(){$('menu').hidden=true;if(mode==='paused')mode=menuFrom==='p
 function togglePause(){if(mode==='play')openMenu('pause');else if(mode==='paused'&&(menuKind==='pause'||menuKind==='map'))closeMenu();}
 $('pause').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();});
 $('pause').addEventListener('click',togglePause);
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&mode==='play')openMenu('pause');});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&mode==='play')openMenu('pause');if(AC){try{if(document.hidden)AC.suspend();else AC.resume();}catch(_){}}});
+$('title').addEventListener('pointerdown',()=>audioInit());
 
 function tryFullscreen(){try{const el=document.documentElement;if(matchMedia('(pointer:coarse)').matches&&el.requestFullscreen)el.requestFullscreen().then(()=>{try{screen.orientation.lock('landscape').catch(()=>{});}catch(_){}}).catch(()=>{});}catch(_){}}
 $('start').addEventListener('click',()=>{audioInit();tryFullscreen();newGame();});
 $('continue').addEventListener('click',()=>{audioInit();tryFullscreen();continueGame(false);});
 if(loadSave())$('continue').hidden=false;
 
-window.__db={warp:(id,tx,ty)=>loadScene(id,tx,ty,'D'),get F(){return F;},set F(v){F=v;},get P(){return P;},get S(){return S;},get mode(){return mode;},get enemies(){return enemies;},get npcs(){return npcs;},give(m){marks+=m;updateHud(true);},advance,face(x,y){P.fx=x;P.fy=y;},get pickups(){return pickups;}};
+window.__db={warp:(id,tx,ty)=>loadScene(id,tx,ty,'D'),get F(){return F;},set F(v){F=v;},get P(){return P;},get S(){return S;},get mode(){return mode;},get enemies(){return enemies;},get npcs(){return npcs;},give(m){marks+=m;updateHud(true);},advance,face(x,y){P.fx=x;P.fy=y;},get pickups(){return pickups;},get music(){return MUS.id;}};
 
 /* ================= boot ================= */
 S=buildForest();MW=S.w;MH=S.h;map=S.g.m;renderGround();
