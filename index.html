@@ -190,7 +190,7 @@ function shadowImg(w,a){a=a||.42;const k=w+'|'+a;let c=SHADOWS.get(k);if(c)retur
 
 /* ================= people sprites ================= */
 const PAL={
-  wren:{tun:'#3fb04e',tunD:'#2a7a3a',tunL:'#72d266',hair:'#8b5a2b',hairD:'#6e441d',skin:'#f3c69b',skinD:'#d99e72',belt:'#6e4320',buck:'#f0c65a',hood:true},
+  wren:{tun:'#3fb04e',tunD:'#2a7a3a',tunL:'#72d266',hair:'#c8692a',hairD:'#7e3a16',hoodC:'#2f8a48',skin:'#f3c69b',skinD:'#d99e72',belt:'#6e4320',buck:'#f0c65a',hood:true},
   guard:{tun:'#8a94a8',tunD:'#5d667a',tunL:'#c2cad8',hair:'#3a2a1a',hairD:'#2a1d12',skin:'#e8b88a',skinD:'#c99068',belt:'#3a3a48',buck:'#c2cad8',hood:true,hoodC:'#6d778c',legs:'#5d667a'},
   fen:{tun:'#7a4f9a',tunD:'#553570',tunL:'#9c72bd',hair:'#2a1f1a',hairD:'#1a120e',skin:'#e0a878',skinD:'#bf8659',belt:'#3a2a1a',hood:true,hoodC:'#4a2f63'},
   odo:{tun:'#7a5232',tunD:'#553820',tunL:'#9a6c48',hair:'#a8a8a8',hairD:'#7a7a7a',skin:'#c98f62',skinD:'#a8704a',belt:'#2a1d12',beard:'#b8b8b8',legs:'#4a3a30'},
@@ -221,7 +221,7 @@ function personBase(dir,f,p){return mk(16,24,g=>{
     else{blob(g,p.hairD,8,7,7,6);blob(g,p.hair,8,6,7,5);blob(g,hairL,6,3,3,1);}
     if(dir===0){
       R(g,p.skin,3,6,10,6);R(g,p.skin,4,12,8,1);R(g,p.skinD,12,7,1,5);R(g,p.skinD,4,12,8,1);
-      if(p.hood){R(g,p.hair,3,5,10,2);R(g,p.hair,3,7,1,2);R(g,p.hair,12,7,1,2);R(g,p.hairD,5,7,2,1);R(g,p.hairD,9,7,1,1);R(g,hairL,4,5,3,1);
+      if(p.hood){R(g,hoodD,3,4,10,1);R(g,p.hairD,3,5,10,1);R(g,p.hair,3,6,10,2);R(g,p.hair,3,7,2,4);R(g,p.hair,11,7,2,4);R(g,p.hairD,3,10,1,1);R(g,p.hairD,12,10,1,1);R(g,p.hair,7,8,2,1);R(g,p.hair,4,8,1,1);R(g,p.hair,11,8,1,1);R(g,p.hairD,6,7,1,1);R(g,p.hairD,9,7,1,1);R(g,hairL,4,6,3,1);R(g,hairL,9,6,2,1);R(g,hairL,3,8,1,1);
         R(g,hoodC,1,6,2,8);R(g,hoodD,13,6,2,8);R(g,hoodC,2,12,2,2);R(g,hoodD,12,12,2,2);R(g,hoodL,1,6,1,5);}
       else{R(g,p.hair,2,4,12,3);R(g,p.hair,2,7,2,5);R(g,p.hair,12,7,2,5);R(g,p.hairD,4,7,3,1);R(g,p.hairD,9,7,2,1);R(g,hairL,4,4,4,1);if(p.bald){R(g,p.skin,4,4,8,3);R(g,shade(p.skin,.2),5,4,3,1);}}
       R(g,eye,5,8,2,3);R(g,eye,9,8,2,3);R(g,'#ffffff',5,8,1,1);R(g,'#ffffff',9,8,1,1);
@@ -238,7 +238,7 @@ function personBase(dir,f,p){return mk(16,24,g=>{
     if(p.hood){blob(g,hoodD,8,7,7,7);blob(g,hoodC,8,6,7,6);blob(g,hoodL,6,3,4,2);}
     else{blob(g,p.hairD,8,7,7,6);blob(g,p.hair,8,6,7,5);blob(g,hairL,6,3,3,1);}
     R(g,p.skin,7,6,6,6);R(g,p.skin,13,8,1,3);R(g,p.skinD,7,12,5,1);R(g,p.skinD,12,10,1,2);
-    if(p.hood){R(g,p.hair,7,5,6,2);R(g,p.hair,12,7,1,1);R(g,hairL,8,5,3,1);R(g,hoodC,5,4,3,10);R(g,hoodD,5,11,3,3);R(g,hoodL,6,4,1,5);R(g,hoodC,2,8,3,6);}
+    if(p.hood){R(g,hoodD,7,4,6,1);R(g,p.hair,7,5,7,2);R(g,p.hair,12,7,2,1);R(g,p.hair,7,7,3,4);R(g,p.hairD,7,10,2,1);R(g,p.hairD,9,7,1,1);R(g,hairL,8,5,3,1);R(g,hairL,7,8,1,1);R(g,hoodC,5,4,3,10);R(g,hoodD,5,11,3,3);R(g,hoodL,6,4,1,5);R(g,hoodC,2,8,3,6);}
     else{R(g,p.hair,2,3,11,4);R(g,p.hair,2,7,6,5);R(g,hairL,4,3,5,1);R(g,p.hairD,6,9,2,3);if(p.bald){R(g,p.skin,7,3,6,4);}}
     R(g,eye,10,8,2,3);R(g,'#ffffff',10,8,1,1);R(g,blush,11,11,1,1);
     if(p.beard){R(g,p.beard,8,10,6,3);R(g,p.beard,9,13,4,2);}
@@ -817,7 +817,7 @@ function buildTown(){
   return{id:'town',name:'Brackenford',w:W,h:H,g,outdoor:true,buildings:blds,npcs,
     enemies:[mkEnemy('slime',6,24),mkEnemy('slime',8,13),mkEnemy('slime',54,25)],
     signs:{'12,17':[L('Sign','BRACKENFORD. Market town of the river crossing. Founded long enough ago that nobody remembers when.')],'30,7':[L('Sign','North gate: the Old Quarry. Mind the bats.')],'47,18':[L('Sign','The Hall of Wardens. Only the proven may enter.')],'27,29':[L('Sign','SOUTH GATE. Beyond lies the Gloaming Fen. Closed by order of the Hall.')],
-      '33,22':[L('Notice','RECRUITS WANTED. The Hall of Wardens seeks the brave. Speak with Captain Venn outside the hall.'),L('Notice','Also: whoever keeps stealing pies from the Rusty Kettle, Marla knows it was you.')]},
+      '33,22':[L('Notice','RECRUITS WANTED. The Hall of Wardens seeks the brave. Speak with Captain Venn outside the hall.'),L('Notice','Also: whoever keeps stealing pies from the Rusty Kettle, Marla knows it was you.'),L('Gazette','THE GALLOWMARK GAZETTE, Spring 1903. His Majesty King Edric the Kind reports that Her Highness Princess Rosalind is well, and hard at work on her great project at Highcrown Castle.'),L('','Under the notice, someone has scratched three words: WHERE IS SHE?')]},
     exits:[{x0:0,y0:18,x1:0,y1:21,to:'forest',tx:50,ty:16,face:'L'},{x0:27,y0:0,x1:30,y1:0,to:'quarry',tx:15,ty:21,face:'U'},
       {x0:19,y0:11,x1:19,y1:11,to:'chapel',tx:6,ty:10,face:'U'},{x0:35,y0:11,x1:35,y1:11,to:'smithy',tx:7,ty:8,face:'U'},
       {x0:19,y0:26,x1:19,y1:26,to:'inn',tx:8,ty:9,face:'U'},{x0:51,y0:14,x1:51,y1:14,to:'hall',tx:10,ty:14,face:'U',req:()=>F.hall_open,msg:'The great doors are barred.'},
@@ -1211,7 +1211,7 @@ function talkVennHall(){
       L('Pip',lastInput==='touch'?'Hold SWORD, then let go to spin! Let\'s go, Wren!':(lastInput==='pad'?'Hold the sword button, then let go to spin! Let\'s go, Wren!':'Hold J, then let go to spin! Let\'s go, Wren!'))],
     after(){F.ch3=true;F.spin=true;toast('New goal: find Mirewatch Tower in the Gloaming Fen, south of town',3.4);saveGame();}};
   if(!F.mw_done)return[L('Venn','The south gate is open. Mirewatch lies somewhere in the Gloaming Fen. And Wren? Watch Morrow\'s soldiers.')];
-  if(F.shard3)return[L('Venn','Three shards... and Morrow sending you to fetch them like a hunting dog. He\'s playing a long game.'),L('Venn','Rest while you can, Warden. Gallowmark is bigger than Brackenford, and the other shards won\'t wait.')];
+  if(F.shard3)return[L('Venn','Three shards... and Morrow sending you to fetch them like a hunting dog. He\'s playing a long game.'),L('Venn','I\'ll tell you something I\'ve told no one. The King closed every Hall of Wardens twenty years ago. I kept this one open in secret.'),L('Venn','Corwin, Wick, your friend Fen\'s mother... everyone who looks too closely at the castle seems to disappear. Be careful, Wren.')];
   return[L('Venn','Two shards, and the Grapple Claw of the first Wardens. Gallowmark hasn\'t seen your like in an age.'),L('Venn','Keep those shards close. Morrow will not stay polite forever.')];}
 function talkTilda(){return{lines:[L('Tilda','Fresh goods for brave folk! Potions to mend you, and something rarer for the well-off.')],after(){openMenu('shop');}};}
 function talkBram(){if(F.ch3)return[L('Bram','The south gate\'s open again? Bring me back some fen turnips. They\'re purple and they scream a bit.')];return[L('Bram','Apples, pears, turnips! No? Suit yourself.'),L('Bram','Did you hear? A royal envoy rode in last week. Chancellor Morrow. Hasn\'t smiled once.')];}
@@ -1233,14 +1233,14 @@ function talkOdo(){
 function talkAldous(){
   if(F.kindness)return[L('Aldous','The bell rings sweeter for its journey. Thank you, Wren.')];
   if(F.bell)return{lines:[L('Aldous','Our silver bell! And the youth who took it?'),L('','You tell him about Fen and the sick sister.'),L('Aldous','Then the chapel will send medicine. Kindness answered with kindness.'),L('Aldous','Take this token. Captain Venn will understand.')],after(){F.bell=false;F.bell_returned=true;F.kindness=true;gotItem('Token of Kindness');}};
-  const legend=[L('Aldous','Long ago the Dawnbell rang over Gallowmark, and its song kept the door between worlds shut.'),L('Aldous','Then it shattered. Its shards were scattered across the land, and the door has been creaking ever since.'),L('Pip','Wren... the falling star we chased. Could it have been one of those shards?')];
+  const legend=[L('Aldous','Long ago the Dawnbell rang over Gallowmark, and its song kept the door between worlds shut.'),L('Aldous','Then it shattered. Its shards were scattered across the land, and the door has been creaking ever since.'),L('Aldous','The Crown says the old song is only a fairy tale. Odd, then, how many of the King\'s men ask me about it.'),L('Pip','Wren... the falling star we chased. Could it have been one of those shards?')];
   if(!F.quest)return legend.concat([L('Aldous','Kneel at the altar whenever you need rest. The Dawn keeps watch.')]);
   if(!F.bell_quest)return{lines:[L('Aldous','A token of kindness? Then perhaps you can help an old man.'),L('Aldous','Our silver bell was stolen from the altar. A quick-fingered youth in purple was seen running toward the Old Quarry.'),L('Aldous','Please don\'t hurt them. Just bring the bell home.')],after(){F.bell_quest=true;saveGame();}};
   return[L('Aldous','The quarry is north of town. I pray the youth is unharmed.')];}
-function talkFenQuarry(n){return{lines:[L('Fen','You again? Come to drag me back to the guards?'),L('Fen','Fine. I took the bell. The envoy\'s men pay good coin for silver, and my sister\'s sick.'),L('Pip','Wren, maybe we can help instead of fighting.')],after(){openMenu('fen',n);}};}
+function talkFenQuarry(n){return{lines:[L('Fen','You again? Come to drag me back to the guards?'),L('Fen','Fine. I took the bell. The envoy\'s men pay good coin for silver, and my sister\'s sick.'),L('Fen','They don\'t even want the silver. They crack every bell open and look inside, like they\'re hunting for something.'),L('Pip','Wren, maybe we can help instead of fighting.')],after(){openMenu('fen',n);}};}
 function talkWick(){
   if(!F.wick_met)return{lines:[L('Wick','Visitors! Wipe your boots. I\'m Wick. I\'ve watched this fen for forty years.'),L('Wick','Mirewatch? Sank the night the great bell broke. Lights have danced around it ever since. Not friendly lights.'),
-      L('Wick','The old Wardens drove grapple posts across the lake. A few still stand, if you\'ve got a claw to catch them.'),
+      L('Wick','The old Wardens drove grapple posts across the lake. A few still stand, if you\'ve got a claw to catch them.'),L('Wick','I was a Warden myself, before the King closed the Halls "to save the treasury". My friend Corwin went into that tower to guard something. He never came out.'),
       L('Wick','Now, a favor. My lamp runs on glowcaps, the little shining mushrooms. Bring me five and I\'ll give you something precious.')],
     after(){F.wick_met=true;F.wick_q=true;toast('Side quest: find 5 glowcaps for Old Wick',3);saveGame();}};
   if(!F.wick_done&&(F.caps||0)>=5)return{lines:[L('Wick','Five glowcaps! My lamp will burn till spring.'),L('Wick','Here. I pulled this out of a pike forty years ago. Never knew what it was for. Maybe you will.')],after(){F.wick_done=true;addHeartPiece();}};
@@ -1263,8 +1263,8 @@ function talkNell(){
       L('Fen','Wren, take this. Mum sewed it before she left. It holds more potions than any bag in town. And these marks, for the trouble.')],
     after(){F.lily=false;F.lily_done=true;F.bag=true;marks+=30;gotItem('Big Potion Bag (carry 5 potions) and 30 marks');}};
   if(F.lily_done)return[L('Nell','When I\'m bigger, I\'m going to be a Warden too. Fen says I\'m too bossy. Wardens should be bossy.')];
-  return[L('Nell','*cough* Hello... are you the one who brought back the chapel bell? Fen talks about you all the time.')];}
-function talkSoldier(){return F.mw_morrow?[L('Soldier','The Chancellor says you are to be given every courtesy. And watched. Closely.')]:[L('Soldier','By order of Chancellor Morrow, all relics found in Gallowmark belong to the Crown.'),L('Soldier','The tower in the fen? Not my business. Nobody who goes in at night comes out talking sense.')];}
+  return[L('Nell','*cough* Hello... are you the one who brought back the chapel bell? Fen talks about you all the time.'),L('Nell','Mum went to work at the castle when I was little. A special job for the princess, the letter said. She never wrote back.'),L('Nell','The fever started when the soldiers began digging by the south road. Fen says that\'s silly.')];}
+function talkSoldier(){return F.mw_morrow?[L('Soldier','The Chancellor says you are to be given every courtesy. And watched. Closely.')]:[L('Soldier','God save King Edric the Kind!'),L('Soldier','By order of Chancellor Morrow, all relics found in Gallowmark belong to the Crown.'),L('Soldier','The tower in the fen? Not my business. Nobody who goes in at night comes out talking sense.')];}
 function gotItem(name){SFX.item();toast('You got: '+name,3);updateHud(true);saveGame();}
 
 /* ================= physics ================= */
@@ -1320,7 +1320,7 @@ function saveGame(){if(!P||!S||S.fight||(S.trap&&S.shut&&!F[S.trap]))return;stor
 function loadSave(){return store.get('dawnbell-save-v1',null);}
 function beginPlay(){$('title').hidden=true;$('hud').hidden=false;$('controls').hidden=false;stickHome();}
 function newGame(){F={sword:1};marks=0;potions=0;playTime=0;tut=0;tutDist=0;swung=false;locked=false;P=newPlayer();mode='play';beginPlay();loadScene('forest',START.x,START.y,'D');
-  say([L('Pip','Wren! Wren, wake up!'),L('Pip','We fell through the forest pool chasing that falling star. This is nowhere near Hollowmere.'),
+  say([L('Pip','Wren! Wren, wake up!'),L('Pip','We fell through the forest pool chasing that falling star. This is nowhere near Hollowmere.'),L('Pip','You were talking in your sleep. Something about a garden, and a girl humming a song.'),
     L('Pip','And the woods are crawling with slimes. Good thing you brought your practice blade.'),L('Pip','Let\'s find a way out of here. I\'ll stay close.')],()=>toast('Goal: clear the slimes and find the path east',3));}
 function continueGame(fullHeal){const s=loadSave();if(!s){newGame();return;}F=s.F||{sword:1};marks=s.marks||0;potions=s.potions||0;playTime=s.playTime||0;tut=Math.max(4,s.tut||0);hint('');
   P=newPlayer();P.maxHp=s.maxHp||6;P.hp=fullHeal?P.maxHp:Math.max(2,s.hp||P.maxHp);mode='play';beginPlay();loadScene(s.scene,s.tx,s.ty,'D');P.inExit=true;
@@ -1487,7 +1487,7 @@ function startGrim(){const b=mkEnemy('grim',10,5);enemies.push(b);S.fight=true;S
 function grimDefeated(e){S.fight=false;$('boss').hidden=true;F.hd_done=true;S.rocks=[];shake(4,.8);SFX.slam();if(S.shut){for(const i of S.shut)map[i]=T.DOOR;S.shut=null;}
   const cx=clamp(e.x,3*TS,(MW-3)*TS),cy=clamp(e.y,4*TS,(MH-3)*TS);
   pickups.push({x:cx-14,y:cy,vx:0,vy:0,z:0,vz:90,type:'shard',t:0},{x:cx+16,y:cy,vx:0,vy:0,z:0,vz:90,type:'hc',t:0});saveGame();}
-function shard2Cutscene(){say([L('Pip','Another shard! It was stuck in that beetle\'s shell the whole time. No wonder it was so grumpy.'),L('','You got a second Dawnbell Shard. When the two shards touch, they ring like a tiny bell.'),
+function shard2Cutscene(){say([L('Pip','Another shard! It was stuck in that beetle\'s shell the whole time. No wonder it was so grumpy.'),L('','You got a second Dawnbell Shard. When the two shards touch, they ring like a tiny bell.'),L('Pip','See those stakes in the floor? They have the royal crest on them. Someone from the castle mapped this cave long before us.'),
   L('Pip','Hear that? They\'re singing to each other. I think they want to be whole again.'),L('Pip','Morrow\'s men never made it this far. Let\'s get back to Captain Venn before they try again.')],
   ()=>{saveGame();SFX.win();setTimeout(()=>openMenu('chapter2'),700);});}
 function startBoss(){$('boss-name').textContent='Iron Sentinel';const b=mkEnemy('sentinel',10,5);enemies.push(b);S.fight=true;S.boss=b;$('boss').hidden=false;updateBossBar();shake(2,.4);SFX.slam();}
@@ -1498,7 +1498,7 @@ function shardCutscene(){
   const m=mkNpc('morrow',PAL.morrow,10,2,()=>[]);npcs.push(m);burst(m.x,m.y-6,16,['#4a3e5a','#8a6ac8','#ffffff'],60,.6);
   say([L('Pip','Wren! It was glowing inside the Sentinel. Is that a shard of the Dawnbell?'),L('','You got a Dawnbell Shard. It hums softly, warm in your hand.'),
     L('Venn','Well fought. By the old oaths, you are a Warden of Brackenford.'),L('Morrow','What a remarkable child. Do take good care of that shard.'),
-    L('Morrow','I\'ll be needing it.'),L('Pip','Who was THAT? Wren, I don\'t like him one bit.')],()=>{burst(m.x,m.y-6,20,['#4a3e5a','#8a6ac8','#16111d'],70,.7);npcs=npcs.filter(n=>n!==m);saveGame();SFX.win();setTimeout(()=>openMenu('chapter'),700);});}
+    L('Morrow','I\'ll be needing it. His Majesty sends his warmest regards.'),L('Pip','Wren, look at the Sentinel\'s back plate. It has a maker\'s mark: a crown. The castle built that thing.'),L('Pip','Who was THAT? Wren, I don\'t like him one bit.')],()=>{burst(m.x,m.y-6,20,['#4a3e5a','#8a6ac8','#16111d'],70,.7);npcs=npcs.filter(n=>n!==m);saveGame();SFX.win();setTimeout(()=>openMenu('chapter'),700);});}
 
 /* ---- chapter three systems: lantern, shots, blocks, braziers, vines, new foes ---- */
 const ECOLS={slime:['#dcffb8','#7fd85a','#3e9446','#fff'],big:['#f2c9ff','#b866c4','#6c2d7c','#fff'],rat:['#c8a8a0','#7d6a60','#fff'],ratking:['#c8a8a0','#f0c65a','#7d6a60','#fff'],bat:['#c8a8e0','#6a4a8a','#fff'],sentinel:['#7f8796','#ff5a3c','#fff1a0','#3a3240'],beetle:['#6fc2b8','#2f6a6e','#f0c65a','#fff'],grim:['#8a6a9a','#ff8a3a','#ecd0a0','#2a1e30'],
@@ -1587,9 +1587,9 @@ function startWraith(){const b=mkEnemy('wraith',11,5);enemies.push(b);S.fight=tr
 function wraithDefeated(e){S.fight=false;$('boss').hidden=true;F.mw_done=true;shots=[];if(S.shut){for(const i of S.shut)map[i]=T.DOOR;S.shut=null;}enemies.forEach(o=>{if(o!==e&&!o.dead){o.dead=true;burst(o.x,o.y-6,10,ecol(o),60,.4);}});
   for(const[x,y]of S.brazList)setT(x,y,T.BRAZL);shake(4,.8);SFX.slam();
   const cx=clamp(e.x,3*TS,(MW-3)*TS),cy=clamp(e.y,4*TS,(MH-3)*TS);
-  say([L('Bogwraith','The light... I remember the light...'),L('Bogwraith','I was a Warden once. I swore to guard the shard... and the dark made me forget why.'),L('Bogwraith','Ring the bell again, little Warden. Ring it...')],()=>{
+  say([L('Bogwraith','The light... I remember the light...'),L('Bogwraith','I was a Warden once. Corwin, they called me. I swore to guard the shard...'),L('Bogwraith','The King\'s own men sealed the door behind me. They smiled while they did it. Then the dark made me forget.'),L('Bogwraith','Ring the bell again, little Warden. Ring it...')],()=>{
     pickups.push({x:cx-14,y:cy,vx:0,vy:0,z:0,vz:90,type:'shard',t:0},{x:cx+16,y:cy,vx:0,vy:0,z:0,vz:90,type:'hc',flag:'mw_hc',t:0});saveGame();});}
-function shard3Cutscene(){say([L('','You got the third Dawnbell Shard. The three pieces chime together, louder than ever.'),L('Pip','Listen! It\'s almost a tune now. Three down... but how many are out there?'),
+function shard3Cutscene(){say([L('','You got the third Dawnbell Shard. The three pieces chime together, louder than ever.'),L('Pip','Listen! It\'s almost a tune now. Three down... but how many are out there?'),L('','The chime fills your head. For a moment you see a garden full of white roses, and a girl in a silver circlet humming this exact tune.'),L('Pip','Wren? You went pale. ...The garden by the palace in Hollowmere? You saw it too?'),L('Pip','But how could a Gallowmark bell know a song from home?'),
   L('Morrow','Splendid work, little Warden. Truly.'),L('Pip','Morrow?! Where is that voice coming from?'),L('Morrow','Keep gathering them for me. When the bell is whole, I will come to collect.'),
   L('Pip','...He\'s gone. Wren, we need to tell Captain Venn everything.')],()=>{saveGame();SFX.win();setTimeout(()=>openMenu('chapter3'),700);});}
 function morrowIsland(){F.mw_morrow=true;const m=mkNpc('morrow',PAL.morrow,49,21,()=>[],{fx:-1,fy:0});npcs.push(m);burst(m.x,m.y-6,16,['#4a3e5a','#8a6ac8','#ffffff'],60,.6);
@@ -2006,7 +2006,7 @@ function openMenu(kind,arg){const h=$('menu-h'),b=$('menu-body'),row=$('menu-row
   else if(kind==='dead'){h.textContent='Wren collapsed';b.innerHTML='<p>Pip nudges you back to your feet. You wake up where your journey was last saved.</p>';btn('Try again',()=>{$('menu').hidden=true;mode='play';continueGame(true);});}
   else if(kind==='chapter'){h.textContent='Chapter one complete';b.innerHTML=`<p>Wren is a Warden of Brackenford, with a Dawnbell shard and a new enemy.</p><p>Play time ${fmt(playTime)} &middot; ${marks} marks</p><p>Captain Venn has more to say. Talk to him before you leave the Hall.</p>`;btn('Keep exploring',closeMenu);}
   else if(kind==='chapter2'){h.textContent='Chapter two complete';b.innerHTML=`<p>Wren conquered the Hollow Deep, claimed the Grapple Claw and saved a second Dawnbell shard from Morrow.</p><p>Play time ${fmt(playTime)} &middot; ${marks} marks &middot; ${P.maxHp/2} hearts</p><p>That's the end of this build. More of Gallowmark is coming.</p>`;btn('Keep exploring',closeMenu);}
-  else if(kind==='chapter3'){h.textContent='Chapter three complete';b.innerHTML=`<p>Wren freed the Bogwraith, claimed the Ember Lantern and saved a third Dawnbell shard. Morrow is watching every step.</p><p>Play time ${fmt(playTime)} &middot; ${marks} marks &middot; ${P.maxHp/2} hearts &middot; heart pieces ${F.hpieces||0}</p><p>Beyond the Heartlands lie Highcrown, the capital, and the rest of Gallowmark. They're coming in future chapters.</p>`;btn('Keep exploring',closeMenu);}
+  else if(kind==='chapter3'){h.textContent='Chapter three complete';b.innerHTML=`<p>Wren freed the Bogwraith, claimed the Ember Lantern and saved a third Dawnbell shard. Morrow is watching every step.</p><p>Play time ${fmt(playTime)} &middot; ${marks} marks &middot; ${P.maxHp/2} hearts &middot; heart pieces ${F.hpieces||0}</p><p>Somewhere in Highcrown Castle, a princess nobody has seen in years is humming a song from Hollowmere. The road to the capital is coming in future chapters.</p>`;btn('Keep exploring',closeMenu);}
   else if(kind==='shop'){h.textContent='Tilda\'s Stall';b.innerHTML=`<p>You have ${marks} marks.</p>`;
     const buy=(cost,fn)=>()=>{if(marks<cost)return;marks-=cost;fn();SFX.coin();updateHud(true);openMenu('shop');};
     btn(`Potion: 15${potions?` (have ${potions})`:''}`,buy(15,()=>{potions++;}),potions>=(F.bag?5:3)||marks<15);
