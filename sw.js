@@ -1,5 +1,5 @@
 // Dawnbell offline cache. Bump VERSION whenever the game files change.
-const VERSION = 'dawnbell-v3';
+const VERSION = 'dawnbell-v4';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-180.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
