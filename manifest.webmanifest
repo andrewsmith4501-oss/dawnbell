@@ -1,7 +1,7 @@
 {
   "name": "Dawnbell",
   "short_name": "Dawnbell",
-  "description": "Chapter one: The Warden's Trial. A top-down action adventure.",
+  "description": "Three chapters: The Warden's Trial, The Hollow Deep and The Gloaming Fen. A top-down action adventure for phone and PC.",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
