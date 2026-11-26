@@ -2101,7 +2101,8 @@ const R3=(()=>{
     if(list)for(const i of list){const y=(i/(nx*nz))|0,r=i-y*nx*nz,z=(r/nx)|0,x=r-z*nx;each(x,y,z);}
     else for(let y=0;y<ny;y++)for(let z=0;z<nz;z++)for(let x=0;x<nx;x++)each(x,y,z);}
   /* a free box (any size, turned around y) with the same face shading, for furniture and buildings */
-  function boxF(acc,w,h,d,c,x,y,z,ry){const hw=w/2,hd=d/2,cs=Math.cos(ry||0),sn=Math.sin(ry||0),P8=[];
+  let BK=0;/* each box grows by its own hair-thin amount, so two faces never sit in exactly the same spot (that is what flickers) */
+  function boxF(acc,w,h,d,c,x,y,z,ry){const eB=(BK++%11+1)*.0009;w+=eB*2;h+=eB*2;d+=eB*2;y-=eB;const hw=w/2,hd=d/2,cs=Math.cos(ry||0),sn=Math.sin(ry||0),P8=[];
     for(const[a,b,e]of[[-1,0,-1],[1,0,-1],[-1,1,-1],[1,1,-1],[-1,0,1],[1,0,1],[-1,1,1],[1,1,1]]){const lx=a*hw,lz=e*hd;P8.push([x+lx*cs+lz*sn,y+b*h,z-lx*sn+lz*cs]);}
     const quads=[[0,2,4,6,[-1,0,0]],[5,7,1,3,[1,0,0]],[4,6,5,7,[0,0,1]],[1,3,0,2,[0,0,-1]],[2,3,6,7,[0,1,0]],[4,5,0,1,[0,-1,0]]];
     const jit=.95+hash3(x*13|0,y*7|0,z*11|0)*.08;
@@ -2189,14 +2190,14 @@ const R3=(()=>{
       mset(G,dx,y,dz,q<.06?C[3]:C[(q*30|0)%3]);}}
   function buildTrees(){const st=ST;if(!st.outdoor)return null;const TP=5,G=microGrid((MW+TP*2)*MR,Math.ceil(4.5*MR),(MH+TP*2)*MR);let n=0;
     for(let z=-TP;z<MH+TP;z++)for(let x=-TP;x<MW+TP;x++)if(tAt(x,z)===T.TREE){addTree(G,x+TP,z+TP,st.marsh);n++;}
-    if(!n)return null;const acc=newAcc();meshGrid(acc,G,MP,MS,-TP,0,-TP,G.list);return acc;}
+    if(!n)return null;const acc=newAcc();meshGrid(acc,G,MP,MS,-TP+.031,.031,-TP+.031,G.list);return acc;}/* tiny nudge so tree faces never sit exactly on cliffs or props (that flickers) */
   function buildProps(acc){/* small micro-voxel props, one little grid per tile so cutting a bush only redraws these */
     for(let z=0;z<MH;z++)for(let x=0;x<MW;x++){const t=map[z*MW+x];let G=null,sz=0;
       if(t===T.BUSH){G=microGrid(7,5,7);addBush(G,x,z);}
       else if(t===T.ROCK||t===T.ORE){G=microGrid(6,4,6);addRock(G,x,z,t===T.ORE);}
       else if(t===T.STUMP){G=microGrid(5,3,5);addStump(G,x,z);}
       else if(t===T.BRAMBLE||t===T.VINE){G=microGrid(6,t===T.VINE?9:6,6);addThorns(G,x,z,t===T.VINE);}
-      if(G){const o=(1-G.nx*MS)/2;meshGrid(acc,G,MP,MS,x+o,0,z+o,G.list,true);}}}
+      if(G){const o=(1-G.nx*MS)/2,e=((x&1)+(z&1)*2+1)*.006;meshGrid(acc,G,MP,MS,x+o+e,e,z+o+e,G.list,true);}}}/* neighbours get different tiny nudges so overlapping props don't flicker */
   /* ---------- furniture and fittings, built from shaded boxes ---------- */
   const C_=h=>rgb(h),WOOD=C_('#8a5a30'),WOODL=C_('#b07a44'),WOODD=C_('#5a3a1e'),IRON=C_('#4a4e58'),IRONL=C_('#8a90a0'),GOLD=C_('#f0c65a'),STONEC=C_('#9a9aa2'),STONED=C_('#6a6a74'),
     PAPER=C_('#f2ead6'),CLOTH=C_('#c0453a');
@@ -2221,7 +2222,7 @@ const R3=(()=>{
       case T.FORGE:B(1,.9,.85,STONED,cx,0,cz);B(.7,.1,.55,C_('#ff8a3a'),cx,.9,cz);B(.5,1.6,.5,STONEC,cx,.9,cz-.2);dyn.push({k:'coals',x:cx,y:.95,z:cz});break;
       case T.PEW:B(.95,.08,.42,WOOD,cx,.36,cz);B(.95,.5,.08,WOOD,cx,.36,cz+.2);B(.08,.36,.4,WOODD,cx-.42,0,cz);B(.08,.36,.4,WOODD,cx+.42,0,cz);break;
       case T.ALTAR:B(1,.7,.7,C_('#e8e0cc'),cx,0,cz);B(1.06,.08,.76,GOLD,cx,.7,cz);B(.9,.02,.3,C_('#5b6f9a'),cx,.78,cz);if(F.bell_returned){B(.3,.3,.3,GOLD,cx,.8,cz);B(.4,.08,.4,GOLD,cx,.8,cz);}break;
-      case T.PILLAR:B(.8,.2,.8,STONED,cx,0,cz);B(.6,2.2,.6,STONEC,cx,.2,cz);B(.8,.2,.8,STONED,cx,2.2,cz);break;
+      case T.PILLAR:B(.8,.2,.8,STONED,cx,0,cz);B(.6,2.0,.6,STONEC,cx,.2,cz);B(.8,.2,.8,STONED,cx,2.2,cz);break;
       case T.POST:B(.24,1.1,.24,WOOD,cx,0,cz);B(.34,.08,.34,WOODD,cx,0,cz);B(.3,.08,.3,GOLD,cx,1.05,cz);B(.1,.2,.1,GOLD,cx,1.13,cz);break;
       case T.CHEST:{const c=S.chests&&S.chests[x+','+z],open=c&&F[c.id],big=c&&c.item==='bk2'||c&&String(c.item).startsWith('b');const k=big?1.15:1;
         B(.72*k,.42*k,.5*k,WOOD,cx,0,cz);B(.76*k,.06,.54*k,GOLD,cx,.02,cz);B(.08,.3*k,.54*k,GOLD,cx-.3*k,.06,cz);B(.08,.3*k,.54*k,GOLD,cx+.3*k,.06,cz);
@@ -2239,7 +2240,7 @@ const R3=(()=>{
       case T.STAIRS:for(let i=0;i<3;i++)B(1,.3,.33,C_('#5a5a64'),cx,-.3*(i+1),z+.17+i*.33);break;
       case T.DOOR:if(S.indoor){const side=(x===0||x===MW-1);if(side){B(.2,2.1,.15,WOODD,cx,0,z+.08);B(.2,2.1,.15,WOODD,cx,0,z+.92);}else{B(.15,2.1,.2,WOODD,x+.08,0,cz);B(.15,2.1,.2,WOODD,x+.92,0,cz);}}break;
       case T.CAVE:B(1.1,.3,.4,C_('#8a7658'),cx,1.9,z+.2);B(.25,1.9,.4,C_('#8a7658'),x+.1,0,z+.2);B(.25,1.9,.4,C_('#8a7658'),x+.9,0,z+.2);break;
-      case T.FLOWER:{const fc=['#fff6e0','#ffd84a','#f59ac0','#a8c8ff'];for(let i=0;i<4;i++){const fx=x+.18+hash(x*5+i,z)*.64,fz=z+.18+hash(x,z*5+i)*.64;B(.03,.14,.03,C_('#3f8a34'),fx,0,fz);B(.08,.05,.08,C_(fc[((hash(x+i,z*3)*4)|0)]),fx,.14,fz);B(.04,.04,.04,C_('#ffe060'),fx,.19,fz);}break;}
+      case T.FLOWER:{const fc=['#fff6e0','#ffd84a','#f59ac0','#a8c8ff'];for(let i=0;i<4;i++){const fx=x+.18+hash(x*5+i,z)*.64,fz=z+.18+hash(x,z*5+i)*.64;const fy=i*.012;B(.03,.14+fy,.03,C_('#3f8a34'),fx,0,fz);B(.08,.05,.08,C_(fc[((hash(x+i,z*3)*4)|0)]),fx,.14+fy,fz);B(.04,.035,.04,C_('#ffe060'),fx,.19+fy,fz);}break;}
       case T.GRASS:if(!S.indoor&&h<.3){for(let i=0;i<3;i++){const gx=x+.15+hash(x*9+i,z)*.7,gz=z+.15+hash(x,z*9+i)*.7,gh=.08+hash(i,x)*.12;B(.05,gh,.05,ST.marsh?C_('#4a8a50'):C_('#4f9a38'),gx,0,gz);}}break;
       }}
     /* buildings */
@@ -2251,12 +2252,12 @@ const R3=(()=>{
       for(let i=0;i<6;i++)B(.3+hash(i,x0)*.3,.2,.06,C_('#5c9a3a'),x0+.3+hash(x0,i)*(w-.6),hash(i,z0)*3.8,z0+d-.08);return;}
     const hall=b.kind==='hall',wallH=hall?2.6:2,wall=C_(b.wall||'#e9dcbf'),beam=C_('#6b4423'),roof=C_(b.roof||'#7a5a3a'),roofD=mul(roof,.82),front=z0+d;
     B(w-.1,wallH,d-.1,wall,cx,0,cz);B(w,.25,d,C_('#9a9284'),cx,0,cz);
-    for(let i=0;i<=w;i+=2)B(.12,wallH,.06,beam,x0+Math.min(i,w-.06)+(i===0?.06:0),0,front-.04);B(w,.1,.06,beam,cx,wallH*.5,front-.04);B(w,.12,.06,beam,cx,wallH-.1,front-.04);
+    for(let i=0;i<=w;i+=2)B(.12,wallH-.01,.06,beam,x0+Math.min(i,w-.06)+(i===0?.06:0),0,front-.04);B(w,.1,.06,beam,cx,wallH*.5,front-.04);B(w,.12,.06,beam,cx,wallH-.1,front-.04);
     for(const s of[-1,1])B(.06,wallH,.12,beam,cx+s*(w/2-.05),0,front-.1);
     const dx=x0+b.door+.5;B(.72,1.25,.06,WOODD,dx,0,front-.02);B(.86,.1,.08,beam,dx,1.25,front-.02);B(.06,.06,.02,GOLD,dx+.22,.6,front+.02);B(.9,.08,.4,C_('#8a8478'),dx,0,front+.15);
     for(let i=0;i<w;i++){if(i===b.door)continue;if((i+1)%2&&w>4&&i!==0&&i!==w-1)continue;const wx=x0+i+.5;B(.46,.46,.05,beam,wx,1.0,front-.02);B(.36,.36,.06,C_('#a8d8f0'),wx,1.05,front-.02);B(.04,.36,.07,beam,wx,1.05,front-.02);}
     const ov=.25,depth=d+ov*2,n=Math.max(3,Math.round(depth/2/.22)),step=depth/2/n;
-    for(let i=0;i<n;i++){const dd=depth-i*2*step,yy=wallH+i*.26;B(w+ov*2,.27,dd,i%2?roof:roofD,cx,yy,cz);}
+    for(let i=0;i<n;i++){const dd=depth-i*2*step,yy=wallH+i*.26;B(w+ov*2-i*.004,.27,dd,i%2?roof:roofD,cx,yy,cz);}
     B(w+ov*2+.04,.12,.3,mul(roof,.7),cx,wallH+n*.26,cz);
     if(b.kind==='chapel'){const tx=cx,tz=cz;B(1.3,1.6,1.3,wall,tx,wallH+n*.26,tz);B(.6,.6,.06,C_('#3a3040'),tx,wallH+n*.26+.6,tz+.66);B(.36,.36,.36,GOLD,tx,wallH+n*.26+.7,tz+.5);
       for(let i=0;i<5;i++)B(1.5-i*.3,.3,1.5-i*.3,C_(b.roof),tx,wallH+n*.26+1.6+i*.3,tz);B(.08,.6,.08,GOLD,tx,wallH+n*.26+3.1,tz);B(.3,.08,.08,GOLD,tx,wallH+n*.26+3.5,tz);}
@@ -2312,7 +2313,7 @@ const R3=(()=>{
     for(let i=0;i<PL.length;i++){const l=PL[i],s=L[i];if(!s){l.intensity=0;continue;}l.position.set(s[0],s[1],s[2]);l.intensity=s[3]*(1+Math.sin(time*9+i)*.05);l.color.setHex(s[4]);l.distance=s[5];}}
   /* ---------- characters, built from boxes like the Adventure Plus hero ---------- */
   const matCache=new Map();const lam=c=>{let m=matCache.get(c);if(!m){m=new THREE.MeshLambertMaterial({color:c});matCache.set(c,m);}return m;};
-  function box(w,h,d,c,x,y,z,par){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),typeof c==='string'||typeof c==='number'?lam(c):c);m.position.set(x,y,z);par.add(m);return m;}
+  let CK=0;function box(w,h,d,c,x,y,z,par){const e=((CK++*5)%13+1)*.0007;const m=new THREE.Mesh(new THREE.BoxGeometry(w+e,h+e,d+e),typeof c==='string'||typeof c==='number'?lam(c):c);m.position.set(x,y,z);par.add(m);return m;}
   const grp=(x,y,z,par)=>{const g=new THREE.Group();g.position.set(x,y,z);par.add(g);return g;};
   let hero=null,H={},pipG=null,wingL,wingR,heroBlob,ring,partsMesh,chain=null,stars=null;
   /* own materials per model so a hit flash only lights that one */
