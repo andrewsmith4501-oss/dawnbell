@@ -857,6 +857,7 @@ function buildTown(){
   const npcs=[];
   if(!F.quest)npcs.push(mkNpc('guard1',PAL.guard,14,19,talkGuard),mkNpc('guard2',PAL.guard,14,20,talkGuard));
   else npcs.push(mkNpc('guard1',PAL.guard,13,18,talkGuard,{fx:1,fy:0}),mkNpc('guard2',PAL.guard,13,21,talkGuard,{fx:1,fy:0}));
+  if(!F.quest)GATE_G.forEach((g,i)=>npcs.push(mkNpc('gguard'+i,PAL.guard,F.inside?g[2]:g[0],F.inside?g[3]:g[1],talkGuard,{gateG:i})));
   if(!F.met_fen)npcs.push(mkNpc('fen',PAL.fen,12,26,talkFenGap,{fx:1,fy:0}));
   if(!F.boss_done)npcs.push(mkNpc('venn',PAL.venn,53,15,talkVenn));
   npcs.push(mkNpc('tilda',PAL.tilda,31,15,talkTilda),mkNpc('bram',PAL.bram,25,15,talkBram));
@@ -1478,6 +1479,11 @@ const COAST_IDS=new Set(['coast','harbor','gulltav','hobbhouse','gl1','gl2','gl3
 const BUILD={coast:buildCoast,harbor:buildHarbor,gulltav:buildGullTav,hobbhouse:buildHobbHouse,gl1:buildGL1,gl2:buildGL2,gl3:buildGL3,gl4:buildGL4,gl5:buildGL5,gl6:buildGL6,marsh:buildMarsh,hut:buildHut,fenhouse:buildFenHouse,mw1:buildMW1,mw2:buildMW2,mw3:buildMW3,mw4:buildMW4,mw5:buildMW5,mw6:buildMW6,mw7:buildMW7,hd1:buildHD1,hd2:buildHD2,hd3:buildHD3,hd4:buildHD4,hd5:buildHD5,hd6:buildHD6,hd7:buildHD7,forest:buildForest,town:buildTown,quarry:buildQuarry,smithy:buildSmithy,inn:buildInn,cellar:buildCellar,chapel:buildChapel,hall:buildHall};
 
 /* ================= npc talk ================= */
+const TOWN_GATES=[{x0:14,x1:14,y0:19,y1:20,w:1},{x0:28,x1:29,y0:5,y1:5},{x0:44,x1:44,y0:19,y1:20}];
+function townGateShut(x,y,e){if(F.quest)return false;const a=Math.floor((x-e.hw)/TS),b=Math.floor((x+e.hw-.01)/TS),c=Math.floor((y-e.hh)/TS),d=Math.floor((y+e.hh-.01)/TS);
+  for(const g of TOWN_GATES){if(!g.w&&F.inside)continue;if(a<=g.x1&&b>=g.x0&&c<=g.y1&&d>=g.y0){const nw=performance.now();if(!(nw<(window.__gateT||0))){window.__gateT=nw+3000;toast(F.met_fen&&!F.inside?'The guards close ranks. Try Fen\'s gap in the west wall.':F.inside?'The gate guards won\'t let you out this way.':'The guards cross their spears. Strangers are turned away.',2.4);}return true;}}return false;}
+const GATE_G=[[28,5,27,6],[29,5,30,6],[44,19,43,18],[44,20,43,21]];
+function gateGuardsAside(){for(const n of npcs)if(n.gateG!==undefined){const g=GATE_G[n.gateG];n.x=g[2]*TS+8;n.y=g[3]*TS+8;n.fx=0;n.fy=1;}}
 function talkGuard(){F.met_guard=true;if(F.quest)return[L('Guard','Captain Venn vouched for you, so you may pass. Behave yourself.')];
   return[L('Guard','Halt. Brackenford is closed to strangers while the royal envoy is visiting.'),L('Guard','No papers, no entry. And don\'t go sneaking round the south wall like the street kids do.')];}
 function talkFenGap(n){return{lines:[L('Fen','Psst. Over here. Guards giving you trouble?'),L('Fen','There\'s a gap in the wall behind these crates. I\'ll shift them for you.'),L('Fen','Don\'t thank me. You owe me one, stranger.')],
@@ -1569,6 +1575,7 @@ function gotItem(name){SFX.item();toast('You got: '+name,3);updateHud(true);save
 function hitsSolid(x,y,hw,hh,fly,swim){const x0=Math.floor((x-hw)/TS),x1=Math.floor((x+hw-.01)/TS),y0=Math.floor((y-hh)/TS),y1=Math.floor((y+hh-.01)/TS);
   for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const t=tileAt(tx,ty);if(SOLID[t]&&!(fly&&(t===T.PIT||t===T.WATER||t===T.LILY))&&!(swim&&(t===T.WATER||t===T.LILY)))return true;}return false;}
 function blocked(e,x,y){if(hitsSolid(x,y,e.hw,e.hh,e.fly,e===P&&!!F.charm))return true;
+  if(e===P&&S.id==='town'&&townGateShut(x,y,e))return true;
   if(e===P){for(const n of npcs)if(Math.abs(n.x-x)<n.hw+e.hw&&Math.abs(n.y-y)<n.hh+e.hh+1)return true;}
   else if(e.talk&&P){if(Math.abs(P.x-x)<P.hw+e.hw&&Math.abs(P.y-y)<P.hh+e.hh+1)return true;}
   return false;}
@@ -1949,7 +1956,7 @@ function updatePlayer(dt){
   if(S.id==='town'&&!F.ch3&&P.y>28.6*TS&&P.x>27*TS&&P.x<31*TS&&toastT<=0)toast(F.hd_done?'The south gate is barred. Captain Venn holds the key.':'The south gate is barred shut.',2);
   if(S.id==='town'&&!F.ch4&&P.x>42.4*TS&&P.y>26.5*TS&&P.y<29*TS&&toastT<=0)toast(F.mw_done?'The east gate is chained shut by order of the crown. Captain Venn might know a way.':'The east gate is chained shut by order of the crown.',2);
   if(S.id==='marsh'&&!F.mw_morrow&&P.x>45*TS&&P.y>16*TS&&P.y<26*TS&&P.state==='normal'){morrowIsland();return;}
-  if(S.id==='town'&&!F.inside&&P.x>15*TS&&P.x<44*TS&&P.y>6*TS&&P.y<30*TS)F.inside=true;
+  if(S.id==='town'&&!F.inside&&P.x>15*TS&&P.x<44*TS&&P.y>6*TS&&P.y<30*TS){F.inside=true;gateGuardsAside();}
   if(S.id==='forest'&&S.gate===0&&P.x>(MW-8)*TS&&Math.abs(P.y-16.9*TS)<3*TS&&toastT<=0)toast(`Brambles block the path. Slimes left: ${enemies.filter(e=>!e.dead).length}`,2.4);
 }
 function updateEnemies(dt){
