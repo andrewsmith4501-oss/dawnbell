@@ -240,6 +240,8 @@ const _colA = new THREE.Color();
 const _colB = new THREE.Color();
 const _colC = new THREE.Color();
 
+import { GraphicsPipeline } from './graphics';
+
 function detectSoftwareGl(): boolean {
   try {
     const c = document.createElement('canvas');
@@ -265,6 +267,7 @@ export class DawnbellEngine {
   private camera!: THREE.PerspectiveCamera;
   private sunLight!: THREE.DirectionalLight;
   private hemiLight!: THREE.HemisphereLight;
+  private gfx!: GraphicsPipeline;
   private sunOrb!: THREE.Mesh;
 
   private mats!: MaterialLibrary;
@@ -396,6 +399,8 @@ export class DawnbellEngine {
     this.initThree();
     this.initParticles();
     this.buildAllSceneObjects();
+    this.gfx.resize(this.mountEl.clientWidth || window.innerWidth, Math.max(1, this.mountEl.clientHeight || window.innerHeight), true);
+    this.gfx.apply();
 
     this.input.attach(this.renderer.domElement, () => this.gameState === 'playing' && !this.mapOpen && !this.dialogue);
     window.addEventListener('resize', this.onResizeBound);
@@ -610,6 +615,7 @@ export class DawnbellEngine {
     this.sunLight.shadow.normalBias = 0.025;
     this.scene.add(this.sunLight);
     this.scene.add(this.sunLight.target);
+    this.gfx = new GraphicsPipeline(this.renderer, this.scene, this.camera, this.sunLight, this.isSoftwareGl);
 
     // Voxel sun orb high in the sky
     this.sunOrb = new THREE.Mesh(
@@ -1051,6 +1057,14 @@ export class DawnbellEngine {
     this.emitHud();
   }
 
+  cycleGraphics(): string {
+    return this.gfx.cycleSetting();
+  }
+
+  graphicsLabel(): string {
+    return this.gfx.label();
+  }
+
   cycleTimeOfDay(): void {
     this.timeOfDay = nextTimeOfDay(this.timeOfDay);
     const label =
@@ -1171,11 +1185,7 @@ export class DawnbellEngine {
     const h = Math.max(1, this.mountEl.clientHeight || window.innerHeight);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(w, h);
-    const isMobileViewport =
-      typeof window !== 'undefined' &&
-      (window.matchMedia?.('(pointer: coarse)').matches || w <= 900);
-    this.renderer.setPixelRatio(this.isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, isMobileViewport ? 1.5 : 2));
+    this.gfx.resize(w, h);
   }
 
   private afterDraw(cb: () => void): void {
@@ -1209,7 +1219,7 @@ export class DawnbellEngine {
     this.lastTime = now;
 
     this.stepFrame(realDt);
-    this.renderer.render(this.scene, this.camera);
+    this.gfx.render(realDt);
 
     if (this.isSoftwareGl) {
       this.afterDraw(this.tick);
@@ -3378,6 +3388,8 @@ export class DawnbellEngine {
     this.sunLight.target.position.set(this.px, this.py, this.pz);
     this.sunOrb.position.set(sunX, sunY * 1.45, sunZ);
     this.world.skyUniforms.uSunDir.value.set(sunX, sunY * 1.45, sunZ).normalize();
+    this.world.skyUniforms.uPost.value = this.gfx.usesPost() ? 1 : 0;
+    this.gfx.updateAtmosphere(this.world.skyUniforms.uSunDir.value, this.sunLight.color, this.timeOfDay);
     (this.sunOrb.material as THREE.MeshBasicMaterial).color.setHex(
       this.timeOfDay === 'day' ? 0xfff4bc : this.timeOfDay === 'sunset' ? 0xff9a44 : 0xd8ecff
     );
@@ -4031,6 +4043,7 @@ export class DawnbellEngine {
     window.removeEventListener('resize', this.onResizeBound);
     this.input.detach();
     this.world.dispose();
+    this.gfx.dispose();
     this.mats.dispose();
     this.renderer.dispose();
   }

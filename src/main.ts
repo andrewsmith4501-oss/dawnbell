@@ -30,6 +30,8 @@ const hud = new GameHud(uiMount, {
   onSelectMapTab: (tab) => engine?.openMapTab(tab),
   onToggleLamp: () => engine?.toggleDawnLamp(),
   onCycleTime: () => engine?.cycleTimeOfDay(),
+  onCycleGraphics: () => engine?.cycleGraphics() ?? 'Graphics: Auto',
+  getGraphicsLabel: () => engine?.graphicsLabel() ?? 'Graphics: Auto',
   onFastTravel: (id) => engine?.fastTravelTo(id),
   onSelectRune: (id) => engine?.selectRune(id),
   onDismissDialogue: () => engine?.dismissDialogue(),
@@ -47,6 +49,7 @@ const hud = new GameHud(uiMount, {
 engine = new DawnbellEngine(canvasMount, (snap) => {
   hud.render(snap);
 });
+if (new URLSearchParams(window.location.search).has('debug')) (window as unknown as { __db: unknown }).__db = engine;
 engine.setPadMenuHandler((ev) => hud.handleGamepadMenu(ev));
 
 // Support ?autostart=1 (& optional ?chapter=2|3) for instant unobstructed gameplay boot

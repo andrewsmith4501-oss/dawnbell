@@ -26,6 +26,8 @@ export interface HudActions {
   onSelectMapTab: (tab: 'map' | 'journal') => void;
   onToggleLamp: () => void;
   onCycleTime: () => void;
+  onCycleGraphics: () => string;
+  getGraphicsLabel: () => string;
   onFastTravel: (landmarkId: string) => void;
   onSelectRune: (id: RuneId) => void;
   onDismissDialogue: () => void;
@@ -506,6 +508,7 @@ export class GameHud {
             <button id="btn-resume" class="btn-primary menu-nav-item">Resume</button>
             <button id="btn-pause-controls" class="btn-secondary menu-nav-item">Remap Controls</button>
             <button id="btn-pause-touch" class="btn-secondary menu-nav-item">Touch Controls: Off</button>
+            <button id="btn-pause-gfx" class="btn-secondary menu-nav-item">Graphics: Auto</button>
             <button id="btn-pause-time" class="btn-secondary menu-nav-item">Time: Morning</button>
             <button id="btn-pause-mute" class="btn-secondary menu-nav-item">Sound: On</button>
             <button id="btn-restart" class="btn-secondary menu-nav-item">Restart</button>
@@ -739,6 +742,11 @@ export class GameHud {
     this.pauseTouchBtn.addEventListener('click', () => {
       this.touchOverride = !this.touchEnabled;
       this.setTouchMode(this.touchOverride);
+    });
+    const gfxBtn = this.root.querySelector('#btn-pause-gfx') as HTMLButtonElement;
+    gfxBtn.textContent = this.actions.getGraphicsLabel();
+    gfxBtn.addEventListener('click', () => {
+      gfxBtn.textContent = this.actions.onCycleGraphics();
     });
     this.pauseTimeBtn.addEventListener('click', () => {
       this.actions.onCycleTime();
@@ -1339,6 +1347,9 @@ export class GameHud {
     this.timeBtn.dataset.tod = s.timeOfDay;
     this.timeBtn.title = `Time: ${todLabel} (Press T)`;
     this.pauseTimeBtn.textContent = `Time: ${todLabel}`;
+    const gfxLabel = this.actions.getGraphicsLabel();
+    const gfxEl = this.root.querySelector('#btn-pause-gfx');
+    if (gfxEl && gfxEl.textContent !== gfxLabel) gfxEl.textContent = gfxLabel;
     this.muteBtn.classList.toggle('is-muted', s.muted);
     this.pauseMuteBtn.textContent = s.muted ? 'Sound: Muted' : 'Sound: On';
     this.controllerTagEl.hidden = !s.gamepadConnected;

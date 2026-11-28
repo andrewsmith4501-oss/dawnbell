@@ -329,6 +329,7 @@ export interface SkyDomeUniforms {
   uHorizon: { value: THREE.Color };
   uSunColor: { value: THREE.Color };
   uSunDir: { value: THREE.Vector3 };
+  uPost: { value: number };
 }
 
 export interface CuttableBushProp {
@@ -397,6 +398,7 @@ function buildSkyDome(): { mesh: THREE.Mesh; uniforms: SkyDomeUniforms } {
     uHorizon: { value: new THREE.Color('#b6e0fc') },
     uSunColor: { value: new THREE.Color('#fff1bd') },
     uSunDir: { value: new THREE.Vector3(0.45, 0.7, 0.35).normalize() },
+    uPost: { value: 0 },
   };
   const geo = new THREE.SphereGeometry(430, 24, 16);
   const mat = new THREE.ShaderMaterial({
@@ -416,6 +418,7 @@ function buildSkyDome(): { mesh: THREE.Mesh; uniforms: SkyDomeUniforms } {
       uniform vec3 uHorizon;
       uniform vec3 uSunColor;
       uniform vec3 uSunDir;
+      uniform float uPost;
       varying vec3 vWorldDir;
       void main() {
         vec3 dir = normalize(vWorldDir);
@@ -423,6 +426,9 @@ function buildSkyDome(): { mesh: THREE.Mesh; uniforms: SkyDomeUniforms } {
         vec3 sky = mix(uHorizon, uZenith, pow(h, 0.62));
         float sunAmt = max(dot(dir, normalize(uSunDir)), 0.0);
         sky += uSunColor * (pow(sunAmt, 14.0) * 0.32 + pow(sunAmt, 96.0) * 0.45);
+        // With post-processing on, the frame is tone mapped and sRGB encoded afterwards,
+        // so convert to linear light first to keep the sky's authored colours.
+        if (uPost > 0.5) sky = pow(sky, vec3(2.2)) * 1.35;
         gl_FragColor = vec4(sky, 1.0);
       }
     `,
@@ -548,39 +554,81 @@ function buildTerrainMesh(mats: MaterialLibrary): THREE.Mesh {
   return mesh;
 }
 
-function buildWaterMesh(): { mesh: THREE.Mesh; uniforms: { uTime: { value: number } } } {
-  const uniforms = { uTime: { value: 0 } };
-  const geo = new THREE.PlaneGeometry(WORLD_EXTENT * 2.2, WORLD_EXTENT * 2.2, 64, 64);
+function buildWaterMesh(sky?: SkyDomeUniforms): { mesh: THREE.Mesh; uniforms: { uTime: { value: number } } } {
+  const uniforms = {
+    uTime: { value: 0 },
+    uSkyHorizon: sky ? sky.uHorizon : { value: new THREE.Color('#b6e0fc') },
+    uSkyZenith: sky ? sky.uZenith : { value: new THREE.Color('#4d9ee8') },
+  };
+  const geo = new THREE.PlaneGeometry(WORLD_EXTENT * 2.2, WORLD_EXTENT * 2.2, 96, 96);
   geo.rotateX(-Math.PI / 2);
 
   const mat = new THREE.MeshStandardMaterial({
-    color: 0x2c92ce,
-    roughness: 0.18,
-    metalness: 0.2,
+    color: 0x1f7fb8,
+    roughness: 0.08,
+    metalness: 0.0,
     transparent: true,
-    opacity: 0.84,
-    flatShading: true,
+    opacity: 0.86,
+    envMapIntensity: 0.15,
   });
 
+  // Rolling waves, sparkling sun glints, sky reflection that grows at grazing angles (Fresnel),
+  // and clearer water when looking straight down.
   mat.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = uniforms.uTime;
+    shader.uniforms.uSkyHorizon = uniforms.uSkyHorizon;
+    shader.uniforms.uSkyZenith = uniforms.uSkyZenith;
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nuniform float uTime;\nvarying vec3 vWaterPos;')
+      .replace('#include <common>', '#include <common>\nuniform float uTime;\nvarying vec3 vWaterPos;\nvarying vec3 vWaterWorld;')
       .replace(
         '#include <begin_vertex>',
         `#include <begin_vertex>
-         transformed.y += sin(position.x * 0.45 + uTime * 1.8) * 0.032 + cos(position.z * 0.4 - uTime * 1.4) * 0.028;
-         vWaterPos = transformed;`
+         transformed.y += sin(position.x * 0.45 + uTime * 1.8) * 0.026 + cos(position.z * 0.4 - uTime * 1.4) * 0.022
+                        + sin((position.x + position.z) * 0.9 + uTime * 2.6) * 0.01;
+         vWaterPos = transformed;
+         vWaterWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;`
       );
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform float uTime;\nvarying vec3 vWaterPos;')
+      .replace(
+        '#include <common>',
+        '#include <common>\nuniform float uTime;\nuniform vec3 uSkyHorizon;\nuniform vec3 uSkyZenith;\nvarying vec3 vWaterPos;\nvarying vec3 vWaterWorld;\nfloat waterFres;\nvec3 waterN;'
+      )
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
-         float ripple = sin(vWaterPos.x * 1.15 + uTime * 2.1) * cos(vWaterPos.z * 1.05 - uTime * 1.6);
-         diffuseColor.rgb += vec3(0.08, 0.15, 0.18) * smoothstep(0.45, 0.95, ripple);`
+         {
+           vec2 p = vWaterPos.xz;
+           float t = uTime;
+           float dx = cos(p.x * 0.9 + t * 1.3) * 0.08 + cos((p.x + p.y) * 2.1 + t * 2.3) * 0.05
+                    + cos(p.x * 4.7 - t * 3.1 + p.y * 1.3) * 0.03 + cos(p.x * 9.1 + p.y * 3.7 + t * 4.2) * 0.016;
+           float dz = cos(p.y * 0.8 - t * 1.1) * 0.08 + cos((p.y - p.x) * 2.4 - t * 1.9) * 0.05
+                    + cos(p.y * 5.3 + t * 2.7) * 0.03 + cos(p.y * 8.3 - p.x * 2.9 - t * 3.6) * 0.016;
+           waterN = normalize(vec3(-dx, 1.0, -dz));
+           vec3 V = normalize(cameraPosition - vWaterWorld);
+           waterFres = 0.04 + 0.96 * pow(1.0 - max(dot(waterN, V), 0.0), 5.0);
+           float crest = smoothstep(0.1, 0.2, dx * dx + dz * dz);
+           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.16, 0.55, 0.62), 0.25 + 0.2 * sin(p.x * 0.07 + p.y * 0.05));
+           diffuseColor.rgb += vec3(0.25, 0.3, 0.3) * crest * 0.35;
+           diffuseColor.a = mix(0.72, 0.97, clamp(waterFres * 1.6, 0.0, 1.0));
+         }`
+      )
+      .replace(
+        '#include <normal_fragment_maps>',
+        `#include <normal_fragment_maps>
+         normal = normalize((viewMatrix * vec4(waterN, 0.0)).xyz);`
+      )
+      .replace(
+        '#include <opaque_fragment>',
+        `{
+           vec3 V = normalize(cameraPosition - vWaterWorld);
+           vec3 R = reflect(-V, waterN);
+           vec3 skyRef = mix(uSkyHorizon, uSkyZenith, pow(clamp(R.y, 0.0, 1.0), 0.6));
+           outgoingLight = mix(outgoingLight, skyRef, clamp(waterFres, 0.0, 0.85));
+         }
+         #include <opaque_fragment>`
       );
   };
+  mat.customProgramCacheKey = () => 'dawnbell-water-v2';
 
   const mesh = new THREE.Mesh(geo, mat);
   mesh.position.y = WATER_Y;
@@ -1279,7 +1327,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
   group.add(terrainMesh);
   proxyRegistry.registerTerrain(terrainMesh);
 
-  const { mesh: waterMesh, uniforms: waterUniforms } = buildWaterMesh();
+  const { mesh: waterMesh, uniforms: waterUniforms } = buildWaterMesh(skyDome.uniforms);
   group.add(waterMesh);
 
   // Floating lily pads on Azure Mirror Lake (y = WATER_Y + 0.08 stays cleanly above 0.06 max wave crest!)
