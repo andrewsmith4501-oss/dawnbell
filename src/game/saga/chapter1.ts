@@ -146,7 +146,7 @@ function building(
   saga.addProp(g, () => true, [col]);
 }
 
-function sign(saga: SagaSystem, id: string, x: number, z: number, rot: number, speaker: string, lines: string[], label = 'Read the sign'): void {
+export function sign(saga: SagaSystem, id: string, x: number, z: number, rot: number, speaker: string, lines: string[], label = 'Read the sign'): void {
   const m = saga.host.mats;
   const y = getTerrainHeight(x, z);
   const g = new THREE.Group();

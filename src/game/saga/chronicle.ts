@@ -35,9 +35,14 @@ export function setupChronicle(saga: SagaSystem): void {
       return `Earn three tokens: ${todo.join('; ')}`;
     }
     if (!F.ch2) return 'Talk to Captain Venn in the Hall of Wardens';
-    if (!F.hd_done) return 'Find the broken Warden seal in the Old Quarry and explore the Hollow Deep';
+    if (!F.hd_done) {
+      if (!F.hd_seen) return 'Find the broken Warden seal at the north end of the Old Quarry, in Emberstone Canyon';
+      if (!F.hook) return 'Explore the Hollow Deep. Somewhere below lies a relic of the first Wardens';
+      if (!F.hd_bk) return 'Use the Grapple Claw to cross the chasms and find the great key';
+      return 'Open the great door in the Pillar Hall with the Belfry Key';
+    }
     if (!F.ch3) return 'Report to Captain Venn in the Hall of Wardens';
-    if (!F.mw_done) return 'Cross the Gloaming Fen (far south-west) and climb Mirewatch Tower';
+    if (!F.mw_done) return 'Cross the Gloaming Fen (far north-west, past Highland Lookout) and climb Mirewatch Tower';
     if (!F.ch4) return 'Report to Captain Venn in the Hall of Wardens';
     if (!F.shard4) return 'Follow the coast road to Port Gullhaven and find out what is in the royal crates';
     return 'Tell Captain Venn about the ship with no lamps';

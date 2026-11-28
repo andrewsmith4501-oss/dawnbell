@@ -13,6 +13,7 @@ export const WALL_H = 3.4;
   b  bed             A  altar           F  forge (glows)       N  anvil
   R  counter         H  hearth (glows)  P  pew                 p  pillar
   l  lamp post       W  shallow water   C  chest (flagged)     o  ore rock
+  _  bottomless pit  v  grapple post    I  stone pillar        c x  floor markers (chests, crystals)
   a..z (other lower-case, see room.marks) are free floor markers
   D S U E Q Y Z      doors / stairs (see room.doors)
 */
@@ -30,6 +31,14 @@ export interface DoorDef {
   /** Flag that must be truthy to pass */
   needs?: string;
   lockedText?: string;
+  /** A flag holding a count of small keys; one is used to set `needs` */
+  keyPool?: string;
+  /** A flag for a big key that sets `needs` when held */
+  bigKey?: string;
+  bigKeyText?: string;
+  /** While this flag is truthy the door is sealed (boss fights) */
+  blockedBy?: string;
+  blockedText?: string;
 }
 
 export interface RoomDef {
@@ -59,6 +68,10 @@ export interface BuiltRoom {
   find: (ch: string) => Array<{ x: number; z: number; c: number; r: number }>;
   colliders: SolidCollider[];
   gates: Map<string, { colliders: SolidCollider[]; meshes: THREE.Object3D[] }>;
+  /** True when (x, z) is over a pit tile */
+  isPit: (x: number, z: number) => boolean;
+  /** True when (x, z) is over walkable floor */
+  isFloor: (x: number, z: number) => boolean;
 }
 
 let roomSerial = 0;
@@ -91,10 +104,25 @@ export function buildRoom(
   const water = mats.getMat('#2a6a9a', { roughness: 0.1, transparent: true, opacity: 0.8 });
 
   const isWall = (ch: string) => ch === '#';
-  const isOpen = (ch: string) => ch !== ' ' && ch !== '#';
+  const isOpen = (ch: string) => ch !== ' ' && ch !== '#' && ch !== '_';
+  const hasPits = def.map.some((l) => l.includes('_'));
 
-  // Dark base under everything so gaps never show the void.
-  addVoxelBox(group, w * TILE + 40, 1, h * TILE + 40, mats.getMat('#0c0a0a', { roughness: 1 }), ox + (w * TILE) / 2, -0.52, oz + (h * TILE) / 2, false, false);
+  // Dark base under everything so gaps never show the void (deep down when the room has pits).
+  addVoxelBox(group, w * TILE + 40, 1, h * TILE + 40, mats.getMat('#060506', { roughness: 1 }), ox + (w * TILE) / 2, hasPits ? -14.5 : -0.52, oz + (h * TILE) / 2, false, false);
+  if (hasPits) {
+    // Rock skirts under every floor tile next to a pit, so the chasm has walls
+    const rock = mats.getMat('#2a2830', { roughness: 1, bump: 'stone' });
+    for (let r = 0; r < h; r++)
+      for (let c = 0; c < w; c++) {
+        const ch = at(c, r);
+        if (ch === '_' || ch === ' ') continue;
+        const pitNear = at(c + 1, r) === '_' || at(c - 1, r) === '_' || at(c, r + 1) === '_' || at(c, r - 1) === '_';
+        if (pitNear) {
+          const { x, z } = tile(c, r);
+          addVoxelBox(group, TILE, 13.8, TILE, rock, x, -7.1, z, false, false);
+        }
+      }
+  }
 
   // Floors per tile run
   for (let r = 0; r < h; r++) {
@@ -221,6 +249,13 @@ export function buildRoom(
           addVoxelBox(group, 0.1, 0.5, 0.5, woodD, x + 0.68, 0.25, z);
           solid(id, x, z, 0.76, 0.3, 0.6);
           break;
+        case 'v':
+          addVoxelBox(group, 0.42, 1.7, 0.42, woodD, x, 0.85, z);
+          addVoxelBox(group, 0.5, 0.12, 0.5, iron, x, 1.5, z);
+          addVoxelBox(group, 0.36, 0.36, 0.08, mats.getMat('#d8a640', { metalness: 0.8, roughness: 0.3, emissive: '#5a3a00', emissiveIntensity: 0.4 }), x, 1.75, z);
+          solid(id, x, z, 0.24, 0.24, 1.8);
+          break;
+        case 'I':
         case 'p':
           addVoxelBox(group, 0.9, WALL_H, 0.9, wallMat, x, WALL_H / 2, z);
           solid(id, x, z, 0.46, 0.46, WALL_H + 4);
@@ -293,5 +328,12 @@ export function buildRoom(
     return out;
   };
 
-  return { def, ox, oz, w, h, group, tile, find, colliders, gates };
+  const cell = (x: number, z: number) => at(Math.floor((x - ox) / TILE), Math.floor((z - oz) / TILE));
+  const isPit = (x: number, z: number) => hasPits && cell(x, z) === '_';
+  const isFloor = (x: number, z: number) => {
+    const ch = cell(x, z);
+    return isOpen(ch);
+  };
+
+  return { def, ox, oz, w, h, group, tile, find, colliders, gates, isPit, isFloor };
 }

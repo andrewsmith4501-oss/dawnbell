@@ -14,6 +14,7 @@ import {
 } from './math';
 import { SagaSystem, type SagaChoice, type JournalEntry } from './saga/saga';
 import { setupChapterOne } from './saga/chapter1';
+import { setupChapterTwo } from './saga/chapter2';
 import { setupChronicle, OPENING, applySkip } from './saga/chronicle';
 import {
   RuneId,
@@ -315,6 +316,7 @@ export class DawnbellEngine {
   private choiceNavLatch = false;
   private saga!: SagaSystem;
   private lastWorldPos = { x: 0, z: 46 };
+  private lastEnemyCb: EnemyUpdateCallbacks | null = null;
   private indoorBlend = 0;
   private story: StoryState = createStoryState(1);
   private sideQuests: SideQuestState = createSideQuestState();
@@ -843,7 +845,30 @@ export class DawnbellEngine {
       removeEnemies: (tag) => this.enemies.removeTagged(tag),
       particles: (x, y, z, c, n, sp) => this.spawnParticles(x, y, z, c, n, sp ?? 5),
       shake: (a) => (this.trauma = Math.min(1, this.trauma + a)),
-      player: () => ({ x: this.px, y: this.py, z: this.pz }),
+      player: () => ({ x: this.px, y: this.py, z: this.pz, yaw: this.pYaw }),
+      movePlayer: (x, y, z) => {
+        this.px = x;
+        this.py = y;
+        this.pz = z;
+        this.pvx = 0;
+        this.pvy = 0;
+        this.pvz = 0;
+        this.gliding = false;
+        this.climbing = false;
+      },
+      hurt: (dmg, fx, fz) => {
+        if (this.invulnTimer <= 0) this.takeDamage(dmg, fx, fz);
+      },
+      enemiesTagged: (tag) => this.enemies.enemies.filter((e) => (tag === '*' || e.tag === tag) && !e.dead && e.state !== 'ko'),
+      killEnemy: (e) => {
+        if (this.lastEnemyCb) this.enemies.damageEnemy(e, 99999, 0, 0, this.lastEnemyCb);
+      },
+      stunEnemy: (e, secs) => {
+        if (e.dead || e.state === 'ko') return;
+        e.state = 'stunned';
+        e.stateTimer = secs;
+        this.enemies.tokenPool.release(e.id);
+      },
       heal: () => {
         this.inv.hp = this.inv.maxHp;
       },
@@ -852,6 +877,7 @@ export class DawnbellEngine {
       anyEnemyAlive: (tag) => this.enemies.enemies.some((e) => e.tag === tag && !e.dead && e.state !== 'ko'),
     });
     setupChapterOne(this.saga);
+    setupChapterTwo(this.saga);
     setupChronicle(this.saga);
   }
 
@@ -895,6 +921,8 @@ export class DawnbellEngine {
     this.gliding = false;
     this.camPos.set(x - Math.sin(yaw) * 6, y + 4.2, z - Math.cos(yaw) * 6);
     this.camLook.set(x, y + 1.6, z);
+    this.camera.position.copy(this.camPos);
+    this.camera.lookAt(this.camLook);
   }
 
   private resetPlayerToOverlook(): void {
@@ -1457,6 +1485,11 @@ export class DawnbellEngine {
 
     if (this.gameState !== 'playing' || this.mapOpen || this.dialogue) {
       this.updateParticles(realDt);
+      if (this.gameState === 'playing' && this.dialogue) {
+        // Keep Wren and the camera where she is (she may just have stepped through a door)
+        this.updateHeroVisuals(realDt, 0);
+        this.updateGameplayCamera(realDt, inp);
+      }
       return;
     }
 
@@ -1554,6 +1587,7 @@ export class DawnbellEngine {
       onExplosion: (x, y, z, r, dmg) => this.triggerExplosion(x, y, z, r, dmg),
       spawnParticles: (x, y, z, col, count, spd) => this.spawnParticles(x, y, z, col, count, spd),
     };
+    this.lastEnemyCb = enemyCallbacks;
 
     const { anyAggro, imminentThreat } = this.enemies.update(
       simDt,
@@ -2061,7 +2095,7 @@ export class DawnbellEngine {
     }
 
     // Water swimming check
-    if (floorY < WATER_Y - 0.55 && this.py <= WATER_Y - 0.35) {
+    if (floorY < WATER_Y - 0.55 && this.py <= WATER_Y - 0.35 && !inPocket(this.px)) {
       this.swimming = true;
       this.gliding = false;
       this.grounded = false;

@@ -32,6 +32,9 @@ export interface EnemySpawnSpec {
   tag?: string;
   variant?: EnemyVariant;
   scale?: number;
+  /** Shell blocks sword hits unless stunned */
+  armored?: boolean;
+  boss?: boolean;
 }
 
 export interface EnemyEntity {
@@ -41,6 +44,10 @@ export interface EnemyEntity {
   /** Set for enemies spawned by the saga (story rooms, dungeons) */
   tag?: string;
   variant?: EnemyVariant;
+  armored?: boolean;
+  armorPings?: number;
+  /** Show the boss health bar */
+  boss?: boolean;
   campId?: string;
   x: number;
   y: number;
@@ -402,6 +409,9 @@ export class EnemyManager {
         name,
         tag: spec.tag,
         variant: spec.variant,
+        armored: spec.armored,
+        boss: spec.boss,
+        armorPings: 0,
         campId: spec.campId,
         x: spec.x,
         y,
@@ -479,7 +489,7 @@ export class EnemyManager {
   getActiveBoss(px: number, pz: number): EnemyEntity | null {
     for (let i = 0; i < this.enemies.length; i++) {
       const e = this.enemies[i];
-      if (e.kind === 'sentinel' && !e.dead && Math.hypot(e.x - px, e.z - pz) < 34) {
+      if ((e.kind === 'sentinel' || e.boss) && !e.dead && Math.hypot(e.x - px, e.z - pz) < 34) {
         return e;
       }
     }
@@ -503,6 +513,13 @@ export class EnemyManager {
       e.stasisDirZ = kbZ / len;
       e.hitFlash = 0.1;
       cb.spawnParticles(e.x, e.y + e.height * 0.5, e.z, 0xffe466, 8, 5);
+      return true;
+    }
+
+    if (e.armored && e.state !== 'stunned') {
+      e.armorPings = (e.armorPings ?? 0) + 1;
+      e.hitFlash = 0.06;
+      cb.spawnParticles(e.x, e.y + e.height * 0.6, e.z, 0xc8d0dc, 6, 4);
       return true;
     }
 

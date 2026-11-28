@@ -33,7 +33,14 @@ export interface SagaHost {
   removeEnemies: (tag: string) => void;
   particles: (x: number, y: number, z: number, color: number, count: number, speed?: number) => void;
   shake: (amount: number) => void;
-  player: () => { x: number; y: number; z: number };
+  player: () => { x: number; y: number; z: number; yaw: number };
+  /** Move the player without snapping the camera (grapple pulls) */
+  movePlayer: (x: number, y: number, z: number) => void;
+  /** Hurt the player (half-hearts) */
+  hurt: (dmg: number, fromX: number, fromZ: number) => void;
+  enemiesTagged: (tag: string) => EnemyEntity[];
+  stunEnemy: (e: EnemyEntity, seconds: number) => void;
+  killEnemy: (e: EnemyEntity) => void;
   heal: () => void;
   /** Run the open-world game's own dialogue for one of its villagers (e.g. the archery side quest). */
   legacyTalk: (role: string) => void;
@@ -51,6 +58,8 @@ export interface SagaEnemySpec {
   tag?: string;
   scale?: number;
   variant?: EnemyVariant;
+  armored?: boolean;
+  boss?: boolean;
 }
 
 export type TalkResult = DialogueLine[] | { lines: DialogueLine[]; after?: () => void };
@@ -107,20 +116,28 @@ export class SagaSystem {
   private props: Array<{ obj: THREE.Object3D; shown: () => boolean; colliders?: SolidCollider[] }> = [];
   private roomUses: SagaRoomUse[] = [];
   private doorCooldown = 0;
-  private enterHooks = new Map<string, () => void>();
+  private enterHooks = new Map<string, Array<() => void>>();
   private killHooks: Array<(e: EnemyEntity) => void> = [];
   private updateHooks: Array<(dt: number) => void> = [];
   objectiveFn: () => string = () => '';
   chapterFn: () => { roman: string; title: string } = () => ({ roman: 'I', title: "The Warden's Trial" });
   journalFn: () => { main: JournalEntry[]; side: JournalEntry[] } = () => ({ main: [], side: [] });
   currentRoom: BuiltRoom | null = null;
+  private cachedRoom: BuiltRoom | null = null;
+  private prompts: Array<() => { label: string; act: () => void } | null> = [];
+  private lastSafe: { x: number; z: number } | null = null;
+  private grapple: { fx: number; fy: number; fz: number; tx: number; tz: number; t: number; dur: number; line: THREE.Line } | null = null;
+  private grappleCooldown = 0;
   private nextRoomX = POCKET_X + 120;
 
   constructor(host: SagaHost) {
     this.host = host;
     host.scene.add(this.group);
     setPocketHooks(
-      () => 0,
+      (x, z) => {
+        const r = this.cachedRoom && this.inRoom(this.cachedRoom, x, z) ? this.cachedRoom : (this.cachedRoom = this.roomAt(x, z));
+        return r && r.isPit(x, z) ? -14 : 0;
+      },
       (x, z) => this.roomAt(x, z)?.def.name ?? 'Indoors'
     );
   }
@@ -194,7 +211,9 @@ export class SagaSystem {
   }
 
   onEnterRoom(id: string, fn: () => void): void {
-    this.enterHooks.set(id, fn);
+    const list = this.enterHooks.get(id) ?? [];
+    list.push(fn);
+    this.enterHooks.set(id, list);
   }
 
   onKill(fn: (e: EnemyEntity) => void): void {
@@ -203,6 +222,44 @@ export class SagaSystem {
 
   onUpdate(fn: (dt: number) => void): void {
     this.updateHooks.push(fn);
+  }
+
+  private inRoom(r: BuiltRoom, x: number, z: number): boolean {
+    return x >= r.ox && x < r.ox + r.w * TILE && z >= r.oz && z < r.oz + r.h * TILE;
+  }
+
+  /** Extra button prompts that are not tied to one spot (e.g. throwing the Grapple Claw). */
+  addPrompt(fn: () => { label: string; act: () => void } | null): void {
+    this.prompts.push(fn);
+  }
+
+  get grappling(): boolean {
+    return this.grapple !== null;
+  }
+
+  /** Pull Wren across to (tx, tz) along a chain from her hand. */
+  startGrapple(tx: number, tz: number, hookX: number, hookZ: number): void {
+    if (this.grapple) return;
+    const p = this.host.player();
+    const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(p.x, p.y + 1.2, p.z), new THREE.Vector3(hookX, 1.6, hookZ)]);
+    const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xd8c080 }));
+    line.userData.hook = { x: hookX, z: hookZ };
+    this.host.scene.add(line);
+    const d = Math.hypot(tx - p.x, tz - p.z);
+    this.grapple = { fx: p.x, fy: p.y, fz: p.z, tx, tz, t: 0, dur: 0.18 + d * 0.045, line };
+    this.host.sfx('item');
+  }
+
+  /** Throw the claw at something that can't be crossed to (an enemy): just the chain flash. */
+  flashChain(hookX: number, hookY: number, hookZ: number): void {
+    const p = this.host.player();
+    const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(p.x, p.y + 1.2, p.z), new THREE.Vector3(hookX, hookY, hookZ)]);
+    const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xd8c080 }));
+    this.host.scene.add(line);
+    setTimeout(() => {
+      this.host.scene.remove(line);
+      geo.dispose();
+    }, 260);
   }
 
   roomAt(x: number, z: number): BuiltRoom | null {
@@ -234,11 +291,11 @@ export class SagaSystem {
     const z = t.z + dz * TILE * offset;
     const yaw = Math.atan2(dx, dz);
     this.host.teleport(x, 0.05, z, yaw);
+    this.lastSafe = { x, z };
     this.doorCooldown = 0.8;
     this.currentRoom = room;
     this.host.sfx('door');
-    const hook = this.enterHooks.get(roomId);
-    if (hook) hook();
+    for (const hook of this.enterHooks.get(roomId) ?? []) hook();
   }
 
   exitToWorld(x: number, z: number, yaw: number): void {
@@ -252,7 +309,52 @@ export class SagaSystem {
   update(dt: number): void {
     const p = this.host.player();
     this.doorCooldown = Math.max(0, this.doorCooldown - dt);
+    this.grappleCooldown = Math.max(0, this.grappleCooldown - dt);
     this.currentRoom = p.x > POCKET_X ? this.roomAt(p.x, p.z) : null;
+
+    // Grapple pull
+    if (this.grapple) {
+      const g = this.grapple;
+      g.t += dt;
+      const k = Math.min(1, g.t / g.dur);
+      const e = k * k * (3 - 2 * k);
+      const x = g.fx + (g.tx - g.fx) * e;
+      const z = g.fz + (g.tz - g.fz) * e;
+      const y = g.fy + (0.05 - g.fy) * e + Math.sin(k * Math.PI) * 1.2;
+      this.host.movePlayer(x, y, z);
+      const pos = g.line.geometry.getAttribute('position') as THREE.BufferAttribute;
+      pos.setXYZ(0, x, y + 1.2, z);
+      pos.needsUpdate = true;
+      if (k >= 1) {
+        this.host.scene.remove(g.line);
+        g.line.geometry.dispose();
+        this.grapple = null;
+        this.grappleCooldown = 0.4;
+        this.lastSafe = { x: g.tx, z: g.tz };
+      }
+      return;
+    }
+
+    // Monsters that tumble into a chasm are gone for good
+    if (this.currentRoom) for (const e of this.host.enemiesTagged('*')) if (e.y < -3 && e.x > POCKET_X) this.host.killEnemy(e);
+
+    // Pits: remember the last safe floor, and fall back to it
+    if (this.currentRoom) {
+      const r = this.currentRoom;
+      if (!r.isPit(p.x, p.z) && p.y > -0.3 && r.isFloor(p.x, p.z)) {
+        // keep a small margin from pit edges
+        const m = 0.7;
+        if (!r.isPit(p.x + m, p.z) && !r.isPit(p.x - m, p.z) && !r.isPit(p.x, p.z + m) && !r.isPit(p.x, p.z - m))
+          this.lastSafe = { x: p.x, z: p.z };
+      }
+      if (p.y < -4 && this.lastSafe) {
+        this.host.teleport(this.lastSafe.x, 0.05, this.lastSafe.z, p.yaw);
+        this.host.hurt(2, this.lastSafe.x, this.lastSafe.z);
+        this.host.toast('Wren fell into the chasm!', 1.6);
+      }
+    } else {
+      this.lastSafe = null;
+    }
 
     // Visibility of NPCs + props
     for (const n of this.npcs) {
@@ -288,10 +390,29 @@ export class SagaSystem {
       const room = this.currentRoom;
       for (const [ch, door] of Object.entries(room.def.doors)) {
         for (const t of room.find(ch)) {
-          if (Math.hypot(p.x - t.x, p.z - t.z) < TILE * 0.55) {
+          if (Math.abs(p.x - t.x) < TILE * 0.5 && Math.abs(p.z - t.z) < TILE * 0.5) {
+            if (door.blockedBy && this.F[door.blockedBy]) {
+              this.host.toast(door.blockedText ?? 'The way is sealed!', 1.6);
+              this.doorCooldown = 1.2;
+              continue;
+            }
             if (door.needs && !this.F[door.needs]) {
-              if (door.lockedText) this.host.toast(door.lockedText, 2.2);
-              this.doorCooldown = 1.5;
+              const pool = door.keyPool ? Number(this.F[door.keyPool] || 0) : 0;
+              if (door.keyPool && pool > 0) {
+                this.F[door.keyPool] = pool - 1;
+                this.F[door.needs] = true;
+                this.host.sfx('gate');
+                this.host.toast('You unlocked the door with a small key.', 2.2);
+                this.host.save();
+              } else if (door.bigKey && this.F[door.bigKey]) {
+                this.F[door.needs] = true;
+                this.host.sfx('gate');
+                this.host.toast(door.bigKeyText ?? 'The great lock turns.', 2.4);
+                this.host.save();
+              } else {
+                if (door.lockedText) this.host.toast(door.lockedText, 2.2);
+                this.doorCooldown = 1.5;
+              }
               continue;
             }
             if (door.to === 'world') this.exitToWorld(door.x ?? 0, door.z ?? 0, door.yaw ?? 0);
@@ -333,6 +454,12 @@ export class SagaSystem {
       const sy = s.y ?? getTerrainHeight(s.x, s.z);
       if (d < s.radius && Math.abs(p.y - sy) < 2.6 && d < (best?.dist ?? maxDist)) {
         best = { label: s.label(), dist: d, act: () => s.act() };
+      }
+    }
+    if (!best && !this.grapple && this.grappleCooldown <= 0) {
+      for (const fn of this.prompts) {
+        const r = fn();
+        if (r) return { ...r, dist: 0.5 };
       }
     }
     return best;
