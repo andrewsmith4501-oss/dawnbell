@@ -64,7 +64,7 @@ export class CollisionProxyRegistry {
     return mesh;
   }
 
-  /** Sync a dynamic collider's position/active state (e.g. Cracked Boulder, Stasis Boulder, Cryonis Pillar). */
+  /** Sync a dynamic collider's position/active state (e.g. Cracked Boulder, Stillstone Boulder, Frostrise Pillar). */
   sync(collider: SolidCollider): void {
     const mesh = this.meshByCollider.get(collider);
     if (!mesh) return;
@@ -75,7 +75,7 @@ export class CollisionProxyRegistry {
     }
   }
 
-  /** Remove a transient collider's invisible proxy (e.g. evicted Cryonis Ice Pillar). */
+  /** Remove a transient collider's invisible proxy (e.g. evicted Frostrise Ice Pillar). */
   remove(collider: SolidCollider): void {
     const mesh = this.meshByCollider.get(collider);
     if (!mesh) return;

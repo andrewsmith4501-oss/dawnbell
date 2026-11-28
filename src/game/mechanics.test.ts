@@ -17,14 +17,14 @@ import {
   createArrow,
   stepArrow,
   computeBombBlast,
-  computeStasisLaunch,
+  computeStillstoneLaunch,
   createInitialInventory,
   cookHeartyMeal,
   consumeHealingItem,
   activateShrine,
   AttackTokenPool,
   stepShieldSurf,
-  planCryonisPillars,
+  planFrostrisePillars,
   collectWhisperSeed,
   nextTimeOfDay,
 } from './mechanics';
@@ -112,8 +112,8 @@ test('arrows follow gravity arc, bombs blast cracked rocks, and stasis launches 
   assert.equal(nearBlast.breaksCrackedRock, true);
   assert.equal(farBlast.hit, false);
 
-  const stasisZero = computeStasisLaunch({ hits: 0, dirX: 1, dirZ: 0 });
-  const stasisCharged = computeStasisLaunch({ hits: 4, dirX: 0, dirZ: -1 });
+  const stasisZero = computeStillstoneLaunch({ hits: 0, dirX: 1, dirZ: 0 });
+  const stasisCharged = computeStillstoneLaunch({ hits: 4, dirX: 0, dirZ: -1 });
   assert.equal(stasisZero.power, 0);
   assert.ok(stasisCharged.vz < -20);
   assert.ok(stasisCharged.vy > 6);
@@ -155,11 +155,11 @@ test('shield surfing accelerates downhill and cryonis caps active ice pillars at
 
   let slots: Array<{ id: string; x: number; z: number }> = [];
   for (let i = 1; i <= 3; i++) {
-    const res = planCryonisPillars(slots, { id: `ice_${i}`, x: i * 4, z: -40 });
+    const res = planFrostrisePillars(slots, { id: `ice_${i}`, x: i * 4, z: -40 });
     slots = res.slots;
     assert.equal(res.evicted, null);
   }
-  const fourth = planCryonisPillars(slots, { id: 'ice_4', x: 16, z: -40 });
+  const fourth = planFrostrisePillars(slots, { id: 'ice_4', x: 16, z: -40 });
   assert.equal(fourth.slots.length, 3);
   assert.equal(fourth.evicted?.id, 'ice_1');
 });

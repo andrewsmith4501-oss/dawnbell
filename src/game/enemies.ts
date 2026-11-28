@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { getTerrainHeight, WATER_Y, clamp, dampAngle } from './math';
-import { AttackTokenPool, computeStasisLaunch } from './mechanics';
+import { AttackTokenPool, computeStillstoneLaunch } from './mechanics';
 import { MaterialLibrary, addVoxelBox, createContactShadow } from './voxelBuilder';
 import { resolveCircleOverlapXZ, type SolidCollider } from './collision';
 
@@ -20,10 +20,27 @@ export interface EnemyProjectile {
   mesh: THREE.Mesh;
 }
 
+export type EnemyVariant = 'rat' | 'ratking';
+
+export interface EnemySpawnSpec {
+  kind: EnemyKind;
+  x: number;
+  z: number;
+  campId?: string;
+  name?: string;
+  hp?: number;
+  tag?: string;
+  variant?: EnemyVariant;
+  scale?: number;
+}
+
 export interface EnemyEntity {
   id: string;
   kind: EnemyKind;
   name: string;
+  /** Set for enemies spawned by the saga (story rooms, dungeons) */
+  tag?: string;
+  variant?: EnemyVariant;
   campId?: string;
   x: number;
   y: number;
@@ -70,7 +87,8 @@ export interface EnemyUpdateCallbacks {
 
 function buildEnemyVisual(
   mats: MaterialLibrary,
-  kind: EnemyKind
+  kind: EnemyKind,
+  variant?: EnemyVariant
 ): {
   root: THREE.Group;
   body: THREE.Group;
@@ -101,7 +119,31 @@ function buildEnemyVisual(
   let coreMesh: THREE.Mesh | undefined;
   let laserLine: THREE.Mesh | undefined;
 
-  if (kind === 'slime') {
+  if (variant === 'rat' || variant === 'ratking') {
+    // Giant cellar rat (behaves like a slime: hop, lunge, bite)
+    radius = 0.6;
+    height = 0.8;
+    const fur = own(variant === 'ratking' ? '#8a7068' : '#7d6a60', { roughness: 0.9, pattern: 'cloth' });
+    const belly = own('#c8a8a0', { roughness: 0.9 });
+    const pink = mats.getMat('#e8a0a8', { roughness: 0.6 });
+    const eye = mats.getMat('#ff4a3a', { emissive: '#ff2a1a', emissiveIntensity: 0.8 });
+    addVoxelBox(body, 0.62, 0.5, 1.0, fur, 0, 0.36, -0.05);
+    addVoxelBox(body, 0.5, 0.2, 0.8, belly, 0, 0.16, -0.02);
+    addVoxelBox(body, 0.42, 0.38, 0.42, fur, 0, 0.46, 0.55);
+    addVoxelBox(body, 0.18, 0.16, 0.2, pink, 0, 0.4, 0.82);
+    for (const sd of [-1, 1]) {
+      addVoxelBox(body, 0.16, 0.2, 0.06, pink, sd * 0.18, 0.72, 0.5, false);
+      addVoxelBox(body, 0.07, 0.07, 0.04, eye, sd * 0.12, 0.55, 0.76, false);
+      addVoxelBox(body, 0.12, 0.2, 0.14, fur, sd * 0.22, 0.1, 0.32);
+      addVoxelBox(body, 0.12, 0.2, 0.14, fur, sd * 0.22, 0.1, -0.4);
+    }
+    addVoxelBox(body, 0.08, 0.08, 0.8, pink, 0, 0.3, -0.92);
+    if (variant === 'ratking') {
+      const gold = mats.getMat('#f0c65a', { metalness: 0.85, roughness: 0.25 });
+      addVoxelBox(body, 0.34, 0.08, 0.34, gold, 0, 0.7, 0.52);
+      for (const [cx, cz] of [[-0.13, -0.13], [0.13, -0.13], [-0.13, 0.13], [0.13, 0.13]]) addVoxelBox(body, 0.07, 0.14, 0.07, gold, cx, 0.8, 0.52 + cz);
+    }
+  } else if (kind === 'slime') {
     radius = 0.65;
     height = 0.98;
     const jelly = own('#44c83a', { roughness: 0.18, transparent: true, opacity: 0.78 });
@@ -320,9 +362,21 @@ export class EnemyManager {
       { kind: 'sentinel', x: 2, z: -40 },
     ];
 
-    roster.forEach((spec, idx) => {
+    roster.forEach((spec) => this.spawn(spec));
+  }
+
+  private spawnSerial = 0;
+
+  spawn(spec: EnemySpawnSpec): EnemyEntity {
+    {
+      const idx = this.spawnSerial++;
       const y = Math.max(WATER_Y + 0.1, getTerrainHeight(spec.x, spec.z));
-      const vis = buildEnemyVisual(this.mats, spec.kind);
+      const vis = buildEnemyVisual(this.mats, spec.kind, spec.variant);
+      if (spec.scale && spec.scale !== 1) {
+        vis.root.scale.setScalar(spec.scale);
+        vis.radius *= spec.scale;
+        vis.height *= spec.scale;
+      }
       vis.root.position.set(spec.x, y, spec.z);
       this.group.add(vis.root);
 
@@ -331,20 +385,23 @@ export class EnemyManager {
       this.group.add(shadow);
 
       const maxHp =
-        spec.kind === 'sentinel' ? 220 : spec.kind === 'beetle' ? 76 : spec.kind === 'wisp' ? 52 : 38;
+        spec.hp ?? (spec.kind === 'sentinel' ? 220 : spec.kind === 'beetle' ? 76 : spec.kind === 'wisp' ? 52 : 38);
       const name =
-        spec.kind === 'sentinel'
-          ? 'Iron Sentinel'
+        spec.name ??
+        (spec.kind === 'sentinel'
+          ? 'Mirror Colossus'
           : spec.kind === 'beetle'
             ? 'Horn-Beetle'
             : spec.kind === 'wisp'
               ? 'Bramble Wisp'
-              : 'Meadow Slime';
+              : 'Meadow Slime');
 
-      this.enemies.push({
+      const ent: EnemyEntity = {
         id: `enemy_${idx}`,
         kind: spec.kind,
         name,
+        tag: spec.tag,
+        variant: spec.variant,
         campId: spec.campId,
         x: spec.x,
         y,
@@ -379,8 +436,22 @@ export class EnemyManager {
         armR: vis.armR,
         coreMesh: vis.coreMesh,
         flashMats: vis.flashMats,
-      });
-    });
+      };
+      this.enemies.push(ent);
+      return ent;
+    }
+  }
+
+  removeTagged(tag: string): void {
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+      const e = this.enemies[i];
+      if (e.tag !== tag) continue;
+      this.tokenPool.release(e.id);
+      this.group.remove(e.root);
+      this.group.remove(e.contactShadow);
+      e.flashMats.forEach((m) => m.dispose());
+      this.enemies.splice(i, 1);
+    }
   }
 
   clear(): void {
@@ -421,11 +492,11 @@ export class EnemyManager {
     kbX: number,
     kbZ: number,
     cb: EnemyUpdateCallbacks,
-    opts?: { stunDuration?: number; fromStasisHit?: boolean; isCrit?: boolean }
+    opts?: { stunDuration?: number; fromStillstoneHit?: boolean; isCrit?: boolean }
   ): boolean {
     if (e.dead || e.state === 'ko') return false;
 
-    if (e.stasisTimer > 0 && !opts?.fromStasisHit) {
+    if (e.stasisTimer > 0 && !opts?.fromStillstoneHit) {
       e.stasisHits = Math.min(6, e.stasisHits + 1);
       const len = Math.hypot(kbX, kbZ) || 1;
       e.stasisDirX = kbX / len;
@@ -555,7 +626,7 @@ export class EnemyManager {
         continue;
       }
 
-      // Stasis freeze state!
+      // Stillstone freeze state!
       if (e.stasisTimer > 0) {
         e.stasisTimer -= simDt;
         const pulse = e.stasisTimer < 1.2 ? Math.sin(e.stasisTimer * 26) * 0.5 + 0.5 : 0.7;
@@ -569,7 +640,7 @@ export class EnemyManager {
             m.emissiveIntensity = 0;
           }
           if (e.stasisHits > 0) {
-            const launch = computeStasisLaunch({
+            const launch = computeStillstoneLaunch({
               hits: e.stasisHits,
               dirX: e.stasisDirX,
               dirZ: e.stasisDirZ,
@@ -577,7 +648,7 @@ export class EnemyManager {
             e.vx += launch.vx;
             e.vy += launch.vy;
             e.vz += launch.vz;
-            this.damageEnemy(e, e.stasisHits * 10, 0, 0, cb, { fromStasisHit: true, stunDuration: 1.8 });
+            this.damageEnemy(e, e.stasisHits * 10, 0, 0, cb, { fromStillstoneHit: true, stunDuration: 1.8 });
           }
         }
         continue;

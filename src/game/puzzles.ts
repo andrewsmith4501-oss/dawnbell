@@ -34,8 +34,8 @@ export const PUZZLE_DEFS: Record<PuzzleId, PuzzleDef> = {
     region: 'Overlook Ridge',
     x: 13.2,
     z: 29.0,
-    hint: 'Lock the Ancient Stasis Boulder upslope (2 + F), strike it toward the glowing floor seal, and launch it into the socket.',
-    rewardText: 'Stasis Vault Chest: +1 Heart Container · +40 Marks',
+    hint: 'Lock the Ancient Stillstone Boulder upslope (2 + F), strike it toward the glowing floor seal, and launch it into the socket.',
+    rewardText: 'Stillstone Vault Chest: +1 Heartstone · +40 Marks',
   },
   dawn_braziers: {
     id: 'dawn_braziers',
@@ -145,7 +145,7 @@ export function ringChimeBell(
   };
 }
 
-export function checkStasisSocketLock(
+export function checkStillstoneSocketLock(
   state: PuzzleState,
   boulderX: number,
   boulderZ: number,

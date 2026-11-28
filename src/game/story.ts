@@ -52,16 +52,16 @@ export const CHAPTERS: Record<ChapterId, ChapterDef> = {
   1: {
     id: 1,
     roman: 'I',
-    title: "The Warden's Trial",
-    subtitle: "Chapter I · The Warden's Trial",
+    title: "The First Toll",
+    subtitle: "Chapter I · The First Toll",
     regionFocus: 'Whisperwood & Windcrest Bluff',
     summary:
-      'The Great Dawnbell fell silent when the valley seals fractured. Guided by Pip, young Wren must answer Warden Odo at Hearthbrook Outpost, clear the monsters holding Whisperwood Camp, and climb Windcrest Bluff to awaken the Shrine of Wind.',
+      'The Great Dawnbell fell silent when the valley seals fractured. Guided by Pip, young Wren must answer Elder Aldous in Brackenford, clear the monsters holding Whisperwood Camp, and climb Windcrest Bluff to awaken the Shrine of Wind.',
     completionText:
-      'The First Toll rings bright across Whisperwood! Beneath the eastern cliffs, ancient stone groans awake — the way to The Hollow Deep has opened.',
-    rewardText: '+1 Heart Container · Full Heal · Way to Emberstone Canyon Opened',
+      'The First Toll rings bright across Whisperwood! Beneath the eastern cliffs, ancient stone groans awake — the way to The Ember Deeps has opened.',
+    rewardText: '+1 Heartstone · Full Heal · Way to Emberstone Canyon Opened',
     goals: [
-      { event: 'spoke_odo', label: 'Speak with Warden Odo at Hearthbrook Outpost' },
+      { event: 'spoke_odo', label: 'Speak with Elder Aldous in Brackenford' },
       { event: 'cleared_whisper_camp', label: 'Clear Whisperwood Camp to break its seal' },
       { event: 'awakened_wind_shrine', label: 'Ascend Windcrest Bluff & awaken the Shrine of Wind' },
     ],
@@ -72,7 +72,7 @@ export const CHAPTERS: Record<ChapterId, ChapterDef> = {
       },
       {
         speaker: 'Pip',
-        text: "Warden Odo is waiting down the eastern trail at Hearthbrook Outpost to start your Warden's Trial. Let's glide down or head straight for the camp!",
+        text: "Elder Aldous in Brackenford knows the old Bell Shrine lore. Let's glide down or head straight for the camp!",
       },
     ],
     atmosphere: {
@@ -91,14 +91,14 @@ export const CHAPTERS: Record<ChapterId, ChapterDef> = {
   2: {
     id: 2,
     roman: 'II',
-    title: 'The Hollow Deep',
-    subtitle: 'Chapter II · The Hollow Deep',
+    title: 'The Ember Deeps',
+    subtitle: 'Chapter II · The Ember Deeps',
     regionFocus: 'Emberstone Canyon',
     summary:
       'The First Toll shook the canyon vaults awake. Venture east into sunlit amber Emberstone Canyon, shatter a cracked Hollow Seal boulder with your Ember Bomb rune, rout Canyon Horn Camp, and ignite the Shrine of Embers.',
     completionText:
-      'The Second Toll echoes through the canyon depths! As dusk gathers over the northern waters, Pip kindles the golden Dawn Lamp for the journey into The Gloaming Fen.',
-    rewardText: '+1 Heart Container · Dawn Lamp Kindled · Gloaming Fen Awaits',
+      'The Second Toll echoes through the canyon depths! As dusk gathers over the northern waters, Pip kindles the golden Dawn Lamp for the journey into The Twilight Mere.',
+    rewardText: '+1 Heartstone · Dawn Lamp Kindled · Twilight Mere Awaits',
     goals: [
       { event: 'shattered_boulder', label: 'Shatter a cracked stone seal with Ember Bomb (1 + F)' },
       { event: 'cleared_canyon_camp', label: 'Clear Canyon Horn Camp in Emberstone Canyon' },
@@ -107,7 +107,7 @@ export const CHAPTERS: Record<ChapterId, ChapterDef> = {
     introDialogue: [
       {
         speaker: 'Pip',
-        text: 'Did you feel that tremor, Wren? The First Toll shook the ancient seals inside Emberstone Canyon — the Hollow Deep is stirring!',
+        text: 'Did you feel that tremor, Wren? The First Toll shook the ancient seals inside Emberstone Canyon — the Ember Deeps is stirring!',
       },
       {
         speaker: 'Pip',
@@ -130,27 +130,27 @@ export const CHAPTERS: Record<ChapterId, ChapterDef> = {
   3: {
     id: 3,
     roman: 'III',
-    title: 'The Gloaming Fen',
-    subtitle: 'Chapter III · The Gloaming Fen',
+    title: 'The Twilight Mere',
+    subtitle: 'Chapter III · The Twilight Mere',
     regionFocus: 'Highland Lookout & Azure Mirror Lake',
     summary:
-      'Indigo twilight mist rolls across Azure Mirror Lake as the Gloaming Fen awakens. With your golden Dawn Lamp piercing the mist, storm Highland Lookout, vanquish the Iron Sentinel on the island, and awaken the Shrine of Stillness to restore eternal dawn.',
+      'Indigo twilight mist rolls across Azure Mirror Lake as the Twilight Mere awakens. With your golden Dawn Lamp piercing the mist, storm Highland Lookout, vanquish the Mirror Colossus on the island, and awaken the Shrine of Stillness to restore eternal dawn.',
     completionText:
       'All three Ancient Bell Shrines sing in harmony! Twilight parts across the valley as the Great Dawnbell tolls a golden morning over Whisperwood.',
     rewardText: 'Warden of the Dawnbell · Eternal Dawn Restored',
     goals: [
-      { event: 'cleared_highland_camp', label: 'Clear Highland Lookout above the Gloaming Fen' },
-      { event: 'defeated_sentinel', label: 'Defeat the Iron Sentinel on Azure Mirror Lake' },
+      { event: 'cleared_highland_camp', label: 'Clear Highland Lookout above the Twilight Mere' },
+      { event: 'defeated_sentinel', label: 'Defeat the Mirror Colossus on Azure Mirror Lake' },
       { event: 'awakened_stillness_shrine', label: 'Awaken the Shrine of Stillness & ring the Dawnbell' },
     ],
     introDialogue: [
       {
         speaker: 'Pip',
-        text: 'Twilight mist is rolling off Azure Mirror Lake — the Gloaming Fen has awakened! Hold close: the Dawn Lamp on your belt will light our way through the fog.',
+        text: 'Twilight mist is rolling off Azure Mirror Lake — the Twilight Mere has awakened! Hold close: the Dawn Lamp on your belt will light our way through the fog.',
       },
       {
         speaker: 'Pip',
-        text: 'Clear Highland Lookout, topple the ancient Iron Sentinel guarding the lake island, and awaken the Shrine of Stillness to ring the Grand Dawnbell!',
+        text: 'Clear Highland Lookout, topple the ancient Mirror Colossus guarding the lake island, and awaken the Shrine of Stillness to ring the Grand Dawnbell!',
       },
     ],
     atmosphere: {
@@ -267,11 +267,11 @@ export function getOdoDialogue(state: StoryState): DialogueLine[] {
   if (state.storyFinished) {
     return [
       {
-        speaker: 'Warden Odo',
-        text: 'The Great Dawnbell sings across Whisperwood once more! You have passed the Trial, braved the Hollow Deep, and banished the Gloaming Fen, Wren.',
+        speaker: 'Elder Aldous',
+        text: 'The Great Dawnbell sings across Whisperwood once more! You have passed the Trial, braved the Ember Deeps, and banished the Twilight Mere, Wren.',
       },
       {
-        speaker: 'Warden Odo',
+        speaker: 'Elder Aldous',
         text: 'The valley is yours to roam under endless golden skies. May the wind always lift your Paraglider!',
       },
     ];
@@ -283,18 +283,18 @@ export function getOdoDialogue(state: StoryState): DialogueLine[] {
     if (doneCamp && doneWind) {
       return [
         {
-          speaker: 'Warden Odo',
+          speaker: 'Elder Aldous',
           text: "By the Bell — you've already cleared Whisperwood Camp and awakened the Shrine of Wind! You have proven yourself a true Warden, Wren!",
         },
       ];
     }
     return [
       {
-        speaker: 'Warden Odo',
-        text: "Ah, Wren! You made it down from Awakening Overlook. The Great Dawnbell fell silent last dusk — so today begins your Warden's Trial.",
+        speaker: 'Elder Aldous',
+        text: "Ah, Wren! You made it down from Awakening Overlook. The Great Dawnbell fell silent last dusk — so today begins your First Toll trial.",
       },
       {
-        speaker: 'Warden Odo',
+        speaker: 'Elder Aldous',
         text: "First, break the monster hold on Whisperwood Camp to the west. Then climb the Dawnbell Spire or ride a Gale Updraft (3 + F) up Windcrest Bluff to awaken the Shrine of Wind!",
       },
     ];
@@ -303,11 +303,11 @@ export function getOdoDialogue(state: StoryState): DialogueLine[] {
   if (state.currentChapter === 2) {
     return [
       {
-        speaker: 'Warden Odo',
-        text: 'That First Toll rang clear to the peaks! Now the Hollow Deep stirs in Emberstone Canyon just east of Hearthbrook.',
+        speaker: 'Elder Aldous',
+        text: 'That First Toll rang clear to the peaks! Now the Ember Deeps stirs in Emberstone Canyon just east of Brackenford.',
       },
       {
-        speaker: 'Warden Odo',
+        speaker: 'Elder Aldous',
         text: 'Use Ember Bombs (1 + F) to shatter the cracked canyon seals, rout Canyon Horn Camp, and awaken the Shrine of Embers. Watch out for armoured beetles!',
       },
     ];
@@ -315,12 +315,12 @@ export function getOdoDialogue(state: StoryState): DialogueLine[] {
 
   return [
     {
-      speaker: 'Warden Odo',
-      text: 'The Gloaming Fen has swallowed Azure Mirror Lake in twilight mist, Wren. Keep your Dawn Lamp burning bright — it will guide you across the dark waters.',
+      speaker: 'Elder Aldous',
+      text: 'The Twilight Mere has swallowed Azure Mirror Lake in twilight mist, Wren. Keep your Dawn Lamp burning bright — it will guide you across the dark waters.',
     },
     {
-      speaker: 'Warden Odo',
-      text: 'Clear Highland Lookout, parry or shoot the glowing eye of the Iron Sentinel, and awaken the Shrine of Stillness to restore the dawn!',
+      speaker: 'Elder Aldous',
+      text: 'Clear Highland Lookout, parry or shoot the glowing eye of the Mirror Colossus, and awaken the Shrine of Stillness to restore the dawn!',
     },
   ];
 }
@@ -352,12 +352,12 @@ export interface SideQuestDef {
 export const SIDE_QUESTS: Record<SideQuestId, SideQuestDef> = {
   mira_harvest: {
     id: 'mira_harvest',
-    title: 'Hearthbrook Harvest',
+    title: 'Brackenford Harvest',
     giver: 'Mira the Herbalist',
-    region: 'Hearthbrook Keep',
+    region: 'Brackenford Keep',
     targetCount: 3,
     summary:
-      'Mira is preparing a warm Hearthbrook Stew for returning travelers. Forage 3 Wild Apples (or cook Hearty Skewers) and bring them to Mira at Hearthbrook Keep.',
+      'Mira is preparing a warm Brackenford Stew for returning travelers. Forage 3 Wild Apples (or cook Hearty Skewers) and bring them to Mira at Brackenford Keep.',
     objectiveLabel: 'Wild Apples / Meals brought to Mira',
     rewardText: '+2 Hearty Skewers · +40 Marks · +10 Arrows',
     x: 24.4,
@@ -365,14 +365,14 @@ export const SIDE_QUESTS: Record<SideQuestId, SideQuestDef> = {
   },
   bram_archery: {
     id: 'bram_archery',
-    title: "Bram's Fletcher Trial",
-    giver: 'Bram the Smith',
-    region: 'Hearthbrook Keep',
+    title: "Odo's Fletcher Trial",
+    giver: 'Odo the Smith',
+    region: 'Brackenford Keep',
     targetCount: 3,
     summary:
-      "Test Bram's newly fletched recurve arrows by shooting all 3 Crimson Bull's-Eye Targets set around the hills of Hearthbrook Keep.",
+      "Test Odo's newly fletched recurve arrows by shooting all 3 Crimson Bull's-Eye Targets set around the hills of Brackenford Keep.",
     objectiveLabel: "Crimson Archery Targets struck",
-    rewardText: '+1 Heart Container · +20 Arrows · +50 Marks',
+    rewardText: '+1 Heartstone · +20 Arrows · +50 Marks',
     x: 28.4,
     z: 19.6,
   },
@@ -392,13 +392,13 @@ export const SIDE_QUESTS: Record<SideQuestId, SideQuestDef> = {
   ancient_sanctuaries: {
     id: 'ancient_sanctuaries',
     title: 'The Three Ancient Trials',
-    giver: 'Warden Odo',
+    giver: 'Elder Aldous',
     region: 'Whisperwood Valley',
     targetCount: 3,
     summary:
       'Solve all 3 ancient puzzles left by the old Bell-Keepers: the Resonance Bells at the Crossroads, the Heavy Stone Socket near Overlook Ridge, and the Three Dawn Braziers ringing the Spire.',
     objectiveLabel: 'Ancient Puzzles solved',
-    rewardText: "Warden's Relic (+1 Heart Container · +100 Marks · Full Heal)",
+    rewardText: "Warden's Relic (+1 Heartstone · +100 Marks · Full Heal)",
     x: 0,
     z: 7.6,
   },
@@ -409,7 +409,7 @@ export const SIDE_QUESTS: Record<SideQuestId, SideQuestDef> = {
     region: 'Dwarven Ore Quarry',
     targetCount: 3,
     summary:
-      'Strike or blast 3 gleaming Copper, Gold, or Mithril Ore Veins across the Dwarven Ore Quarry, Emberstone Canyon, or Ashen Wilds to supply the Valenrock smithies.',
+      'Strike or blast 3 gleaming Copper, Gold, or Mithril Ore Veins across the Dwarven Ore Quarry, Emberstone Canyon, or Ashen Wilds to supply the Highcrown smithies.',
     objectiveLabel: 'Gleaming Ore Veins mined',
     rewardText: '+90 Golden Marks · +15 Arrows · Full Stamina Surge',
     x: 108,
@@ -528,7 +528,7 @@ export function getMiraDialogue(
       lines: [
         {
           speaker: 'Mira the Herbalist',
-          text: 'The Hearthbrook Stew smells heavenly thanks to your fresh apples, Wren! Drop by any campfire cauldron whenever you need more Hearty Skewers.',
+          text: 'The Brackenford Stew smells heavenly thanks to your fresh apples, Wren! Drop by any campfire cauldron whenever you need more Hearty Skewers.',
         },
       ],
     };
@@ -539,7 +539,7 @@ export function getMiraDialogue(
       lines: [
         {
           speaker: 'Mira the Herbalist',
-          text: 'Oh, look at those crisp Whisperwood apples! You brought plenty for the whole Hearthbrook harvest cauldron!',
+          text: 'Oh, look at those crisp Whisperwood apples! You brought plenty for the whole Brackenford harvest cauldron!',
         },
         {
           speaker: 'Mira the Herbalist',
@@ -554,11 +554,11 @@ export function getMiraDialogue(
       lines: [
         {
           speaker: 'Mira the Herbalist',
-          text: "Hello, Wren! I'm simmering a pot of Hearthbrook Harvest Stew, but the monsters drove me away from the apple groves.",
+          text: "Hello, Wren! I'm simmering a pot of Brackenford Harvest Stew, but the monsters drove me away from the apple groves.",
         },
         {
           speaker: 'Mira the Herbalist',
-          text: 'Bring me 3 Wild Apples (or Hearty Skewers) and I will reward you with cooked Skewers, Marks, and Arrows! Look under the trees near Overlook and Hearthbrook.',
+          text: 'Bring me 3 Wild Apples (or Hearty Skewers) and I will reward you with cooked Skewers, Marks, and Arrows! Look under the trees near Overlook and Brackenford.',
         },
       ],
     };
@@ -569,7 +569,7 @@ export function getMiraDialogue(
     lines: [
       {
         speaker: 'Mira the Herbalist',
-        text: `Just ${need} more Wild Apple${need > 1 ? 's' : ''} for the Hearthbrook Stew, Wren! Check beneath the fruit trees around Hearthbrook and Awakening Overlook.`,
+        text: `Just ${need} more Wild Apple${need > 1 ? 's' : ''} for the Brackenford Stew, Wren! Check beneath the fruit trees around Brackenford and Awakening Overlook.`,
       },
     ],
   };
@@ -585,8 +585,8 @@ export function getBramDialogue(
       action: 'none',
       lines: [
         {
-          speaker: 'Bram the Smith',
-          text: "Sharpest archer in Whisperwood! Remember: press V on a grassy ridge to Shield Surf, or time a Perfect Parry right when the Iron Sentinel's eye flashes!",
+          speaker: 'Odo the Smith',
+          text: "Sharpest archer in Whisperwood! Remember: press V on a grassy ridge to Shield Surf, or time a Perfect Parry right when the Mirror Colossus's eye flashes!",
         },
       ],
     };
@@ -596,12 +596,12 @@ export function getBramDialogue(
       action: 'complete',
       lines: [
         {
-          speaker: 'Bram the Smith',
+          speaker: 'Odo the Smith',
           text: 'Three clean bull’s-eyes! Ha! Every single fletched shaft flew true as a bell chime!',
         },
         {
-          speaker: 'Bram the Smith',
-          text: "Take this Hearthbrook Heart Container, 20 fine Arrows, and 50 Marks — you've earned every bit of it, Warden!",
+          speaker: 'Odo the Smith',
+          text: "Take this Brackenford Heartstone, 20 fine Arrows, and 50 Marks — you've earned every bit of it, Warden!",
         },
       ],
     };
@@ -611,12 +611,12 @@ export function getBramDialogue(
       action: 'accept',
       lines: [
         {
-          speaker: 'Bram the Smith',
+          speaker: 'Odo the Smith',
           text: "Wren! Your Dawnbell Blade looks keen, and I just strung a fresh batch of recurve arrows. Care for a Fletcher's Trial?",
         },
         {
-          speaker: 'Bram the Smith',
-          text: "I've set up 3 crimson Bull's-Eye Targets around Hearthbrook Outpost. Hold Right-Click (or RT) to shoot all three, then come back for a smith's reward!",
+          speaker: 'Odo the Smith',
+          text: "I've set up 3 crimson Bull's-Eye Targets around Brackenford. Hold Right-Click (or RT) to shoot all three, then come back for a smith's reward!",
         },
       ],
     };
@@ -626,8 +626,8 @@ export function getBramDialogue(
     action: 'none',
     lines: [
       {
-        speaker: 'Bram the Smith',
-        text: `${left} crimson archery target${left > 1 ? 's' : ''} left standing around Hearthbrook Outpost! Draw your bow with Right-Click (or RT) and ring the bull’s-eye.`,
+        speaker: 'Odo the Smith',
+        text: `${left} crimson archery target${left > 1 ? 's' : ''} left standing around Brackenford! Draw your bow with Right-Click (or RT) and ring the bull’s-eye.`,
       },
     ],
   };

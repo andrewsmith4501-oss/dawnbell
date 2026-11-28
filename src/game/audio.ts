@@ -178,17 +178,17 @@ export class SoundEngine {
     this.noise(0.42, 420, 'lowpass', 0.16);
   }
 
-  playStasisLock(): void {
+  playStillstoneLock(): void {
     this.tone(520, 0.14, 'square', 0.045, 780);
     this.tone(1040, 0.22, 'sine', 0.05, 1040, 0.06);
   }
 
-  playStasisHit(hits: number): void {
+  playStillstoneHit(hits: number): void {
     const f = 440 + hits * 110;
     this.tone(f, 0.12, 'triangle', 0.07, f * 1.15);
   }
 
-  playStasisLaunch(): void {
+  playStillstoneLaunch(): void {
     this.tone(240, 0.32, 'sawtooth', 0.09, 920);
     this.noise(0.2, 1800, 'bandpass', 0.08);
   }

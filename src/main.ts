@@ -17,7 +17,8 @@ const uiMount = document.getElementById('ui-mount')!;
 let engine: DawnbellEngine | null = null;
 
 const hud = new GameHud(uiMount, {
-  onNewGame: (ch?: ChapterId) => engine?.startNewGame(ch ?? 1, false),
+  onNewGame: (ch?: number) => engine?.startNewGame(1, false, ch ?? 1),
+  onPickChoice: (i) => engine?.pickChoice(i),
   onContinue: () => engine?.continueGame(),
   onResume: () => engine?.resumeGame(),
   onPause: () => engine?.pauseGame(),
@@ -56,8 +57,7 @@ engine.setPadMenuHandler((ev) => hud.handleGamepadMenu(ev));
 const params = new URLSearchParams(window.location.search);
 if (params.get('autostart') === '1') {
   const chParam = Number(params.get('chapter'));
-  const startCh: ChapterId = chParam === 2 ? 2 : chParam === 3 ? 3 : 1;
-  engine.startNewGame(startCh, true);
+  engine.startNewGame(1, true, chParam >= 2 && chParam <= 4 ? chParam : 1);
 }
 
 window.addEventListener('beforeunload', () => {

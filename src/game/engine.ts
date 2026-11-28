@@ -10,7 +10,11 @@ import {
   getTerrainHeight,
   getTerrainNormal,
   getRegionName,
+  inPocket,
 } from './math';
+import { SagaSystem, type SagaChoice, type JournalEntry } from './saga/saga';
+import { setupChapterOne } from './saga/chapter1';
+import { setupChronicle, OPENING, applySkip } from './saga/chronicle';
 import {
   RuneId,
   TimeOfDayPreset,
@@ -33,13 +37,13 @@ import {
   createArrow,
   stepArrow,
   computeBombBlast,
-  computeStasisLaunch,
+  computeStillstoneLaunch,
   createInitialInventory,
   cookHeartyMeal,
   consumeHealingItem,
   activateShrine,
   stepShieldSurf,
-  planCryonisPillars,
+  planFrostrisePillars,
   collectWhisperSeed,
   nextTimeOfDay,
 } from './mechanics';
@@ -52,7 +56,7 @@ import {
   buildWrenHero,
   buildPipCompanion,
   buildBombMesh,
-  buildCryonisPillar,
+  buildFrostrisePillar,
   HeroRig,
   PipRig,
 } from './voxelBuilder';
@@ -60,7 +64,7 @@ import {
   buildOpenWorld,
   WorldData,
   SolidCollider,
-  StasisBoulderProp,
+  StillstoneBoulderProp,
   WhisperSecretProp,
   ChimeBellProp,
   DawnBrazierProp,
@@ -99,7 +103,7 @@ import {
   PuzzleState,
   createPuzzleState,
   ringChimeBell,
-  checkStasisSocketLock,
+  checkStillstoneSocketLock,
   igniteDawnBrazier,
   countSolvedPuzzles,
   isPuzzleSolved,
@@ -151,7 +155,7 @@ export interface HudSnapshot {
   mapOpen: boolean;
   mapTab: 'map' | 'journal';
   story: StoryState;
-  chapterRoman: 'I' | 'II' | 'III';
+  chapterRoman: string;
   chapterTitle: string;
   activeObjective: string;
   sideQuests: SideQuestState;
@@ -167,6 +171,10 @@ export interface HudSnapshot {
   totalChests: number;
   dialogue: { speaker: string; text: string } | null;
   dialogueRemaining: number;
+  dialogueChoices: Array<{ label: string; disabled: boolean }> | null;
+  dialogueChoiceIndex: number;
+  sagaJournal: { main: JournalEntry[]; side: JournalEntry[] };
+  indoors: boolean;
 }
 
 export interface PadMenuEvent {
@@ -185,7 +193,7 @@ interface PooledShockwave {
   mat: THREE.MeshBasicMaterial;
 }
 
-interface ActiveCryonis {
+interface ActiveFrostrise {
   id: string;
   x: number;
   baseY: number;
@@ -289,7 +297,7 @@ export class DawnbellEngine {
   // Dynamic gameplay entities
   private arrows: ActiveArrow[] = [];
   private activeBomb: ActiveBomb | null = null;
-  private cryonisPillars: ActiveCryonis[] = [];
+  private cryonisPillars: ActiveFrostrise[] = [];
   private cryonisSeq = 0;
   private galeVisual: THREE.Group | null = null;
   private galeTimer = 0;
@@ -301,6 +309,13 @@ export class DawnbellEngine {
   private mapTab: 'map' | 'journal' = 'map';
   private dialogue: { speaker: string; text: string } | null = null;
   private dialogueQueue: DialogueLine[] = [];
+  private dialogueAfter: (() => void) | null = null;
+  private dialogueChoices: SagaChoice[] | null = null;
+  private dialogueChoiceIndex = 0;
+  private choiceNavLatch = false;
+  private saga!: SagaSystem;
+  private lastWorldPos = { x: 0, z: 46 };
+  private indoorBlend = 0;
   private story: StoryState = createStoryState(1);
   private sideQuests: SideQuestState = createSideQuestState();
   private puzzles: PuzzleState = createPuzzleState();
@@ -463,6 +478,8 @@ export class DawnbellEngine {
           pz: this.pz,
           enemiesDefeated: this.enemiesDefeated,
           elapsedSeconds: this.elapsedSeconds,
+          saga: this.saga.serialize(),
+          worldPos: this.lastWorldPos,
         })
       );
     } catch {
@@ -492,6 +509,11 @@ export class DawnbellEngine {
         this.rowanGifted = Boolean(data.rowanGifted);
         if (data.timeOfDay === 'day' || data.timeOfDay === 'sunset' || data.timeOfDay === 'starlight') {
           this.timeOfDay = data.timeOfDay;
+        }
+        this.saga.load(data.saga);
+        if (data.worldPos && typeof data.worldPos.x === 'number') {
+          data.px = data.worldPos.x;
+          data.pz = data.worldPos.z;
         }
         if (typeof data.px === 'number' && typeof data.pz === 'number') {
           this.px = clamp(data.px, -WORLD_PLAY_RADIUS + 8, WORLD_PLAY_RADIUS - 8);
@@ -790,12 +812,89 @@ export class DawnbellEngine {
 
     this.enemies = new EnemyManager(this.scene, this.mats);
     this.enemies.spawnAll();
+    this.initSaga();
 
     this.resetPlayerToOverlook();
 
     if (!this.isSoftwareGl) {
       this.renderer.compile(this.scene, this.camera);
     }
+  }
+
+  private initSaga(): void {
+    const sfx = (k: string) => {
+      if (k === 'coin' || k === 'door') this.audio.playPickup();
+      else if (k === 'item' || k === 'heal') this.audio.playChestOpen();
+      else if (k === 'gate' || k === 'win') this.audio.playShrineActivate();
+      else if (k === 'boss') this.audio.playTelegraph();
+    };
+    this.saga = new SagaSystem({
+      mats: this.mats,
+      scene: this.scene,
+      colliders: this.world.colliders,
+      inv: () => this.inv,
+      say: (lines, after) => this.enqueueDialogue(lines, after),
+      choose: (speaker, text, options) => this.presentChoice(speaker, text, options),
+      toast: (text, dur) => this.showToast(text, dur ?? 3),
+      sfx,
+      save: () => this.saveProgress(),
+      teleport: (x, y, z, yaw) => this.teleportPlayer(x, y, z, yaw),
+      spawnEnemy: (spec) => this.enemies.spawn(spec),
+      removeEnemies: (tag) => this.enemies.removeTagged(tag),
+      particles: (x, y, z, c, n, sp) => this.spawnParticles(x, y, z, c, n, sp ?? 5),
+      shake: (a) => (this.trauma = Math.min(1, this.trauma + a)),
+      player: () => ({ x: this.px, y: this.py, z: this.pz }),
+      heal: () => {
+        this.inv.hp = this.inv.maxHp;
+      },
+      legacyTalk: (role) => this.runVillagerTalk({ role, name: 'Odo the Smith' }),
+      storyEvent: (ev) => this.triggerStoryEvent(ev),
+      anyEnemyAlive: (tag) => this.enemies.enemies.some((e) => e.tag === tag && !e.dead && e.state !== 'ko'),
+    });
+    setupChapterOne(this.saga);
+    setupChronicle(this.saga);
+  }
+
+  private skyDomeMesh: THREE.Object3D | null = null;
+  private applyIndoorAtmosphere(): void {
+    if (!this.skyDomeMesh) {
+      this.world.group.traverse((o) => {
+        const mat = (o as THREE.Mesh).material as THREE.ShaderMaterial | undefined;
+        if (!this.skyDomeMesh && mat && (mat as THREE.ShaderMaterial).uniforms?.uZenith) this.skyDomeMesh = o;
+      });
+    }
+    const indoor = inPocket(this.px);
+    if (this.skyDomeMesh) this.skyDomeMesh.visible = !indoor;
+    this.sunOrb.visible = !indoor;
+    this.world.cloudsGroup.visible = !indoor;
+    this.world.starsMesh.visible = !indoor;
+    if (indoor) {
+      const room = this.saga.currentRoom;
+      const fogHex = room?.def.fog ?? '#17110c';
+      if (this.scene.fog instanceof THREE.Fog) {
+        this.scene.fog.color.set(fogHex);
+        this.scene.fog.near = 14;
+        this.scene.fog.far = 44;
+      }
+      (this.scene.background as THREE.Color).set(fogHex);
+      this.sunLight.intensity = Math.min(this.sunLight.intensity, 1.05);
+      this.hemiLight.intensity = Math.min(this.hemiLight.intensity, 0.62);
+    }
+  }
+
+  private teleportPlayer(x: number, y: number, z: number, yaw: number): void {
+    this.px = x;
+    this.py = y;
+    this.pz = z;
+    this.pvx = 0;
+    this.pvy = 0;
+    this.pvz = 0;
+    this.pYaw = yaw;
+    this.camYaw = yaw;
+    this.climbing = false;
+    this.gliding = false;
+    this.camPos.set(x - Math.sin(yaw) * 6, y + 4.2, z - Math.cos(yaw) * 6);
+    this.camLook.set(x, y + 1.6, z);
   }
 
   private resetPlayerToOverlook(): void {
@@ -827,7 +926,7 @@ export class DawnbellEngine {
     this.pip.root.position.set(this.px + 0.9, this.py + 1.9, this.pz - 0.5);
   }
 
-  startNewGame(startChapter: ChapterId = 1, skipIntroDialogue = false): void {
+  startNewGame(startChapter: ChapterId = 1, skipIntroDialogue = false, sagaSkip = 1): void {
     this.audio.unlock();
     this.inv = createInitialInventory();
     this.story = createStoryState(startChapter);
@@ -936,11 +1035,15 @@ export class DawnbellEngine {
 
     this.enemies.spawnAll();
     this.resetPlayerToOverlook();
+    this.saga.load({});
+    if (sagaSkip > 1) applySkip(this.saga.F, sagaSkip);
+    this.lastWorldPos = { x: this.px, z: this.pz };
 
     const chDef = CHAPTERS[startChapter];
     this.currentRegion = 'Awakening Overlook';
     this.regionBannerTimer = 3.2;
-    this.showToast(`${chDef.subtitle} — ${getNextObjectiveLabel(this.story)}`, 4.0);
+    void chDef;
+    this.showToast(this.saga.objectiveFn(), 4.0);
 
     // Immediately snap gameplay camera smoothly behind Wren framing the full Dawnbell Spire!
     this.camPos.set(this.px, this.py + 3.4, this.pz + 7.8);
@@ -948,7 +1051,7 @@ export class DawnbellEngine {
 
     this.setGameState('playing');
     if (!skipIntroDialogue) {
-      this.enqueueDialogue(chDef.introDialogue);
+      this.enqueueDialogue(sagaSkip > 1 ? [{ speaker: 'Pip', text: `Test start: Chapter ${['', 'One', 'Two', 'Three', 'Four'][sagaSkip]}. Captain Venn is waiting in the Hall of Wardens.` }] : OPENING);
     }
   }
 
@@ -1026,7 +1129,7 @@ export class DawnbellEngine {
   toggleDawnLamp(): void {
     if (this.gameState !== 'playing') return;
     if (!this.story.dawnLampUnlocked) {
-      this.showToast('The Dawn Lamp kindles when Chapter III: The Gloaming Fen begins!', 2.6);
+      this.showToast('The Dawn Lamp kindles when the Twilight Mere awakens!', 2.6);
       return;
     }
     this.dawnLampOn = !this.dawnLampOn;
@@ -1035,19 +1138,62 @@ export class DawnbellEngine {
     this.emitHud();
   }
 
-  private enqueueDialogue(lines: DialogueLine[]): void {
-    if (lines.length === 0) return;
+  private enqueueDialogue(lines: DialogueLine[], after?: () => void): void {
+    if (lines.length === 0) {
+      after?.();
+      return;
+    }
+    // A conversation started while another is open is queued after it.
+    if (this.dialogue) {
+      const prevAfter = this.dialogueAfter;
+      this.dialogueQueue.push(...lines);
+      this.dialogueAfter = () => {
+        prevAfter?.();
+        after?.();
+      };
+      this.emitHud();
+      return;
+    }
     this.dialogue = lines[0];
     this.dialogueQueue = lines.slice(1);
+    this.dialogueAfter = after ?? null;
+    this.dialogueChoices = null;
     this.input.exitPointerLock();
     this.emitHud();
   }
 
+  private presentChoice(speaker: string, text: string, options: SagaChoice[]): void {
+    this.dialogue = { speaker, text };
+    this.dialogueQueue = [];
+    this.dialogueAfter = null;
+    this.dialogueChoices = options;
+    this.dialogueChoiceIndex = Math.max(0, options.findIndex((o) => !o.disabled));
+    this.choiceNavLatch = true;
+    this.input.exitPointerLock();
+    this.emitHud();
+  }
+
+  pickChoice(index: number): void {
+    const opts = this.dialogueChoices;
+    if (!opts) return;
+    const o = opts[index];
+    if (!o || o.disabled) return;
+    this.dialogueChoices = null;
+    this.dialogue = null;
+    this.emitHud();
+    o.pick();
+    this.emitHud();
+  }
+
   dismissDialogue(): void {
+    if (this.dialogueChoices) return;
     if (this.dialogueQueue.length > 0) {
       this.dialogue = this.dialogueQueue.shift() ?? null;
     } else {
       this.dialogue = null;
+      const after = this.dialogueAfter;
+      this.dialogueAfter = null;
+      after?.();
     }
     this.emitHud();
   }
@@ -1253,7 +1399,24 @@ export class DawnbellEngine {
 
     // Handle global Pause / Map / Journal / Dialogue dismissals
     if (this.gameState === 'playing') {
-      if (this.dialogue) {
+      if (this.dialogue && this.dialogueChoices) {
+        const opts = this.dialogueChoices;
+        const dir = inp.moveZ > 0.5 ? -1 : inp.moveZ < -0.5 ? 1 : 0;
+        if (dir === 0) this.choiceNavLatch = false;
+        else if (!this.choiceNavLatch) {
+          this.choiceNavLatch = true;
+          let i = this.dialogueChoiceIndex;
+          for (let k = 0; k < opts.length; k++) {
+            i = (i + dir + opts.length) % opts.length;
+            if (!opts[i].disabled) break;
+          }
+          this.dialogueChoiceIndex = i;
+          this.emitHud();
+        }
+        if (inp.interactPressed || inp.jumpPressed || inp.attackPressed) {
+          this.pickChoice(this.dialogueChoiceIndex);
+        }
+      } else if (this.dialogue) {
         if (inp.interactPressed || inp.jumpPressed || inp.attackPressed || inp.pausePressed) {
           this.dismissDialogue();
         }
@@ -1282,6 +1445,7 @@ export class DawnbellEngine {
 
     // World ambient animations (water ripples, drifting clouds, sunbeams, wind ribbons, shrine crystals, campfires, spire bell)
     this.updateWorldAmbience(realDt);
+    this.applyIndoorAtmosphere();
 
     if (this.gameState === 'title') {
       this.updateTitleCamera(realDt);
@@ -1359,7 +1523,7 @@ export class DawnbellEngine {
       }
     }
 
-    // 4. Lock-on Targeting & Classic Zelda Z-Target Camera Recenter!
+    // 4. Lock-on Targeting & camera recenter
     if (inp.lockOnPressed) {
       if (this.lockedTarget && !this.lockedTarget.dead) {
         this.lockedTarget = null;
@@ -1422,11 +1586,13 @@ export class DawnbellEngine {
       }
     }
 
-    // 7. Update Arrows, Active Bomb, Stasis Boulders, Pickups & Interactions
+    // 7. Update Arrows, Active Bomb, Stillstone Boulders, Pickups & Interactions
     this.updateArrows(simDt, enemyCallbacks);
     this.updateActiveBomb(simDt, enemyCallbacks);
-    this.updateStasisBoulders(simDt, enemyCallbacks);
+    this.updateStillstoneBoulders(simDt, enemyCallbacks);
     this.updatePickupsAndInteractions(realDt, inp);
+    this.saga.update(realDt);
+    if (!inPocket(this.px)) this.lastWorldPos = { x: this.px, z: this.pz };
     this.updateParticles(realDt);
 
     // 8. Visuals, Pip Companion, Camera & Region Check
@@ -1848,7 +2014,7 @@ export class DawnbellEngine {
 
     // Soft natural valley perimeter constraint
     const rCenter = Math.hypot(nextX, nextZ);
-    if (rCenter > WORLD_PLAY_RADIUS) {
+    if (rCenter > WORLD_PLAY_RADIUS && !inPocket(nextX)) {
       const k = WORLD_PLAY_RADIUS / rCenter;
       nextX *= k;
       nextZ *= k;
@@ -2059,7 +2225,7 @@ export class DawnbellEngine {
         }
         this.spawnParticles(b.x, b.y + 0.45, b.z, 0x58c448, 10, 4.8, 9, 0.16);
         this.spawnParticles(b.x, b.y + 0.55, b.z, 0xf25a52, 3, 3.6, 8, 0.12);
-        // Classic Zelda bush foraging bonus!
+        // bush foraging bonus
         if (b.index % 5 === 0) {
           this.inv.marks += 2;
           this.audio.playPickup();
@@ -2117,12 +2283,14 @@ export class DawnbellEngine {
     const reach = this.isSpinning ? 3.2 : 2.7;
     const fx = Math.sin(this.pYaw);
     const fz = Math.cos(this.pYaw);
-    const dmg = computeSwordDamage({
-      comboStep: this.comboStep,
-      isSpinAttack: this.isSpinning,
-      isFlurryRush: this.flurryTimer > 0,
-      isJumpStrike: !this.grounded,
-    });
+    const dmg = Math.round(
+      computeSwordDamage({
+        comboStep: this.comboStep,
+        isSpinAttack: this.isSpinning,
+        isFlurryRush: this.flurryTimer > 0,
+        isJumpStrike: !this.grounded,
+      }) * ((this.saga.F.sword as number) >= 2 ? 1.35 : 1)
+    );
 
     const cb: EnemyUpdateCallbacks = {
       onPlayerDamaged: () => {},
@@ -2151,7 +2319,7 @@ export class DawnbellEngine {
       this.trauma = Math.min(1, this.trauma + (this.isSpinning ? 0.35 : 0.16));
     }
 
-    // Strike Stasis Boulders to build kinetic launch energy!
+    // Strike Stillstone Boulders to build kinetic launch energy!
     for (let i = 0; i < this.world.stasisBoulders.length; i++) {
       const sb = this.world.stasisBoulders[i];
       if (sb.stasisTimer <= 0 || this.attackHitSet.has(sb.id)) continue;
@@ -2166,7 +2334,7 @@ export class DawnbellEngine {
         sb.arrowIndicator.visible = true;
         sb.arrowIndicator.rotation.y = Math.atan2(sb.chargeDirX, sb.chargeDirZ);
         sb.arrowIndicator.scale.set(1, 1, 0.7 + sb.stasisHits * 0.25);
-        this.audio.playStasisHit(sb.stasisHits);
+        this.audio.playStillstoneHit(sb.stasisHits);
         this.hitstopTimer = 0.035;
         this.spawnParticles(sb.x, sb.y + 1.0, sb.z, 0xffe252, 10, 5.5);
       }
@@ -2202,7 +2370,7 @@ export class DawnbellEngine {
       }
     }
 
-    // Classic Zelda Bush-Slicing!
+    // bush slicing
     this.sliceNearbyBushes(reach + 0.55);
   }
 
@@ -2310,7 +2478,7 @@ export class DawnbellEngine {
         }
       }
 
-      // Bram's Fletcher Trial — Crimson Archery Bull's-Eye Targets!
+      // Odo's Fletcher Trial — Crimson Archery Bull's-Eye Targets!
       if (!hit) {
         for (let j = 0; j < this.world.archeryTargets.length; j++) {
           const tgt = this.world.archeryTargets[j];
@@ -2324,8 +2492,8 @@ export class DawnbellEngine {
             this.sideQuests = qRes.state;
             this.showToast(
               this.hitTargets.length >= SIDE_QUESTS.bram_archery.targetCount
-                ? "Bull's-eye! All 3 targets struck — return to Bram the Smith!"
-                : `Bull's-eye! (${this.hitTargets.length}/3 Bram Archery Targets)`,
+                ? "Bull's-eye! All 3 targets struck — return to Odo the Smith!"
+                : `Bull's-eye! (${this.hitTargets.length}/3 archery targets)`,
               3.2
             );
             this.saveProgress();
@@ -2381,11 +2549,12 @@ export class DawnbellEngine {
 
   private handleEnemyKilled(e: EnemyEntity): void {
     this.enemiesDefeated++;
+    this.saga.onEnemyKilled(e);
     this.inv.marks += e.kind === 'sentinel' ? 80 : e.kind === 'beetle' ? 15 : 8;
     this.hitstopTimer = e.kind === 'sentinel' ? 0.08 : 0.04;
     this.trauma = Math.min(1, this.trauma + (e.kind === 'sentinel' ? 0.7 : 0.3));
-    if (e.kind === 'sentinel') {
-      this.showToast('Iron Sentinel defeated! The Shrine of Stillness lies open!', 4.2);
+    if (e.kind === 'sentinel' && !e.tag) {
+      this.showToast('Mirror Colossus defeated! The Shrine of Stillness lies open!', 4.2);
       this.audio.playShrineActivate();
       this.triggerStoryEvent('defeated_sentinel');
     }
@@ -2414,29 +2583,21 @@ export class DawnbellEngine {
       this.audio.playShrineActivate();
       this.spawnParticles(this.px, this.py + 1.6, this.pz, 0xffe466, 28, 7.5, -2, 0.24);
       if (res.chapterJustCompleted === 1) {
-        this.timeOfDay = 'sunset';
-        this.showToast(`Chapter I Complete! ${finishedDef.rewardText}`, 4.5);
+        this.showToast(`Bell Shrines, part one complete! ${finishedDef.rewardText}`, 4.5);
         this.enqueueDialogue([
           { speaker: 'The Great Dawnbell', text: finishedDef.completionText },
           ...CHAPTERS[2].introDialogue,
         ]);
       } else if (res.chapterJustCompleted === 2) {
-        this.timeOfDay = 'starlight';
         this.dawnLampOn = true;
-        this.showToast(`Chapter II Complete! Dawn Lamp Kindled (Press G to toggle)!`, 4.8);
+        this.showToast(`Bell Shrines, part two complete! Dawn Lamp kindled (press G to toggle)`, 4.8);
         this.enqueueDialogue([
           { speaker: 'The Great Dawnbell', text: finishedDef.completionText },
           ...CHAPTERS[3].introDialogue,
         ]);
       } else if (res.chapterJustCompleted === 3 || res.storyFinished) {
-        this.timeOfDay = 'day';
-        this.victory = true;
-        this.showToast('All three Chapters complete! Eternal Dawn returns to Dawnbell!', 5.0);
-        window.setTimeout(() => {
-          if (this.running && this.gameState === 'playing') {
-            this.setGameState('gameover');
-          }
-        }, 1600);
+        this.showToast('All three Bell Shrines sing together! Their song will keep the realm door from creaking a little longer.', 5.0);
+        this.enqueueDialogue([{ speaker: 'The Great Dawnbell', text: finishedDef.completionText }]);
       }
     } else if (res.newlyCompletedGoal) {
       this.showToast(`Objective Complete: ${res.newlyCompletedGoal}`, 3.2);
@@ -2459,7 +2620,7 @@ export class DawnbellEngine {
       this.inv.maxHp += 2;
       this.inv.hp = this.inv.maxHp;
       this.inv.marks += 100;
-      this.showToast("Side Quest Complete: The Three Ancient Trials! +1 Heart Container & +100 Marks!", 4.5);
+      this.showToast("Side Quest Complete: The Three Ancient Trials! +1 Heartstone & +100 Marks!", 4.5);
     } else {
       this.showToast(`Ancient Puzzle Solved (${solvedCount}/3)! Relic Chest unlocked!`, 3.6);
     }
@@ -2471,7 +2632,7 @@ export class DawnbellEngine {
     bell.swingVel = 7.2;
     const res = ringChimeBell(this.puzzles, bell.color);
     this.puzzles = res.state;
-    this.audio.playStasisHit(Math.max(1, res.stepIndex * 2));
+    this.audio.playStillstoneHit(Math.max(1, res.stepIndex * 2));
     this.spawnParticles(bell.x, bell.y + 1.9, bell.z, 0xffe678, 14, 5.2, 4, 0.18);
     for (const b of this.world.chimeBells) {
       b.lit = isPuzzleSolved(this.puzzles, 'chime_bells') || this.puzzles.chimeProgress.includes(b.color);
@@ -2575,8 +2736,8 @@ export class DawnbellEngine {
       this.showToast('Ember Bomb deployed — press Rune again to detonate!', 2.0);
     } else if (this.activeRune === 'stasis') {
       if (this.runeCooldowns.stasis > 0) return;
-      // Lock nearest Stasis Boulder or Enemy within 18m in front!
-      let bestBoulder: StasisBoulderProp | null = null;
+      // Lock nearest Stillstone Boulder or Enemy within 18m in front!
+      let bestBoulder: StillstoneBoulderProp | null = null;
       let bestDist = 18;
       for (const sb of this.world.stasisBoulders) {
         const d = Math.hypot(sb.x - this.px, sb.z - this.pz);
@@ -2592,9 +2753,9 @@ export class DawnbellEngine {
         bestBoulder.vy = 0;
         bestBoulder.vz = 0;
         this.runeCooldowns.stasis = 6.5;
-        this.audio.playStasisLock();
+        this.audio.playStillstoneLock();
         this.spawnParticles(bestBoulder.x, bestBoulder.y + 1.0, bestBoulder.z, 0xffe454, 16, 5);
-        this.showToast('Stasis Locked! Strike boulder with sword to launch!', 2.6);
+        this.showToast('Stillstone Locked! Strike boulder with sword to launch!', 2.6);
         return;
       }
 
@@ -2602,11 +2763,11 @@ export class DawnbellEngine {
       if (bestEnemy) {
         this.enemies.freezeEnemy(bestEnemy, 5.0);
         this.runeCooldowns.stasis = 7.5;
-        this.audio.playStasisLock();
+        this.audio.playStillstoneLock();
         this.spawnParticles(bestEnemy.x, bestEnemy.y + 1.0, bestEnemy.z, 0xffe454, 16, 5);
-        this.showToast(`${bestEnemy.name} frozen in Stasis!`, 2.2);
+        this.showToast(`${bestEnemy.name} frozen in Stillstone!`, 2.2);
       } else {
-        this.showToast('No boulder or enemy in Stasis range', 1.6);
+        this.showToast('No boulder or enemy in Stillstone range', 1.6);
       }
     } else if (this.activeRune === 'gale') {
       if (this.runeCooldowns.gale > 0) return;
@@ -2646,7 +2807,7 @@ export class DawnbellEngine {
       const onWater = gh <= WATER_Y + 0.25;
       const baseY = onWater ? WATER_Y - 0.15 : gh;
       const pillarId = `cryo_${++this.cryonisSeq}`;
-      const plan = planCryonisPillars(
+      const plan = planFrostrisePillars(
         this.cryonisPillars.map((c) => ({ id: c.id, x: c.x, z: c.z })),
         { id: pillarId, x: tx, z: tz },
         3
@@ -2664,7 +2825,7 @@ export class DawnbellEngine {
           this.cryonisPillars.splice(oldIdx, 1);
         }
       }
-      const mesh = buildCryonisPillar(this.mats);
+      const mesh = buildFrostrisePillar(this.mats);
       mesh.position.set(tx, baseY - 2.4, tz);
       this.scene.add(mesh);
       const collider: SolidCollider = {
@@ -2684,15 +2845,15 @@ export class DawnbellEngine {
       this.world.proxyRegistry.register(collider);
       this.cryonisPillars.push({ id: pillarId, x: tx, baseY, z: tz, rise: 0, mesh, collider });
       this.runeCooldowns.cryonis = 2.0;
-      this.audio.playStasisLock();
+      this.audio.playStillstoneLock();
       this.input.rumble(0.42, 130);
       this.spawnParticles(tx, baseY + 0.6, tz, 0xa8f6ff, 20, 6.2, 8, 0.22);
-      this.showToast(onWater ? 'Cryonis Ice Bridge raised! Climb or leap across!' : 'Cryonis Ice Pillar raised! Climb for high ground!', 2.4);
+      this.showToast(onWater ? 'Frostrise Ice Bridge raised! Climb or leap across!' : 'Frostrise Ice Pillar raised! Climb for high ground!', 2.4);
     }
   }
 
   private updateActiveBomb(simDt: number, _cb: EnemyUpdateCallbacks): void {
-    // Animate rising Cryonis Ice Pillars!
+    // Animate rising Frostrise Ice Pillars!
     for (const cp of this.cryonisPillars) {
       if (cp.rise < 1) {
         cp.rise = Math.min(1, cp.rise + simDt * 4.2);
@@ -2813,7 +2974,7 @@ export class DawnbellEngine {
     this.triggerExplosion(b.x, b.y + 0.5, b.z, 6.8, 64);
   }
 
-  private updateStasisBoulders(simDt: number, cb: EnemyUpdateCallbacks): void {
+  private updateStillstoneBoulders(simDt: number, cb: EnemyUpdateCallbacks): void {
     for (const sb of this.world.stasisBoulders) {
       if (sb.stasisTimer > 0) {
         sb.stasisTimer -= simDt;
@@ -2829,7 +2990,7 @@ export class DawnbellEngine {
           }
           sb.arrowIndicator.visible = false;
           if (sb.stasisHits > 0) {
-            const launch = computeStasisLaunch({
+            const launch = computeStillstoneLaunch({
               hits: sb.stasisHits,
               dirX: sb.chargeDirX,
               dirZ: sb.chargeDirZ,
@@ -2838,7 +2999,7 @@ export class DawnbellEngine {
             sb.vy = launch.vy;
             sb.vz = launch.vz;
             sb.stasisHits = 0;
-            this.audio.playStasisLaunch();
+            this.audio.playStillstoneLaunch();
             this.trauma = Math.min(1, this.trauma + 0.35);
             this.spawnParticles(sb.x, sb.y + 0.9, sb.z, 0xffe252, 16, 7);
           }
@@ -2882,7 +3043,7 @@ export class DawnbellEngine {
         // Check Heavy Stone Socket Lock Puzzle!
         const sock = this.world.runicSocket;
         if (!sock.locked) {
-          const lockRes = checkStasisSocketLock(this.puzzles, sb.x, sb.z, sock.x, sock.z);
+          const lockRes = checkStillstoneSocketLock(this.puzzles, sb.x, sb.z, sock.x, sock.z);
           if (lockRes.justSolved) {
             this.puzzles = lockRes.state;
             sb.x = sock.x;
@@ -3053,16 +3214,10 @@ export class DawnbellEngine {
             else if (s.id === 'shrine_embers') this.triggerStoryEvent('awakened_ember_shrine');
             else if (s.id === 'shrine_stillness') this.triggerStoryEvent('awakened_stillness_shrine');
             this.saveProgress();
-            if (res.allComplete && !this.victory) {
-              this.victory = true;
-              this.showToast('All 3 Bell Shrines awakened! The Great Dawnbell tolls across the realm!', 5.0);
-              window.setTimeout(() => {
-                if (this.running && this.gameState === 'playing') {
-                  this.setGameState('gameover');
-                }
-              }, 1400);
-            } else if (!res.allComplete) {
-              this.showToast(`${s.name} Awakened! +1 Heart Container & Full Heal!`, 3.6);
+            if (res.allComplete) {
+              this.showToast('All 3 Bell Shrines awakened! The Great Dawnbell hums across the realm!', 5.0);
+            } else {
+              this.showToast(`${s.name} Awakened! +1 Heartstone & Full Heal!`, 3.6);
             }
           }
         };
@@ -3133,100 +3288,24 @@ export class DawnbellEngine {
       }
     }
 
-    // 4. Realm NPCs (Odo, Mira, Bram, Merchant Rowan, Archmage Sedric, Guildmaster Keldor)
+    // 3b. Gallowmark saga: townsfolk, doors, signs, quest objects
+    const sagaHit = this.saga.interaction(bestDist + 0.3);
+    if (sagaHit) {
+      bestDist = sagaHit.dist;
+      this.promptLabel = sagaHit.label;
+      this.nearestInteractAction = () => {
+        this.audio.playPickup();
+        sagaHit.act();
+      };
+    }
+
+    // 4. Realm NPCs (Mira, Merchant Rowan, Archmage Sedric, Guildmaster Keldor)
     for (const npc of this.world.npcs) {
       const d = Math.hypot(npc.x - this.px, npc.z - this.pz);
       if (d < 3.4 && d < bestDist) {
         bestDist = d;
         this.promptLabel = `Speak with ${npc.name}`;
-        this.nearestInteractAction = () => {
-          this.audio.playPickup();
-          if (npc.role === 'warden') {
-            this.triggerStoryEvent('spoke_odo');
-            this.enqueueDialogue(getOdoDialogue(this.story));
-          } else if (npc.role === 'herbalist') {
-            const count = this.inv.apples + this.inv.meals;
-            const res = getMiraDialogue(this.sideQuests, count);
-            if (res.action === 'accept') {
-              this.sideQuests = acceptSideQuest(this.sideQuests, 'mira_harvest');
-              const pRes = setSideQuestProgress(this.sideQuests, 'mira_harvest', count, false);
-              this.sideQuests = pRes.state;
-              this.showToast('Side Quest Accepted: Hearthbrook Harvest', 2.8);
-            } else if (res.action === 'complete') {
-              const comp = completeSideQuest(this.sideQuests, 'mira_harvest');
-              this.sideQuests = comp.state;
-              if (comp.newlyCompleted) {
-                this.inv.meals += 2;
-                this.inv.marks += 40;
-                this.inv.arrows += 10;
-                this.audio.playShrineActivate();
-                this.showToast('Side Quest Complete: Hearthbrook Harvest! +2 Skewers · +40 Marks · +10 Arrows!', 4.0);
-              }
-            }
-            this.saveProgress();
-            this.enqueueDialogue(res.lines);
-          } else if (npc.role === 'blacksmith') {
-            const res = getBramDialogue(this.sideQuests, this.hitTargets.length);
-            if (res.action === 'accept') {
-              this.sideQuests = acceptSideQuest(this.sideQuests, 'bram_archery');
-              const pRes = setSideQuestProgress(this.sideQuests, 'bram_archery', this.hitTargets.length, false);
-              this.sideQuests = pRes.state;
-              this.showToast("Side Quest Accepted: Bram's Fletcher Trial", 2.8);
-            } else if (res.action === 'complete') {
-              const comp = completeSideQuest(this.sideQuests, 'bram_archery');
-              this.sideQuests = comp.state;
-              if (comp.newlyCompleted) {
-                this.inv.maxHp += 2;
-                this.inv.hp = this.inv.maxHp;
-                this.inv.arrows += 20;
-                this.inv.marks += 50;
-                this.audio.playShrineActivate();
-                this.showToast("Side Quest Complete: Bram's Fletcher Trial! +1 Heart Container · +20 Arrows!", 4.2);
-              }
-            }
-            this.saveProgress();
-            this.enqueueDialogue(res.lines);
-          } else if (npc.role === 'merchant') {
-            if (!this.rowanGifted) {
-              this.rowanGifted = true;
-              this.inv.arrows += 5;
-              this.showToast('Merchant Rowan gifted you +5 Valenrock Arrows!', 2.8);
-              this.saveProgress();
-            }
-            this.enqueueDialogue([
-              {
-                speaker: npc.name,
-                text: 'Welcome to Valenrock Square, traveler! The Grand Fountain and Castle Gatehouse have stood watch over the Great North Road for five hundred winters.',
-              },
-              {
-                speaker: npc.name,
-                text: 'Use the Home-Teleport Lodestones on your World Map (M) to travel swiftly between Valenrock, Hearthbrook Keep, Sunscorch Oasis, and the Wizards’ Sea Tower — and beware the Ashen Wilds north of the stone ditch!',
-              },
-            ]);
-          } else if (npc.role === 'wizard') {
-            this.enqueueDialogue([
-              {
-                speaker: npc.name,
-                text: 'Greetings, bearer of the Dawnbell Runes! From our azure Sea Tower we study the Resonance Bells, the Druidic Stone Circle, and the ancient forces of Ember, Stasis, Gale, and Cryonis.',
-              },
-              {
-                speaker: npc.name,
-                text: 'Check your Quest Journal (I) whenever you seek the Three Ancient Trials — solving all three unlocks the Warden’s Relic!',
-              },
-            ]);
-          } else if (npc.role === 'prospector') {
-            this.enqueueDialogue([
-              {
-                speaker: npc.name,
-                text: 'Ho there! Guildmaster Keldor of the Dwarven Ore Quarry. Strike or blast any gleaming Copper, Gold, or blue Mithril vein with your sword or Ember Bomb!',
-              },
-              {
-                speaker: npc.name,
-                text: `You’ve assayed ${this.minedOres.length}/3 veins for the Valenrock smithies. The richest Mithril seams sleep in the deep Quarry and up in the Ashen Wilds!`,
-              },
-            ]);
-          }
-        };
+        this.nearestInteractAction = () => this.runVillagerTalk(npc);
       }
     }
 
@@ -3290,6 +3369,95 @@ export class DawnbellEngine {
     if (inp.interactPressed && this.nearestInteractAction) {
       this.nearestInteractAction();
     }
+  }
+
+  private runVillagerTalk(npc: { role: string; name: string }): void {
+      this.audio.playPickup();
+      if (npc.role === 'warden') {
+        this.triggerStoryEvent('spoke_odo');
+        this.enqueueDialogue(getOdoDialogue(this.story));
+      } else if (npc.role === 'herbalist') {
+        const count = this.inv.apples + this.inv.meals;
+        const res = getMiraDialogue(this.sideQuests, count);
+        if (res.action === 'accept') {
+          this.sideQuests = acceptSideQuest(this.sideQuests, 'mira_harvest');
+          const pRes = setSideQuestProgress(this.sideQuests, 'mira_harvest', count, false);
+          this.sideQuests = pRes.state;
+          this.showToast('Side Quest Accepted: Brackenford Harvest', 2.8);
+        } else if (res.action === 'complete') {
+          const comp = completeSideQuest(this.sideQuests, 'mira_harvest');
+          this.sideQuests = comp.state;
+          if (comp.newlyCompleted) {
+            this.inv.meals += 2;
+            this.inv.marks += 40;
+            this.inv.arrows += 10;
+            this.audio.playShrineActivate();
+            this.showToast('Side Quest Complete: Brackenford Harvest! +2 Skewers · +40 Marks · +10 Arrows!', 4.0);
+          }
+        }
+        this.saveProgress();
+        this.enqueueDialogue(res.lines);
+      } else if (npc.role === 'blacksmith') {
+        const res = getBramDialogue(this.sideQuests, this.hitTargets.length);
+        if (res.action === 'accept') {
+          this.sideQuests = acceptSideQuest(this.sideQuests, 'bram_archery');
+          const pRes = setSideQuestProgress(this.sideQuests, 'bram_archery', this.hitTargets.length, false);
+          this.sideQuests = pRes.state;
+          this.showToast("Side Quest Accepted: Odo's Fletcher Trial", 2.8);
+        } else if (res.action === 'complete') {
+          const comp = completeSideQuest(this.sideQuests, 'bram_archery');
+          this.sideQuests = comp.state;
+          if (comp.newlyCompleted) {
+            this.inv.maxHp += 2;
+            this.inv.hp = this.inv.maxHp;
+            this.inv.arrows += 20;
+            this.inv.marks += 50;
+            this.audio.playShrineActivate();
+            this.showToast("Side Quest Complete: Odo's Fletcher Trial! +1 Heartstone · +20 Arrows!", 4.2);
+          }
+        }
+        this.saveProgress();
+        this.enqueueDialogue(res.lines);
+      } else if (npc.role === 'merchant') {
+        if (!this.rowanGifted) {
+          this.rowanGifted = true;
+          this.inv.arrows += 5;
+          this.showToast('Merchant Rowan gifted you +5 Highcrown Arrows!', 2.8);
+          this.saveProgress();
+        }
+        this.enqueueDialogue([
+          {
+            speaker: npc.name,
+            text: 'Welcome to Highcrown Square, traveler! The Grand Fountain and Castle Gatehouse have stood watch over the Great North Road for five hundred winters.',
+          },
+          {
+            speaker: npc.name,
+            text: 'Use the Home-Teleport Lodestones on your World Map (M) to travel swiftly between Highcrown, Brackenford Keep, Sunscorch Oasis, and the Wizards’ Sea Tower — and beware the Ashen Wilds north of the stone ditch!',
+          },
+        ]);
+      } else if (npc.role === 'wizard') {
+        this.enqueueDialogue([
+          {
+            speaker: npc.name,
+            text: 'Greetings, bearer of the Dawnbell Runes! From our azure Sea Tower we study the Resonance Bells, the Druidic Stone Circle, and the ancient forces of Ember, Stillstone, Gale, and Frostrise.',
+          },
+          {
+            speaker: npc.name,
+            text: 'Check your Quest Journal (I) whenever you seek the Three Ancient Trials — solving all three unlocks the Warden’s Relic!',
+          },
+        ]);
+      } else if (npc.role === 'prospector') {
+        this.enqueueDialogue([
+          {
+            speaker: npc.name,
+            text: 'Ho there! Guildmaster Keldor of the Dwarven Ore Quarry. Strike or blast any gleaming Copper, Gold, or blue Mithril vein with your sword or Ember Bomb!',
+          },
+          {
+            speaker: npc.name,
+            text: `You’ve assayed ${this.minedOres.length}/3 veins for the Highcrown smithies. The richest Mithril seams sleep in the deep Quarry and up in the Ashen Wilds!`,
+          },
+        ]);
+      }
   }
 
   private findNearestLockableEnemy(maxRange = 22): EnemyEntity | null {
@@ -3394,7 +3562,7 @@ export class DawnbellEngine {
       this.timeOfDay === 'day' ? 0xfff4bc : this.timeOfDay === 'sunset' ? 0xff9a44 : 0xd8ecff
     );
 
-    // Turn Hearthbrook Windmill sails, Wizards' Tower arcane crystal ring, & flutter Dawnbell Spire royal banners!
+    // Turn Brackenford Windmill sails, Wizards' Tower arcane crystal ring, & flutter Dawnbell Spire royal banners!
     this.world.windmillSails.rotation.z -= dt * 0.65;
     this.world.wizardsCrystalRing.rotation.y += dt * 0.85;
     for (let i = 0; i < this.world.spireBanners.length; i++) {
@@ -3633,7 +3801,7 @@ export class DawnbellEngine {
       }
     }
 
-    // Grazing RuneScape-inspired Sheep & Dairy Cows in Hearthbrook pastures
+    // Grazing classic Sheep & Dairy Cows in Brackenford pastures
     for (const an of this.world.pastureAnimals) {
       const graze = Math.sin(t * 0.65 + an.phase) > 0.15;
       if (graze) {
@@ -3893,7 +4061,7 @@ export class DawnbellEngine {
     const pivotY = this.py + (this.isAiming ? 1.62 : 1.75);
     const pivotZ = this.pz;
 
-    let dist = this.isAiming ? 3.1 : this.gliding ? 9.5 : 7.8;
+    let dist = this.isAiming ? 3.1 : this.gliding ? 9.5 : this.saga?.currentRoom ? 5.4 : 7.8;
     const rightOffset = this.isAiming ? 0.95 : 0;
 
     const cosP = Math.cos(this.camPitch);
@@ -3928,6 +4096,15 @@ export class DawnbellEngine {
 
     const minCamY = getTerrainHeight(desiredX, desiredZ) + 0.85;
     if (desiredY < minCamY) desiredY = minCamY;
+
+    // Indoors: keep the camera inside the room's walls and under the rafters
+    const room = this.saga?.currentRoom;
+    if (room) {
+      const m = 1.6 + 0.35;
+      desiredX = Math.min(Math.max(desiredX, room.ox + m), room.ox + room.w * 1.6 - m);
+      desiredZ = Math.min(Math.max(desiredZ, room.oz + m), room.oz + room.h * 1.6 - m);
+      desiredY = Math.min(desiredY, 3.15);
+    }
 
     this.camPos.x = damp(this.camPos.x, desiredX, 14, dt);
     this.camPos.y = damp(this.camPos.y, desiredY, 14, dt);
@@ -4013,9 +4190,9 @@ export class DawnbellEngine {
       mapOpen: this.mapOpen,
       mapTab: this.mapTab,
       story: this.story,
-      chapterRoman: chDef.roman,
-      chapterTitle: chDef.title,
-      activeObjective: getNextObjectiveLabel(this.story),
+      chapterRoman: this.saga.chapterFn().roman as HudSnapshot['chapterRoman'],
+      chapterTitle: this.saga.chapterFn().title,
+      activeObjective: this.saga.objectiveFn(),
       sideQuests: this.sideQuests,
       puzzles: this.puzzles,
       dawnLampUnlocked: this.story.dawnLampUnlocked,
@@ -4029,6 +4206,10 @@ export class DawnbellEngine {
       totalChests: this.world.chests.length,
       dialogue: this.dialogue,
       dialogueRemaining: this.dialogueQueue.length,
+      dialogueChoices: this.dialogueChoices ? this.dialogueChoices.map((o) => ({ label: o.label, disabled: Boolean(o.disabled) })) : null,
+      dialogueChoiceIndex: this.dialogueChoiceIndex,
+      sagaJournal: this.saga.journalFn(),
+      indoors: inPocket(this.px),
     });
   }
 

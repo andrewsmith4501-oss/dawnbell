@@ -217,13 +217,13 @@ export function computeBombBlast(distance: number, radius = 6.2, maxDamage = 48)
   };
 }
 
-export interface StasisCharge {
+export interface StillstoneCharge {
   hits: number;
   dirX: number;
   dirZ: number;
 }
 
-export function computeStasisLaunch(charge: StasisCharge): { vx: number; vy: number; vz: number; power: number } {
+export function computeStillstoneLaunch(charge: StillstoneCharge): { vx: number; vy: number; vz: number; power: number } {
   const clampedHits = clamp(charge.hits, 0, 6);
   if (clampedHits === 0) return { vx: 0, vy: 0, vz: 0, power: 0 };
   const len = Math.hypot(charge.dirX, charge.dirZ) || 1;
@@ -314,7 +314,7 @@ export function activateShrine(
     };
   }
   const nextShrines = [...inv.shrinesActivated, shrineId];
-  const nextMaxHp = inv.maxHp + 2; // +1 Heart Container per Bell Shrine!
+  const nextMaxHp = inv.maxHp + 2; // +1 Heartstone per Bell Shrine!
   return {
     newlyActivated: true,
     allComplete: nextShrines.length >= TOTAL_SHRINES,
@@ -398,19 +398,19 @@ export function stepShieldSurf(
   };
 }
 
-export interface CryonisSlot {
+export interface FrostriseSlot {
   id: string;
   x: number;
   z: number;
 }
 
-export function planCryonisPillars(
-  existing: CryonisSlot[],
-  next: CryonisSlot,
+export function planFrostrisePillars(
+  existing: FrostriseSlot[],
+  next: FrostriseSlot,
   maxPillars = 3
-): { slots: CryonisSlot[]; evicted: CryonisSlot | null } {
+): { slots: FrostriseSlot[]; evicted: FrostriseSlot | null } {
   const slots = [...existing];
-  let evicted: CryonisSlot | null = null;
+  let evicted: FrostriseSlot | null = null;
   if (slots.length >= maxPillars) {
     evicted = slots.shift() ?? null;
   }

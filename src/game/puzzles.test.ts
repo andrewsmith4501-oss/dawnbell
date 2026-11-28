@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   createPuzzleState,
   ringChimeBell,
-  checkStasisSocketLock,
+  checkStillstoneSocketLock,
   igniteDawnBrazier,
   countSolvedPuzzles,
   isAllPuzzlesSolved,
@@ -49,20 +49,20 @@ test('Resonance Chime Bells require Gold -> Teal -> Coral sequence and recover c
   assert.equal(after.justSolved, false);
 });
 
-test('Stasis Runic Socket locks only when boulder enters socket radius', () => {
+test('Stillstone Runic Socket locks only when boulder enters socket radius', () => {
   let st = createPuzzleState();
-  const miss = checkStasisSocketLock(st, 8.8, 36.2, 13.2, 29.0);
+  const miss = checkStillstoneSocketLock(st, 8.8, 36.2, 13.2, 29.0);
   assert.equal(miss.justSolved, false);
   assert.equal(miss.state.socketLocked, false);
 
-  const hit = checkStasisSocketLock(st, 12.6, 29.8, 13.2, 29.0);
+  const hit = checkStillstoneSocketLock(st, 12.6, 29.8, 13.2, 29.0);
   st = hit.state;
   assert.equal(hit.justSolved, true);
   assert.equal(st.socketLocked, true);
   assert.equal(countSolvedPuzzles(st), 1);
 
   // Second check is idempotent
-  const repeat = checkStasisSocketLock(st, 13.2, 29.0, 13.2, 29.0);
+  const repeat = checkStillstoneSocketLock(st, 13.2, 29.0, 13.2, 29.0);
   assert.equal(repeat.justSolved, false);
 });
 
@@ -89,7 +89,7 @@ test('Dawn Braziers solve when all three Spire braziers are ignited', () => {
   st = ringChimeBell(st, 'gold').state;
   st = ringChimeBell(st, 'teal').state;
   st = ringChimeBell(st, 'coral').state;
-  st = checkStasisSocketLock(st, 13.2, 29.0, 13.2, 29.0).state;
+  st = checkStillstoneSocketLock(st, 13.2, 29.0, 13.2, 29.0).state;
   assert.equal(isAllPuzzlesSolved(st), true);
   assert.equal(countSolvedPuzzles(st), 3);
 });

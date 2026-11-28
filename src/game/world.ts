@@ -23,7 +23,7 @@ import {
   buildNpcVillager,
   buildMonsterWatchtower,
   buildCrackedBoulder,
-  buildStasisBoulder,
+  buildStillstoneBoulder,
   buildExplosiveBarrel,
   buildSignpost,
   buildWell,
@@ -181,7 +181,7 @@ export interface CrackedBoulderProp {
   collider: SolidCollider;
 }
 
-export interface StasisBoulderProp {
+export interface StillstoneBoulderProp {
   id: string;
   x: number;
   y: number;
@@ -366,7 +366,7 @@ export interface WorldData {
   campfires: CampfireProp[];
   chests: ChestProp[];
   crackedBoulders: CrackedBoulderProp[];
-  stasisBoulders: StasisBoulderProp[];
+  stasisBoulders: StillstoneBoulderProp[];
   barrels: ExplosiveBarrelProp[];
   updrafts: UpdraftZone[];
   pickups: PickupProp[];
@@ -685,7 +685,7 @@ function buildVillageFencesAndCobbles(
   const cobble = mats.getMat('#a4a096', { roughness: 0.88, bump: 'stone', pattern: 'stone' });
   const cobbleD = mats.getMat('#827f78', { roughness: 0.9, bump: 'stone', pattern: 'stone' });
 
-  // Split-rail wooden fences along Awakening Overlook edge & Hearthbrook Outpost lanes
+  // Split-rail wooden fences along Awakening Overlook edge & Brackenford Outpost lanes
   const fenceRuns: Array<{ x1: number; z1: number; x2: number; z2: number; posts: number }> = [
     { x1: -11.5, z1: 45.2, x2: -6.5, z2: 47.6, posts: 4 },
     { x1: 6.2, z1: 47.4, x2: 11.4, z2: 45.0, posts: 4 },
@@ -732,9 +732,9 @@ function buildVillageFencesAndCobbles(
     });
   }
 
-  // Hand-laid cobblestone stepping stones around Hearthbrook Plaza & Awakening Overlook
+  // Hand-laid cobblestone stepping stones around Brackenford Plaza & Awakening Overlook
   const cobbleCenters: Array<[number, number, number]> = [
-    [25.6, 22.0, 5.2], // Hearthbrook well plaza
+    [25.6, 22.0, 5.2], // Brackenford well plaza
     [0.0, 44.2, 3.6], // Awakening Overlook stone pad
     [0.0, 9.8, 2.2], // Dawnbell Spire south approach plaza (cleanly outside stairs!)
   ];
@@ -1285,8 +1285,8 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
   const occupiedZones: Array<{ x: number; z: number; r: number }> = [
     { x: 0, z: 46, r: 10.5 }, // Awakening Overlook
     { x: 0, z: 0, r: 14 }, // Dawnbell Spire
-    { x: 26, z: 22, r: 19 }, // Hearthbrook Outpost
-    { x: 16.5, z: 18.5, r: 6.5 }, // Hearthbrook Windmill
+    { x: 26, z: 22, r: 19 }, // Brackenford Outpost
+    { x: 16.5, z: 18.5, r: 6.5 }, // Brackenford Windmill
     { x: -11.5, z: 19.5, r: 6.5 }, // Stone Arch Bridge
     { x: -46, z: -22, r: 11.5 }, // Shrine of Wind
     { x: 48, z: -10, r: 11.5 }, // Shrine of Embers
@@ -1303,10 +1303,10 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     { x: 34.5, z: 29.5, r: 3.0 }, // Bram Archery Target 1
     { x: 37.5, z: 16.0, r: 3.0 }, // Bram Archery Target 2
     { x: 18.5, z: 30.2, r: 3.0 }, // Bram Archery Target 3
-    // Vast RuneScape-Inspired Outer Regions
-    { x: 38.0, z: 22.0, r: 9.0 }, // Hearthbrook Keep Gatehouse
-    { x: 19.0, z: 36.0, r: 9.5 }, // Hearthbrook Livestock Pasture
-    { x: -6.0, z: -106.0, r: 24.0 }, // Valenrock Square (Varrock-inspired walled city)
+    // Vast classic MMO-Inspired Outer Regions
+    { x: 38.0, z: 22.0, r: 9.0 }, // Brackenford Keep Gatehouse
+    { x: 19.0, z: 36.0, r: 9.5 }, // Brackenford Livestock Pasture
+    { x: -6.0, z: -106.0, r: 24.0 }, // Highcrown Square (old-world walled city)
     { x: -96.0, z: 96.0, r: 16.0 }, // Wizards' Sea Tower Island
     { x: 74.0, z: 48.0, r: 9.5 }, // Sunscorch Desert Border Gate
     { x: 104.0, z: 72.0, r: 12.0 }, // Sunscorch Oasis Bazaar
@@ -1626,7 +1626,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     }
   }
 
-  // 4. Hearthbrook Outpost Village (SE Meadow) — exact rotated OBB collision proxies!
+  // 4. Brackenford Outpost Village (SE Meadow) — exact rotated OBB collision proxies!
   const cottages = [
     { x: 24, z: 14, rot: 0.15, w: 6.2, d: 4.8, roof: '#ab4436', hasChimney: true },
     { x: 34.5, z: 22, rot: -1.1, w: 5.4, d: 4.4, roof: '#466a8c', isSmithy: true },
@@ -1703,7 +1703,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     active: true,
   });
 
-  // Iconic Hearthbrook Wooden Windmill (2 clean rotated OBB proxies excluding spinning canvas sails!)
+  // Iconic Brackenford Wooden Windmill (2 clean rotated OBB proxies excluding spinning canvas sails!)
   const wmX = 16.5;
   const wmZ = 18.5;
   const wmY = getTerrainHeight(wmX, wmZ);
@@ -1866,7 +1866,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     });
   }
 
-  // Friendly Hearthbrook Villagers (with solid colliders so Wren never clips inside them!)
+  // Friendly Brackenford Villagers (with solid colliders so Wren never clips inside them!)
   const npcs: NpcProp[] = [];
   const npcSpecs: Array<{
     id: string;
@@ -1876,9 +1876,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     z: number;
     yaw: number;
   }> = [
-    { id: 'odo', name: 'Warden Odo', role: 'warden', x: 21.8, z: 22.8, yaw: -0.75 },
     { id: 'mira', name: 'Mira the Herbalist', role: 'herbalist', x: 28.8, z: 19.6, yaw: -0.5 },
-    { id: 'bram', name: 'Bram the Smith', role: 'blacksmith', x: 31.4, z: 25.4, yaw: -2.1 },
   ];
   for (const ns of npcSpecs) {
     const ny = getTerrainHeight(ns.x, ns.z);
@@ -2040,8 +2038,8 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     crackedBoulders.push({ id, x: cx, y: cy, z: cz, broken: false, group: mesh, collider });
   }
 
-  // 8. Ancient Stasis Boulders
-  const stasisBoulders: StasisBoulderProp[] = [];
+  // 8. Ancient Stillstone Boulders
+  const stasisBoulders: StillstoneBoulderProp[] = [];
   const stasisSpots: Array<[string, number, number]> = [
     ['stasis_overlook', 8.8, 36.2],
     ['stasis_causeway', 5.4, -26.5],
@@ -2049,7 +2047,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
   ];
   for (const [id, sx, sz] of stasisSpots) {
     const sy = getTerrainHeight(sx, sz);
-    const built = buildStasisBoulder(mats);
+    const built = buildStillstoneBoulder(mats);
     built.group.position.set(sx, sy, sz);
     group.add(built.group);
     const collider: SolidCollider = {
@@ -2125,7 +2123,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
       x: -28,
       z: -38.5,
       campId: 'camp_highland',
-      rewardText: '+1 Heart Container · +15 Arrows · +50 Marks',
+      rewardText: '+1 Heartstone · +15 Arrows · +50 Marks',
       arrows: 15,
       marks: 50,
       apples: 1,
@@ -2165,7 +2163,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
       x: 16.6,
       z: 29.0,
       puzzleId: 'stasis_socket',
-      rewardText: 'Stasis Vault Chest: +1 Heart Container · +40 Marks',
+      rewardText: 'Stillstone Vault Chest: +1 Heartstone · +40 Marks',
       arrows: 6,
       marks: 40,
       apples: 1,
@@ -2185,7 +2183,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
       id: 'chest_ashen_wilds',
       x: 32.0,
       z: -146.5,
-      rewardText: 'Ashen Wilds Hoard: +1 Heart Container · +120 Marks · +15 Arrows',
+      rewardText: 'Ashen Wilds Hoard: +1 Heartstone · +120 Marks · +15 Arrows',
       arrows: 15,
       marks: 120,
       apples: 2,
@@ -2272,7 +2270,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
       y: getTerrainHeight(3.4, 42.4),
       z: 42.4,
       title: 'Awakening Overlook',
-      text: 'North: The Dawnbell Spire & Azure Mirror Lake. East: Hearthbrook Outpost & Shrine of Embers. West: Windcrest Bluff & Shrine of Wind. Leap & tap Space mid-air to Paraglide!',
+      text: 'North: The Dawnbell Spire & Azure Mirror Lake. East: Brackenford Outpost & Shrine of Embers. West: Windcrest Bluff & Shrine of Wind. Leap & tap Space mid-air to Paraglide!',
     },
     {
       id: 'sign_crossroads',
@@ -2280,7 +2278,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
       y: getTerrainHeight(3.8, 25.5),
       z: 25.5,
       title: 'Kingdom Crossroads',
-      text: 'North: Dawnbell Spire, Azure Mirror Lake & Valenrock Square. East: Hearthbrook Keep, River Lum & Sunscorch Desert. West: Whisperwood, Druidic Stone Circle & Frostpeak. Southwest: Wizards’ Sea Tower.',
+      text: 'North: Dawnbell Spire, Azure Mirror Lake & Highcrown Square. East: Brackenford Keep, River Bracken & Sunscorch Desert. West: Whisperwood, Druidic Stone Circle & Frostpeak. Southwest: Wizards’ Sea Tower.',
     },
     {
       id: 'sign_chimes_hint',
@@ -2694,7 +2692,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     });
   }
 
-  // Side Quest: Bram's 3 Crimson Archery Targets around Hearthbrook Keep
+  // Side Quest: Bram's 3 Crimson Archery Targets around Brackenford Keep
   const targetSpecs: Array<{ id: string; x: number; z: number; rotY: number }> = [
     { id: 'target_1', x: 34.5, z: 29.5, rotY: -2.4 },
     { id: 'target_2', x: 37.5, z: 16.0, rotY: -1.6 },
@@ -2732,7 +2730,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     });
   }
 
-  // RuneScape-Style Mineable Ore Veins across Quarry, Canyon & Ashen Wilds
+  // classic MMO-Style Mineable Ore Veins across Quarry, Canyon & Ashen Wilds
   const oreSpecs: Array<{ id: string; tier: 'copper' | 'gold' | 'mithril'; marks: number; x: number; z: number }> = [
     { id: 'ore_canyon_copper', tier: 'copper', marks: 15, x: 54.0, z: -14.5 },
     { id: 'ore_quarry_copper', tier: 'copper', marks: 15, x: 101.5, z: -24.0 },
@@ -2776,7 +2774,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
   }
 
   // 14C. VAST RUNESCAPE-INSPIRED LANDMARKS & LIVING KINGDOM
-  // 1) Hearthbrook Keep Gatehouse (Lumbridge Castle vibe!) & River Lum Stone Bridge
+  // 1) Brackenford Keep Gatehouse (old castle feel) & River Bracken Stone Bridge
   const keepX = 38.0;
   const keepZ = 22.0;
   const keepY = getTerrainHeight(keepX, keepZ);
@@ -2800,7 +2798,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     });
   }
 
-  // River Lum Stone Arch Bridge connecting Hearthbrook Keep to Sunscorch Desert Gate
+  // River Bracken Stone Arch Bridge connecting Brackenford Keep to Sunscorch Desert Gate
   const lumBridgeX = getRiverLumX(36);
   const lumBridgeY = WATER_Y + 0.65;
   const lumBridge = buildStoneBridge(mats);
@@ -2823,7 +2821,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     active: true,
   });
 
-  // Lumbridge-style Livestock Pasture (fluffy Sheep & Dairy Cows south of Hearthbrook Windmill!)
+  // classic Livestock Pasture (fluffy Sheep & Dairy Cows south of Brackenford Windmill!)
   const pastureAnimals: PastureAnimalProp[] = [];
   const pastureSpecs: Array<{ kind: 'sheep' | 'cow'; x: number; z: number }> = [
     { kind: 'sheep', x: 16.5, z: 34.5 },
@@ -2855,7 +2853,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     });
   });
 
-  // 2) Valenrock Square (Varrock-inspired Walled Market City north of Azure Mirror Lake!)
+  // 2) Highcrown Square (old-world Walled Market City north of Azure Mirror Lake!)
   const valX = -6;
   const valZ = -106;
   const valY = getTerrainHeight(valX, valZ);
@@ -2876,7 +2874,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     active: true,
   });
 
-  // Valenrock South Castle Gatehouse facing the lake causeway
+  // Highcrown South Castle Gatehouse facing the lake causeway
   const valGate = buildCastleGatehouse(mats, '#b83232', '#9ea2aa');
   valGate.position.set(valX, getTerrainHeight(valX, valZ + 17), valZ + 17);
   group.add(valGate);
@@ -2899,7 +2897,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     });
   }
 
-  // Timbered Valenrock Townhouses & Grand Exchange Market Stalls ringing Valenrock Square!
+  // Timbered Highcrown Townhouses & Great Market Market Stalls ringing Highcrown Square!
   const valHouses: Array<{ x: number; z: number; rot: number; roof: string }> = [
     { x: valX - 15.5, z: valZ - 6, rot: Math.PI / 2, roof: '#8c3b2e' },
     { x: valX + 15.5, z: valZ - 6, rot: -Math.PI / 2, roof: '#3c6896' },
@@ -2955,7 +2953,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     });
   });
 
-  // Valenrock Grand Exchange Merchant NPC
+  // Highcrown Great Market Merchant NPC
   const merchX = valX - 4.2;
   const merchZ = valZ + 5.2;
   const merchBuilt = buildNpcVillager(mats, 'merchant');
@@ -3134,7 +3132,7 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     active: true,
   });
 
-  // Low stone Wilderness Border Ditch along z = -124 (classic RuneScape Wilderness boundary!)
+  // Low stone Wilderness Border Ditch along z = -124 (classic classic MMO Wilderness boundary!)
   const ditchStone = mats.getMat('#4c4a52', { roughness: 0.94, bump: 'stone' });
   const lavaWarn = mats.getMat('#ff5e28', { emissive: '#ff3c10', emissiveIntensity: 1.4 });
   for (let dx = -12; dx <= 52; dx += 8) {
@@ -3147,10 +3145,10 @@ export function buildOpenWorld(mats: MaterialLibrary): WorldData {
     }
   }
 
-  // 8) RuneScape-Style Home-Teleport Lodestone Pads at every Fast-Travel Hub!
+  // 8) classic MMO-Style Home-Teleport Lodestone Pads at every Fast-Travel Hub!
   const lodestoneSpots: Array<[number, number, string]> = [
-    [22.0, 26.5, '#62e8ff'], // Hearthbrook Keep Lodestone
-    [-6.0, -96.5, '#f2ca58'], // Valenrock Square Lodestone
+    [22.0, 26.5, '#62e8ff'], // Brackenford Keep Lodestone
+    [-6.0, -96.5, '#f2ca58'], // Highcrown Square Lodestone
     [-86.0, 91.5, '#62b6ff'], // Wizards' Sea Tower Lodestone
     [108.5, 73.5, '#f4c45c'], // Sunscorch Oasis Lodestone
     [101.0, -28.0, '#e09248'], // Dwarven Quarry Lodestone

@@ -15,7 +15,7 @@ import {
 } from '../game/keybinds';
 
 export interface HudActions {
-  onNewGame: (chapter?: ChapterId) => void;
+  onNewGame: (ch?: number) => void;
   onContinue: () => void;
   onResume: () => void;
   onPause: () => void;
@@ -31,6 +31,7 @@ export interface HudActions {
   onFastTravel: (landmarkId: string) => void;
   onSelectRune: (id: RuneId) => void;
   onDismissDialogue: () => void;
+  onPickChoice: (index: number) => void;
   hasSave: () => boolean;
   getKeybinds: () => KeybindConfig;
   onRebindKey: (action: BindableAction, code: string) => KeybindConfig;
@@ -69,7 +70,7 @@ const RUNE_META: Array<{ id: RuneId; label: string; key: string; pad: string; ic
   },
   {
     id: 'stasis',
-    label: 'Stasis Lock',
+    label: 'Stillstone Lock',
     key: '2',
     pad: 'LB',
     icon: `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2" transform="rotate(45 12 12)" fill="#3b2f14" stroke="#ffd84a" stroke-width="2"/><path d="M9 10h6M9 14h6" stroke="#ffe98a" stroke-width="2" stroke-linecap="round"/></svg>`,
@@ -83,7 +84,7 @@ const RUNE_META: Array<{ id: RuneId; label: string; key: string; pad: string; ic
   },
   {
     id: 'cryonis',
-    label: 'Cryonis Ice',
+    label: 'Frostrise Ice',
     key: '4',
     pad: 'LB',
     icon: `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="6" y="7" width="12" height="12" rx="1.5" fill="#2c6c94" stroke="#8cf4ff" stroke-width="2"/><path d="M6 12h12M12 7v12M9 4l3 3 3-3" fill="none" stroke="#d4ffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
@@ -148,6 +149,8 @@ export class GameHud {
   private dialogueWhoEl!: HTMLElement;
   private dialogueTextEl!: HTMLElement;
   private dialogueNextEl!: HTMLElement;
+  private dialogueChoicesEl!: HTMLElement;
+  private lastChoiceKey = '';
   private pauseModal!: HTMLElement;
   private pauseControlsGridEl!: HTMLElement;
   private controlsModal!: HTMLElement;
@@ -298,16 +301,16 @@ export class GameHud {
             <path d="M12 44L20 40M76 44L68 40M16 30L24 31M72 30L64 31" stroke="#ffe89c" stroke-width="2.5" stroke-linecap="round"/>
           </svg>
           <h1 class="title-wordmark">DAWNBELL</h1>
-          <p class="title-sub">The Warden's Trial · The Hollow Deep · The Gloaming Fen</p>
+          <p class="title-sub">A Gallowmark adventure · The Warden's Trial · The Hollow Deep · The Gloaming Fen · Saltmarrow Coast</p>
           <div class="title-actions">
             <button id="btn-start" class="btn-primary menu-nav-item" data-start="true" data-menu-row="0">New Adventure</button>
             <button id="btn-continue" class="btn-secondary menu-nav-item" data-menu-row="0" hidden>Continue</button>
             <button id="btn-title-controls" class="btn-secondary menu-nav-item" data-menu-row="0">Controls</button>
           </div>
           <div class="title-chapters" role="group" aria-label="Start at Chapter">
-            <button class="chapter-btn menu-nav-item" data-chapter="1" data-menu-row="1">Ch. I · Warden's Trial</button>
-            <button class="chapter-btn menu-nav-item" data-chapter="2" data-menu-row="1">Ch. II · Hollow Deep</button>
-            <button class="chapter-btn menu-nav-item" data-chapter="3" data-menu-row="1">Ch. III · Gloaming Fen</button>
+            <button class="chapter-btn menu-nav-item" data-chapter="2" data-menu-row="1">Test: skip to Ch. II</button>
+            <button class="chapter-btn menu-nav-item" data-chapter="3" data-menu-row="1">Test: skip to Ch. III</button>
+            <button class="chapter-btn menu-nav-item" data-chapter="4" data-menu-row="1">Test: skip to Ch. IV</button>
           </div>
         </div>
         <div id="title-hint" class="title-hint">Arrows / WASD Navigate Menu · Enter Select · C / Tap Shift Roll &amp; Dodge · Space Jump &amp; Paraglide · LMB Sword · RMB Bow · Gamepad Ready</div>
@@ -346,7 +349,7 @@ export class GameHud {
           </div>
           <div class="quest-tracker" aria-label="Current Objective">
             <span id="hud-quest-chapter" class="quest-tracker-chapter">CH I · THE WARDEN'S TRIAL</span>
-            <span id="hud-quest-goal" class="quest-tracker-goal">▸ Speak with Warden Odo at Hearthbrook Outpost</span>
+            <span id="hud-quest-goal" class="quest-tracker-goal">▸ Speak with Elder Aldous in Brackenford</span>
           </div>
         </div>
 
@@ -476,6 +479,7 @@ export class GameHud {
           <div class="dialogue-card">
             <div id="dlg-who" class="dialogue-who"></div>
             <p id="dlg-text" class="dialogue-text"></p>
+            <div id="dlg-choices" class="dialogue-choices" hidden></div>
             <div id="dlg-next" class="dialogue-next">Press E / Space / A to continue</div>
           </div>
         </div>
@@ -596,6 +600,12 @@ export class GameHud {
     this.dialogueWhoEl = this.root.querySelector('#dlg-who')!;
     this.dialogueTextEl = this.root.querySelector('#dlg-text')!;
     this.dialogueNextEl = this.root.querySelector('#dlg-next')!;
+    this.dialogueChoicesEl = this.root.querySelector('#dlg-choices')!;
+    this.dialogueChoicesEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-choice]');
+      if (b && !b.disabled) this.actions.onPickChoice(Number(b.dataset.choice));
+    });
     this.pauseModal = this.root.querySelector('#pause-modal')!;
     this.pauseControlsGridEl = this.root.querySelector('#pause-controls-grid')!;
     this.controlsModal = this.root.querySelector('#controls-modal')!;
@@ -667,8 +677,7 @@ export class GameHud {
     this.root.querySelectorAll<HTMLButtonElement>('.chapter-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.closeControlsModal();
-        const ch = Number(btn.dataset.chapter) as ChapterId;
-        this.actions.onNewGame(ch === 2 || ch === 3 ? ch : 1);
+        this.actions.onNewGame(Number(btn.dataset.chapter) || 1);
       });
     });
 
@@ -1051,7 +1060,7 @@ export class GameHud {
           <li><b>${formatKeyCode(k.aim)}</b> Bow Aim (Air: Bullet-Time)</li>
           <li><b>${formatKeyCode(k.shield)}</b> Shield (Tap: Perfect Parry)</li>
           <li><b>${formatKeyCode(k.lockOn)}</b> Z-Target Lock-On / Recenter Camera</li>
-          <li><b>1–4 + ${formatKeyCode(k.runeCast)}</b> Bomb · Stasis · Gale · Cryonis</li>
+          <li><b>1–4 + ${formatKeyCode(k.runeCast)}</b> Bomb · Stillstone · Gale · Frostrise</li>
           <li><b>${formatKeyCode(k.interact)} / ${formatKeyCode(k.heal)} / ${formatKeyCode(k.dawnLamp)}</b> Interact · Heal · Dawn Lamp</li>
           <li><b>${formatKeyCode(k.worldMap)} / ${formatKeyCode(k.journal)} / ${formatKeyCode(k.timeCycle)}</b> Map · Quests · Time</li>
         </ul>
@@ -1297,7 +1306,7 @@ export class GameHud {
     if (isOver) {
       this.endTitleEl.textContent = s.victory ? 'The Great Dawnbell Rings' : 'Fallen in the Wilds';
       this.endSubEl.textContent = s.victory
-        ? "You completed The Warden's Trial, The Hollow Deep, and The Gloaming Fen — eternal dawn returns!"
+        ? "The Great Dawnbell rings again!"
         : 'Wren fell before restoring the Great Dawnbell. Gather Hearty Skewers and try again!';
       this.endStatsEl.innerHTML = `
         <div class="stat-tile"><span>Shrines</span><b>${s.shrinesActivated.length}/${s.totalShrines}</b></div>
@@ -1428,6 +1437,18 @@ export class GameHud {
       this.dialogueWhoEl.textContent = s.dialogue.speaker;
       this.dialogueTextEl.textContent = s.dialogue.text;
       const keyLbl = formatKeyCode(s.keybinds.kbd.interact);
+      const choiceKey = s.dialogueChoices ? JSON.stringify(s.dialogueChoices) + s.dialogueChoiceIndex : '';
+      if (choiceKey !== this.lastChoiceKey) {
+        this.lastChoiceKey = choiceKey;
+        this.dialogueChoicesEl.hidden = !s.dialogueChoices;
+        this.dialogueChoicesEl.innerHTML = (s.dialogueChoices ?? [])
+          .map(
+            (c, i) =>
+              `<button class="dialogue-choice${i === s.dialogueChoiceIndex ? ' is-selected' : ''}" data-choice="${i}" ${c.disabled ? 'disabled' : ''}>${c.label}</button>`
+          )
+          .join('');
+      }
+      this.dialogueNextEl.hidden = Boolean(s.dialogueChoices);
       if (this.touchEnabled || s.activeDevice === 'touch') {
         this.dialogueNextEl.textContent =
           s.dialogueRemaining > 0
@@ -1668,7 +1689,7 @@ export class GameHud {
 
   private renderQuestJournal(s: HudSnapshot): void {
     const sqKey = SIDE_QUEST_LIST.map((q) => `${q.id}:${s.sideQuests[q.id].status}:${s.sideQuests[q.id].progress}`).join('|');
-    const key = `${s.story.currentChapter}|${s.story.completedChapters.join(',')}|${s.story.completedEvents.join(',')}|${sqKey}|${s.puzzles.solved.join(',')}`;
+    const key = `${s.story.currentChapter}|${s.story.completedChapters.join(',')}|${s.story.completedEvents.join(',')}|${sqKey}|${s.puzzles.solved.join(',')}|${JSON.stringify(s.sagaJournal)}`;
     if (key === this.lastJournalKey) return;
     this.lastJournalKey = key;
 
@@ -1682,7 +1703,7 @@ export class GameHud {
         return `
           <div class="quest-card ${isCurrent ? 'is-current' : isDone ? 'is-done' : ''}">
             <div class="quest-card-top">
-              <strong>${ch.subtitle}</strong>
+              <strong>Bell Shrines ${ch.roman} · ${ch.goals[ch.goals.length - 1].label.replace(/^.*& /, '').replace(/^Awaken /, '')}</strong>
               <span class="quest-badge ${badgeCls}">${badge}</span>
             </div>
             <p class="quest-desc">${ch.summary}</p>
@@ -1746,15 +1767,32 @@ export class GameHud {
       `;
     }).join('');
 
+    const card = (e: HudSnapshot['sagaJournal']['main'][number]) => `
+        <div class="quest-card ${e.status === 'active' ? 'is-current' : e.status === 'done' ? 'is-done' : ''}">
+          <div class="quest-card-top">
+            <strong>${e.title}</strong>
+            <span class="quest-badge ${e.status}">${e.badge}</span>
+          </div>
+          <div class="quest-meta">${e.meta}</div>
+          <p class="quest-desc">${e.text}</p>
+          ${e.goals ? `<ul class="quest-goals">${e.goals.map((g) => `<li class="${g.met ? 'met' : ''}">${g.met ? '✓' : '○'} ${g.label}</li>`).join('')}</ul>` : ''}
+        </div>`;
+    const sagaMain = s.sagaJournal.main.map(card).join('');
+    const sagaSide = s.sagaJournal.side.map(card).join('');
+    const shrinesStarted = s.story.completedEvents.length > 0;
+
     this.panelJournalEl.innerHTML = `
       <div class="journal-grid">
         <div class="journal-col">
-          <h3>Main Story — The Dawnbell Chronicle</h3>
-          ${chaptersHtml}
+          <h3>Main Story · The Dawnbell Chronicle</h3>
+          ${sagaMain}
         </div>
         <div class="journal-col">
-          <h3>Side Quests (${SIDE_QUEST_LIST.filter((q) => s.sideQuests[q.id].status === 'completed').length}/${SIDE_QUEST_LIST.length})</h3>
+          <h3>Side Quests</h3>
+          ${sagaSide}
           ${sideQuestsHtml}
+          <h3>The Bell Shrines</h3>
+          ${shrinesStarted ? chaptersHtml : '<p class="quest-desc">Brother Aldous at the Chapel of the Dawn knows an old tale about three shrines.</p>'}
           <h3>Ancient Puzzles (${s.puzzles.solved.length}/${PUZZLE_LIST.length})</h3>
           ${puzzlesHtml}
         </div>

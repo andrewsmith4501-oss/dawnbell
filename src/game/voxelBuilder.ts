@@ -489,7 +489,7 @@ export function buildWrenHero(mats: MaterialLibrary): HeroRig {
   addVoxelBox(body, 0.15, 0.05, 0.13, belt, -0.24, 0.86, 0.07);
   addVoxelBox(body, 0.04, 0.04, 0.03, gold, -0.24, 0.82, 0.14);
   addVoxelBox(body, 0.1, 0.14, 0.06, mats.getMat('#3c4454', { roughness: 0.4, metalness: 0.5 }), 0.25, 0.82, 0.06);
-  addVoxelBox(body, 0.06, 0.08, 0.02, gemBlue, 0.25, 0.82, 0.095, false); // BotW Sheikah-style rune slate!
+  addVoxelBox(body, 0.06, 0.08, 0.02, gemBlue, 0.25, 0.82, 0.095, false); // rune slate
 
   // Golden Dawn Lamp clipped to Wren's left hip (unlocked in Chapter III: The Gloaming Fen, toggleable with G!)
   const dawnLampGroup = grp(-0.29, 0.84, 0.15, body);
@@ -1453,7 +1453,7 @@ export function buildNpcVillager(
     addVoxelBox(g, 0.08, 1.65, 0.08, mats.getMat('#7a4e26', { bump: 'wood' }), 0.42, 0.92, 0.2);
     addVoxelBox(g, 0.22, 0.24, 0.22, mats.getMat('#62e4ff', { emissive: '#3ac8ff', emissiveIntensity: 1.2 }), 0.42, 1.84, 0.2, false);
   } else if (isMerchant) {
-    // Valenrock Grand Exchange plumed cap & coin ledger!
+    // Highcrown Great Market plumed cap & coin ledger!
     addVoxelBox(g, 0.42, 0.14, 0.42, mats.getMat('#2a3444'), 0, 1.74, 0);
     addVoxelBox(g, 0.1, 0.28, 0.08, gold, 0.22, 1.88, 0.02, false);
     addVoxelBox(g, 0.3, 0.08, 0.24, mats.getMat('#f4ead0'), -0.32, 0.82, 0.22, false);
@@ -1527,7 +1527,7 @@ export function buildCrackedBoulder(mats: MaterialLibrary): THREE.Group {
   return g;
 }
 
-export function buildStasisBoulder(mats: MaterialLibrary): {
+export function buildStillstoneBoulder(mats: MaterialLibrary): {
   group: THREE.Group;
   coreMats: THREE.MeshStandardMaterial[];
   arrowIndicator: THREE.Group;
@@ -1810,7 +1810,7 @@ export function buildStoneBridge(mats: MaterialLibrary): THREE.Group {
   return g;
 }
 
-export function buildCryonisPillar(mats: MaterialLibrary): THREE.Group {
+export function buildFrostrisePillar(mats: MaterialLibrary): THREE.Group {
   const g = new THREE.Group();
   const ice = mats.getMat('#78e6ff', {
     roughness: 0.12,
@@ -2616,7 +2616,7 @@ export function buildPastureCow(mats: MaterialLibrary): {
 
 /**
  * Volumetric sunlit god-ray shafts slanting diagonally through Dawnbell's iconic vistas
- * (Awakening Overlook, Whisperwood, Dawnbell Spire, and Hearthbrook).
+ * (Awakening Overlook, Whisperwood, Dawnbell Spire, and Brackenford).
  */
 export function buildSunbeamsGroup(): {
   group: THREE.Group;

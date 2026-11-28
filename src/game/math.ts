@@ -26,18 +26,33 @@ export const WORLD_PLAY_RADIUS = 190;
 export const WORLD_EXTENT = 300;
 export const WATER_Y = -0.35;
 
+/**
+ * Interiors and dungeons are built in a "pocket" area far outside the overworld
+ * (x beyond POCKET_X). Terrain there is a flat floor at y = 0, so all ground logic just works.
+ */
+export const POCKET_X = 600;
+export function inPocket(x: number): boolean {
+  return x > POCKET_X;
+}
+let pocketFloorFn: ((x: number, z: number) => number) | null = null;
+let pocketNameFn: ((x: number, z: number) => string) | null = null;
+export function setPocketHooks(floor: (x: number, z: number) => number, name: (x: number, z: number) => string): void {
+  pocketFloorFn = floor;
+  pocketNameFn = name;
+}
+
 export const LANDMARKS: Landmark[] = [
   { id: 'overlook', name: 'Awakening Overlook', kind: 'overlook', x: 0, z: 46, radius: 12, accent: '#72d266' },
   { id: 'spire', name: 'The Dawnbell Spire', kind: 'spire', x: 0, z: 0, radius: 13, accent: '#f0c65a', fastTravel: true },
-  { id: 'village', name: 'Hearthbrook Keep', kind: 'village', x: 26, z: 22, radius: 19, accent: '#e08a4a', fastTravel: true },
+  { id: 'village', name: 'Brackenford Keep', kind: 'village', x: 26, z: 22, radius: 19, accent: '#e08a4a', fastTravel: true },
   { id: 'shrine_wind', name: 'Shrine of Wind', kind: 'shrine', x: -46, z: -22, radius: 12, accent: '#62e8c0' },
   { id: 'shrine_embers', name: 'Shrine of Embers', kind: 'shrine', x: 48, z: -10, radius: 12, accent: '#ff9042' },
   { id: 'shrine_stillness', name: 'Shrine of Stillness', kind: 'shrine', x: 2, z: -58, radius: 12, accent: '#78d4ff' },
   { id: 'camp_whisper', name: 'Whisperwood Camp', kind: 'camp', x: -24, z: 16, radius: 10, accent: '#ef6a58' },
   { id: 'camp_canyon', name: 'Canyon Horn-Camp', kind: 'camp', x: 34, z: -26, radius: 10, accent: '#ef6a58' },
   { id: 'camp_highland', name: 'Highland Lookout', kind: 'camp', x: -28, z: -36, radius: 10, accent: '#ef6a58' },
-  // Vast RuneScape-inspired outer kingdom regions & Lodestones!
-  { id: 'valenrock', name: 'Valenrock Square', kind: 'city', x: -6, z: -106, radius: 22, accent: '#e6c86e', fastTravel: true },
+  // Vast classic outer kingdom regions & Lodestones!
+  { id: 'valenrock', name: 'Highcrown Square', kind: 'city', x: -6, z: -106, radius: 22, accent: '#e6c86e', fastTravel: true },
   { id: 'wizards_tower', name: "Wizards' Sea Tower", kind: 'tower', x: -96, z: 96, radius: 18, accent: '#62b6ff', fastTravel: true },
   { id: 'sunscorch_oasis', name: 'Sunscorch Oasis', kind: 'desert', x: 112, z: 72, radius: 24, accent: '#f4c45c', fastTravel: true },
   { id: 'dwarven_quarry', name: 'Dwarven Ore Quarry', kind: 'quarry', x: 108, z: -28, radius: 20, accent: '#d89252', fastTravel: true },
@@ -136,12 +151,12 @@ const ROAD_SEGMENTS: Array<[number, number, number, number]> = [
   [2, -32, 2, -52],
   [-9, 0, -24, 12],
   [-24, 12, -34, -8],
-  // Great North Road: Azure Mirror Island -> Valenrock Square -> Ashen Wilds Ditch
+  // Great North Road: Azure Mirror Island -> Highcrown Square -> Ashen Wilds Ditch
   [2, -66, -4, -86],
   [-4, -86, -6, -104],
   [-6, -118, 18, -132],
   [18, -132, 32, -148],
-  // Eastern King's Highway: Hearthbrook Keep -> River Bridge -> Desert Border Gate -> Sunscorch Oasis
+  // Eastern King's Highway: Brackenford Keep -> River Bridge -> Desert Border Gate -> Sunscorch Oasis
   [32, 26, 56, 36],
   [56, 36, 76, 48],
   [76, 48, 108, 70],
@@ -170,7 +185,7 @@ export function getRoadFactor(x: number, z: number): number {
 }
 
 /**
- * Winding River Lum centerline X coordinate for a given Z (south of Azure Mirror Lake).
+ * Winding River Bracken centerline X coordinate for a given Z (south of Azure Mirror Lake).
  */
 export function getRiverLumX(z: number): number {
   return 56 + Math.sin(z * 0.042 + 0.5) * 9.5;
@@ -180,6 +195,7 @@ export function getRiverLumX(z: number): number {
  * Deterministic, sculpted vast Gielinor + Dawnbell open-world heightfield.
  */
 export function getTerrainHeight(x: number, z: number): number {
+  if (x > POCKET_X) return pocketFloorFn ? pocketFloorFn(x, z) : 0;
   const nLarge = (fbm2(x * 0.014 + 11.3, z * 0.014 + 7.1, 3) - 0.5) * 6.8;
   const nDetail = (valueNoise2(x * 0.075 - 4.2, z * 0.075 + 9.4) - 0.5) * 1.1;
 
@@ -212,7 +228,7 @@ export function getTerrainHeight(x: number, z: number): number {
   const spireBlend = 1 - smoothstep(9.5, 19, dSpire);
   h = lerp(h, 3.4, spireBlend);
 
-  // Hearthbrook Keep & Pasture (Lumbridge-inspired meadow shelf)
+  // Brackenford Keep & Pasture (classic meadow shelf)
   const dVillage = Math.hypot(x - 26, z - 22);
   const villageBlend = 1 - smoothstep(14, 26, dVillage);
   h = lerp(h, 2.1, villageBlend);
@@ -242,7 +258,7 @@ export function getTerrainHeight(x: number, z: number): number {
   const islandLift = 1 - smoothstep(8.5, 15, dIsland);
   h = lerp(h, 2.6, islandLift);
 
-  // Stone Causeway connecting Spire north shore -> Lake Island -> Valenrock North Shore
+  // Stone Causeway connecting Spire north shore -> Lake Island -> Highcrown North Shore
   if (z < -26 && z > -86) {
     const dCauseway = distToSegment(x, z, 2, -26, -4, -86);
     const causewayBlend = 1 - smoothstep(2.8, 5.4, dCauseway);
@@ -251,12 +267,12 @@ export function getTerrainHeight(x: number, z: number): number {
 
   // ---- VAST RUNESCAPE-INSPIRED OUTER REGIONS ----
 
-  // 1. Valenrock Square (Varrock-inspired walled market city north of Azure Mirror Lake)
+  // 1. Highcrown Square (old-world walled market city north of Azure Mirror Lake)
   const dValen = Math.hypot(x + 6, z + 106);
   const valenBlend = 1 - smoothstep(19, 32, dValen);
   h = lerp(h, 3.2, valenBlend);
 
-  // 2. River Lum carving south from z = 14 to z = 145 between Hearthbrook & Sunscorch Desert
+  // 2. River Bracken carving south from z = 14 to z = 145 between Brackenford & Sunscorch Desert
   if (z > 14 && z < 152) {
     const rx = getRiverLumX(z);
     const dRiver = Math.abs(x - rx);
@@ -386,6 +402,7 @@ export function getTerrainNormal(x: number, z: number): { x: number; y: number; 
 }
 
 export function getBiomeAt(x: number, z: number): BiomeId {
+  if (x > POCKET_X) return 'village';
   const h = getTerrainHeight(x, z);
   if (h < WATER_Y + 0.08) return 'lake';
   const warp = (valueNoise2(x * 0.035 + 4, z * 0.035 - 7) - 0.5) * 22;
@@ -409,6 +426,7 @@ export function getBiomeAt(x: number, z: number): BiomeId {
 }
 
 export function getRegionName(x: number, z: number): string {
+  if (x > POCKET_X) return pocketNameFn ? pocketNameFn(x, z) : 'Indoors';
   for (let i = 0; i < LANDMARKS.length; i++) {
     const lm = LANDMARKS[i];
     if (Math.hypot(x - lm.x, z - lm.z) <= lm.radius + 4) {
@@ -434,7 +452,7 @@ export function getRegionName(x: number, z: number): string {
     case 'peak':
       return 'Windcrest Highlands';
     case 'village':
-      return z < -50 ? 'Valenrock Square' : 'Hearthbrook Keep';
+      return z < -50 ? 'Highcrown Square' : 'Brackenford Keep';
     default:
       return 'The Whisperwood';
   }

@@ -22,12 +22,12 @@ test('new adventure begins at Chapter 1: The Warden’s Trial with 3 goals', () 
   assert.equal(st.dawnLampUnlocked, false);
   assert.equal(st.storyFinished, false);
   const def = getCurrentChapterDef(st);
-  assert.equal(def.title, "The Warden's Trial");
+  assert.equal(def.title, "The First Toll");
   assert.equal(def.goals.length, 3);
-  assert.match(getNextObjectiveLabel(st), /Warden Odo/i);
+  assert.match(getNextObjectiveLabel(st), /Elder Aldous/i);
 });
 
-test('completing Chapter 1 goals in any order advances to Chapter 2: The Hollow Deep', () => {
+test('completing Chapter 1 goals in any order advances to Chapter 2: The Ember Deeps', () => {
   let st = createStoryState(1);
   let res = recordStoryEvent(st, 'awakened_wind_shrine');
   st = res.state;
@@ -46,14 +46,14 @@ test('completing Chapter 1 goals in any order advances to Chapter 2: The Hollow 
   st = res.state;
   assert.equal(res.chapterJustCompleted, 1);
   assert.equal(st.currentChapter, 2);
-  assert.equal(getCurrentChapterDef(st).title, 'The Hollow Deep');
+  assert.equal(getCurrentChapterDef(st).title, 'The Ember Deeps');
   assert.equal(st.dawnLampUnlocked, false);
 });
 
-test('completing Chapter 2 unlocks Dawn Lamp and Chapter 3: The Gloaming Fen, then finishes story', () => {
+test('completing Chapter 2 unlocks Dawn Lamp and Chapter 3: The Twilight Mere, then finishes story', () => {
   let st = createStoryState(2);
-  assert.equal(getOdoDialogue(st)[0].speaker, 'Warden Odo');
-  assert.match(getOdoDialogue(st)[0].text, /Hollow Deep/i);
+  assert.equal(getOdoDialogue(st)[0].speaker, 'Elder Aldous');
+  assert.match(getOdoDialogue(st)[0].text, /Ember Deeps/i);
 
   st = recordStoryEvent(st, 'shattered_boulder').state;
   st = recordStoryEvent(st, 'cleared_canyon_camp').state;
@@ -62,7 +62,7 @@ test('completing Chapter 2 unlocks Dawn Lamp and Chapter 3: The Gloaming Fen, th
   assert.equal(ch2End.chapterJustCompleted, 2);
   assert.equal(st.currentChapter, 3);
   assert.equal(st.dawnLampUnlocked, true);
-  assert.equal(CHAPTERS[3].title, 'The Gloaming Fen');
+  assert.equal(CHAPTERS[3].title, 'The Twilight Mere');
   assert.equal(CHAPTERS[3].atmosphere.dawnLampLit, true);
 
   st = recordStoryEvent(st, 'cleared_highland_camp').state;
